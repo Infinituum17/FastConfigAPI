@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "${modid}",
+  "version": "${version}",
+  "name": "Fast Config API",
+  "description": "A mod that makes creating Configs easy and fast",
+  "authors": [
+    "Infinituum"
+  ],
+  "contact": {
+    "sources": "https://github.com/Infinituum17/FastConfigAPI"
+  },
+  "license": "MIT",
+  "icon": "assets/fastconfigapi/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "infinituum.fastconfigapi.fabric.FastConfigAPIFabric"
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=${mc_version}",
+    "architectury": ">=${arch_version}"
+  }
+}

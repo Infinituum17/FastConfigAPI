@@ -1,0 +1,35 @@
+modLoader = "javafml"
+loaderVersion = "[${forge_maj_version},)"
+issueTrackerURL = "https://github.com/Infinituum17/FastConfigAPI/issues"
+license = "MIT"
+
+[[mods]]
+modId = "${modid}"
+version = "${version}"
+displayName = "Fast Config API"
+authors = "Infinituum"
+description = '''
+A mod that makes creating Configs easy and fast
+'''
+#logoFile = ""
+
+[[dependencies.${modid}]]
+modId = "forge"
+mandatory = true
+versionRange = "[${forge_maj_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${modid}]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[${mc_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${modid}]]
+modId = "architectury"
+mandatory = true
+versionRange = "[${arch_version},)"
+ordering = "AFTER"
+side = "BOTH"
