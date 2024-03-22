@@ -102,7 +102,7 @@ allprojects {
                 if (curseforgeToken != null) {
                     curseforge {
                         token = curseforgeToken
-                        id = "844270"
+                        id = "990853"
                     }
                 }
 
@@ -110,7 +110,7 @@ allprojects {
                 if (modrinthToken != null) {
                     modrinth {
                         token = modrinthToken
-                        id = "b2T42hfY"
+                        id = "jhHNjn7K"
                     }
                 }
             }
