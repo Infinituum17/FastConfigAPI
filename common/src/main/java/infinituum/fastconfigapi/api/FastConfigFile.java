@@ -86,7 +86,24 @@ public class FastConfigFile<T> {
         }
 
         if(needsDefaultWrite) {
-            writeDefault();
+            writeDefaultToDisk();
+        }
+    }
+
+    /**
+     * Writes the current values to the targeted file
+     * @throws RuntimeException For errors in writing files
+     */
+    public void writeCurrentToDisk() throws RuntimeException {
+        try {
+            String json = GSON.toJson(INSTANCE);
+            FileWriter writer = new FileWriter(CONFIG_FILE);
+
+            writer.write(json);
+
+            writer.close();
+        } catch(Exception error) {
+            throw new RuntimeException("Error while writing Config file \"" + CONFIG_FILE.getName() + "\": " + error);
         }
     }
 
@@ -94,7 +111,7 @@ public class FastConfigFile<T> {
      * Writes the default values in the targeted file
      * @throws RuntimeException For errors in writing files
      */
-    private void writeDefault() throws RuntimeException {
+    public void writeDefaultToDisk() throws RuntimeException {
         try {
             String json = GSON.toJson(validateConfigInstance(CONFIG_TEMPLATE));
             FileWriter writer = new FileWriter(CONFIG_FILE);
