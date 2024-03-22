@@ -26,8 +26,6 @@ configurations {
 
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
-    // Remove the next line if you don't want to depend on the API
-    modApi "dev.architectury:architectury-forge:${rootProject.architectury_version}"
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
@@ -38,7 +36,6 @@ processResources {
             "version"            : project.version,
             "forge_maj_version"  : ((String) project.forge_version).split("-")[1].split("\\.")[0],
             "mc_version"         : project.minecraft_version,
-            "arch_version"       : project.architectury_version,
             "pack_format_version": project.pack_format_version,
             "modid"              : project.archives_base_name
     ]

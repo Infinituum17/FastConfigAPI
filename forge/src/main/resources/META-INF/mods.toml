@@ -26,10 +26,3 @@ mandatory = true
 versionRange = "[${mc_version},)"
 ordering = "NONE"
 side = "BOTH"
-
-[[dependencies.${modid}]]
-modId = "architectury"
-mandatory = true
-versionRange = "[${arch_version},)"
-ordering = "AFTER"
-side = "BOTH"

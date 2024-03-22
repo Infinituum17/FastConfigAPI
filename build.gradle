@@ -38,7 +38,6 @@ allprojects {
     group = rootProject.maven_group
     forge_version = rootProject.forge_version
     minecraft_version = rootProject.minecraft_version
-    architectury_version = rootProject.architectury_version
     pack_format_version = rootProject.pack_format_version
     archives_base_name = rootProject.archives_base_name
 
@@ -89,14 +88,6 @@ allprojects {
                 version = project.version
 
                 mainPublication remapJar
-
-                relations {
-                    // Common dependencies
-                    depends {
-                        curseforge = "architectury-api"
-                        modrinth = "architectury-api"
-                    }
-                }
 
                 var curseforgeToken = System.getenv("CURSEFORGE_TOKEN")
                 if (curseforgeToken != null) {

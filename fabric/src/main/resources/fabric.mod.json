@@ -21,7 +21,6 @@
   "mixins": [],
   "depends": {
     "fabric": "*",
-    "minecraft": ">=${mc_version}",
-    "architectury": ">=${arch_version}"
+    "minecraft": ">=${mc_version}"
   }
 }
