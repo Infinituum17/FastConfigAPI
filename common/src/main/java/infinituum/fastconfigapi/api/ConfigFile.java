@@ -18,6 +18,13 @@ public class ConfigFile<T> {
     private final Path CONFIG_DIR;
     private T INSTANCE;
 
+    /**
+     * Default constructor. You aren't supposed to directly use this.
+     * Use `SimpleConfig` to create a `ConfigFile` instance
+     * @param file The targeted Config file
+     * @param configTemplate The class associated with this Config file
+     * @param configDir The path to the config directory where the Config file is created
+     */
     public ConfigFile(File file, Class<T> configTemplate, Path configDir) {
         this.CONFIG_FILE = file;
         this.CONFIG_TEMPLATE = configTemplate;
