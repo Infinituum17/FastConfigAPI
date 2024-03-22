@@ -11,7 +11,7 @@ import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class ConfigFile<T> {
+public class FastConfigFile<T> {
     private final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private final File CONFIG_FILE;
     private final Class<T> CONFIG_TEMPLATE;
@@ -25,7 +25,7 @@ public class ConfigFile<T> {
      * @param configTemplate The class associated with this Config file
      * @param configDir The path to the config directory where the Config file is created
      */
-    public ConfigFile(File file, Class<T> configTemplate, Path configDir) {
+    public FastConfigFile(File file, Class<T> configTemplate, Path configDir) {
         this.CONFIG_FILE = file;
         this.CONFIG_TEMPLATE = configTemplate;
         this.CONFIG_DIR = configDir;

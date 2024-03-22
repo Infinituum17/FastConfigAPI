@@ -5,15 +5,15 @@ import com.google.common.base.CaseFormat;
 import java.io.File;
 import java.nio.file.Path;
 
-public class SimpleConfig {
+public class FastConfig {
     private final Path CONFIG_DIR_PATH;
-    private SimpleConfig SUB_DIR_CONFIG;
+    private FastConfig SUB_DIR_CONFIG;
 
     /**
      * SimpleConfig constructor
      * @param configDirectory Path to the ".minecraft/config" directory
      */
-    public SimpleConfig(Path configDirectory) {
+    public FastConfig(Path configDirectory) {
         this.CONFIG_DIR_PATH = configDirectory;
         this.createDirIfNotExist();
         this.SUB_DIR_CONFIG = null;
@@ -24,7 +24,7 @@ public class SimpleConfig {
      * @param configDirectory Path to the ".minecraft/config" directory
      * @param subDirectoryName Name of the subdirectory (created if it doesn't exist)
      */
-    public SimpleConfig(Path configDirectory, final String subDirectoryName) {
+    public FastConfig(Path configDirectory, final String subDirectoryName) {
         this.CONFIG_DIR_PATH = configDirectory;
         this.createDirIfNotExist();
         this.createSubDirConfig(subDirectoryName);
@@ -42,7 +42,7 @@ public class SimpleConfig {
      * Gets the subdirectory Config if one exists
      * @return the subdirectory Config
      */
-    public SimpleConfig getSubDirConfig() {
+    public FastConfig getSubDirConfig() {
         return SUB_DIR_CONFIG;
     }
 
@@ -51,7 +51,7 @@ public class SimpleConfig {
      * @param subDirectoryName Name of the subdirectory (created if it doesn't exist)
      */
     public void createSubDirConfig(String subDirectoryName) {
-        this.SUB_DIR_CONFIG = new SimpleConfig(CONFIG_DIR_PATH.resolve(subDirectoryName));
+        this.SUB_DIR_CONFIG = new FastConfig(CONFIG_DIR_PATH.resolve(subDirectoryName));
     }
 
     /**
@@ -95,10 +95,10 @@ public class SimpleConfig {
      * @return An instance of the `ConfigTemplate` class with values filled in
      * @throws RuntimeException For errors in reading/writing files
      */
-    public <T> ConfigFile<T> getConfigFile(Class<T> configTemplate) throws RuntimeException {
+    public <T> FastConfigFile<T> getConfigFile(Class<T> configTemplate) throws RuntimeException {
         File configFile = new File(CONFIG_DIR_PATH.resolve(validateFileName(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, configTemplate.getSimpleName()))).toUri());
 
-        return new ConfigFile<>(configFile, configTemplate, CONFIG_DIR_PATH);
+        return new FastConfigFile<>(configFile, configTemplate, CONFIG_DIR_PATH);
     }
 
     /**
@@ -108,9 +108,9 @@ public class SimpleConfig {
      * @return An instance of the `configTemplate` class with values filled in
      * @throws RuntimeException For errors in reading/writing files
      */
-    public <T> ConfigFile<T> getConfigFile(Class<T> configTemplate, String fileName) throws RuntimeException {
+    public <T> FastConfigFile<T> getConfigFile(Class<T> configTemplate, String fileName) throws RuntimeException {
         File configFile = new File(CONFIG_DIR_PATH.resolve(validateFileName(fileName)).toUri());
 
-        return new ConfigFile<>(configFile, configTemplate, CONFIG_DIR_PATH);
+        return new FastConfigFile<>(configFile, configTemplate, CONFIG_DIR_PATH);
     }
 }
