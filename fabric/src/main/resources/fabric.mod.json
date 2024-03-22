@@ -11,7 +11,7 @@
     "sources": "https://github.com/Infinituum17/FastConfigAPI"
   },
   "license": "MIT",
-  "icon": "assets/fastconfigapi/icon.png",
+  "icon": "assets/${modid}/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [

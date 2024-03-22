@@ -76,7 +76,7 @@ allprojects {
     if ((project.name == "fabric" || project.name == "forge") && project.version != "0.0.0") {
         unifiedPublishing {
             project {
-                displayName = "Labelling Containers ${project.minecraft_version}-${project.name} - ${project.mod_version}"
+                displayName = "Fast Config API ${project.minecraft_version}-${project.name} - ${project.mod_version}"
                 gameVersions = [project.minecraft_version]
                 gameLoaders = [project.name]
 

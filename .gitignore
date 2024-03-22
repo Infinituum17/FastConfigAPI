@@ -17,3 +17,11 @@ classes/
 .vscode
 .settings
 *.launch
+
+# other
+**/*.png
+**/.cache/
+
+.architectury-transformer/
+
+changelog.md

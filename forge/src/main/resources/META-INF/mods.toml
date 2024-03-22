@@ -11,7 +11,7 @@ authors = "Infinituum"
 description = '''
 A mod that makes creating Configs easy and fast
 '''
-#logoFile = ""
+logoFile = "assets/${modid}/icon.png"
 
 [[dependencies.${modid}]]
 modId = "forge"
