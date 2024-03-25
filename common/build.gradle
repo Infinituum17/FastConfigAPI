@@ -14,14 +14,24 @@ dependencies {
 
 publishing {
     publications {
-        mavenCommon(MavenPublication) {
-            artifactId = rootProject.archives_base_name
+        gpr(MavenPublication) {
+            groupId = rootProject.maven_group
+            artifactId = rootProject.archives_base_name + "-" + project.name
+            version = rootProject.mod_version
+
             from components.java
         }
     }
 
     // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
-        // Add repositories to publish to here.
+        maven {
+            name = "GithubPackages"
+            url = uri("https://maven.pkg.github.com/infinituum17/fastconfigapi")
+            credentials {
+                username = System.getenv("GITHUB_USERNAME").toString()
+                password = System.getenv("MOD_RESOURCES_GITHUB_TOKEN").toString()
+            }
+        }
     }
 }
