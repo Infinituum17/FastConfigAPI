@@ -74,10 +74,37 @@ components.java {
 
 publishing {
     publications {
-        gpr(MavenPublication) {
+        mavenJava(MavenPublication) {
             groupId = rootProject.maven_group
             artifactId = rootProject.archives_base_name + "-" + project.name
             version = rootProject.mod_version
+
+            pom {
+                name = "FastConfigAPI [Forge]"
+                description = "A mod that makes creating Configs easy and fast"
+                url = "https://github.com/Infinituum17/FastConfigAPI"
+                scm {
+                    url = "https://github.com/Infinituum17/FastConfigAPI"
+                    connection = "scm:git:git://github.com/Infinituum17/FastConfigAPI.git"
+                    developerConnection = "scm:git:git@github.com:Infinituum17/FastConfigAPI.git"
+                }
+                issueManagement {
+                    system = "github"
+                    url = "https://github.com/Infinituum17/FastConfigAPI/issues"
+                }
+                licenses {
+                    license {
+                        name = "MIT"
+                        url = "https://spdx.org/licenses/MIT.html"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "infinituum17"
+                        name = "infinituum17"
+                    }
+                }
+            }
 
             from components.java
         }
@@ -86,12 +113,8 @@ publishing {
     // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
         maven {
-            name = "GithubPackages"
-            url = uri("https://maven.pkg.github.com/infinituum17/fastconfigapi")
-            credentials {
-                username = System.getenv("GITHUB_USERNAME").toString()
-                password = System.getenv("MOD_RESOURCES_GITHUB_TOKEN").toString()
-            }
+            name = "InfinituumModResources"
+            url "file://" + System.getenv("MOD_RESOURCES").toString() + "/maven"
         }
     }
 }
