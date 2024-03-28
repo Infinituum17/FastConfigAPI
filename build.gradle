@@ -76,7 +76,7 @@ allprojects {
         withSourcesJar()
     }
 
-    if ((project.name == "fabric" || project.name == "forge") && project.version != "0.0.0") {
+    if ((project.name == "fabric" || project.name == "forge" || project.name == "neoforge") && project.version != "0.0.0") {
         unifiedPublishing {
             project {
                 displayName = "Fast Config API ${project.minecraft_version}-${project.name} - ${project.mod_version}"
