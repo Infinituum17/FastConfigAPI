@@ -7,54 +7,60 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
-import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Fast Config File class.
+ * @param <T> The type of the class which this Fast Config File is based on.
+ */
 public class FastConfigFile<T> {
-    private final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private final File CONFIG_FILE;
-    private final Class<T> CONFIG_TEMPLATE;
+    private final T CONFIG_DEFAULT_INSTANCE;
+    private final Class<T> CONFIG_CLASS;
     private final Path CONFIG_DIR;
-    private T INSTANCE;
+    private T CACHED_INSTANCE;
 
     /**
      * Default constructor. You aren't supposed to directly use this.
-     * Use `SimpleConfig` to create a `ConfigFile` instance
-     * @param file The targeted Config file
-     * @param configTemplate The class associated with this Config file
-     * @param configDir The path to the config directory where the Config file is created
+     * Use the {@link FastConfig} class to create a {@link FastConfigFile} instance.
+     * @param file The targeted Config file.
+     * @param defaultInstance A default instance of the Config class.
+     * @param configDir The path to the Config directory where the Config file is created.
      */
-    public FastConfigFile(File file, Class<T> configTemplate, Path configDir) {
+    @SuppressWarnings("unchecked")
+    public FastConfigFile(File file, T defaultInstance, Path configDir) {
         this.CONFIG_FILE = file;
-        this.CONFIG_TEMPLATE = configTemplate;
+        this.CONFIG_DEFAULT_INSTANCE = defaultInstance;
+        this.CONFIG_CLASS = (Class<T>) defaultInstance.getClass();
         this.CONFIG_DIR = configDir;
 
-        createIfNotExist();
-        update();
+        this.createIfNotExist();
+        this.reloadConfig();
     }
 
     /**
-     * Gets the Config directory targeted by a specific ConfigFile
-     * @return The Config directory path
+     * Gets the Config directory targeted by <code>this</code> specific {@link FastConfigFile}.
+     * @return The Config directory targeted by <code>this</code> specific {@link FastConfigFile}.
      */
     public Path getConfigDir() {
         return CONFIG_DIR;
     }
 
     /**
-     * Gets the current Config values. Use function `update` to reload values from disk
-     * @return The class object associated with configTemplate, `null` if the file doesn't exist
+     * Gets the cached Config instance.
+     * @return The cached Config instance, <code>null</code> if the file doesn't exist.
      */
-    public T get() {
-        return INSTANCE;
+    public T getConfig() {
+        return CACHED_INSTANCE;
     }
 
     /**
-     * Updates a Config file's instance
-     * @throws RuntimeException For errors in reading files
+     * Reads a Config file from disk and updates the cached Config instance.
+     * @throws RuntimeException Thrown when errors occur in reading / writing files.
      */
-    public void update() throws RuntimeException {
+    public void reloadConfig() throws RuntimeException {
         if(!CONFIG_FILE.exists()) return;
 
         Reader configFileReader;
@@ -65,12 +71,46 @@ public class FastConfigFile<T> {
             throw new RuntimeException("Could not read Config file \"" + CONFIG_FILE.getName() + "\" in directory \"" + CONFIG_DIR + "\": " + error);
         }
 
-        INSTANCE = GSON.fromJson(configFileReader, CONFIG_TEMPLATE);
+        this.CACHED_INSTANCE = GSON.fromJson(configFileReader, this.CONFIG_CLASS);
     }
 
     /**
-     * Creates a new Config file if one doesn't exist
-     * @throws RuntimeException For errors in writing files
+     * Writes the current cached values to the targeted Config file on disk.
+     * @throws RuntimeException Thrown when errors occur in reading / writing files.
+     */
+    public void saveCurrent() throws RuntimeException {
+        try {
+            String json = GSON.toJson(CACHED_INSTANCE);
+            FileWriter writer = new FileWriter(CONFIG_FILE);
+
+            writer.write(json);
+
+            writer.close();
+        } catch(Exception error) {
+            throw new RuntimeException("Error while writing Config file \"" + CONFIG_FILE.getName() + "\": " + error);
+        }
+    }
+
+    /**
+     * Writes the default values to the targeted Config file on disk.
+     * @throws RuntimeException Thrown when errors occur in reading / writing files.
+     */
+    public void saveDefault() throws RuntimeException {
+        try {
+            String json = GSON.toJson(CONFIG_DEFAULT_INSTANCE);
+            FileWriter writer = new FileWriter(CONFIG_FILE);
+
+            writer.write(json);
+
+            writer.close();
+        } catch(Exception error) {
+            throw new RuntimeException("Error while writing Config file \"" + CONFIG_FILE.getName() + "\": " + error);
+        }
+    }
+
+    /**
+     * Creates a new Config file if it doesn't already exist.
+     * @throws RuntimeException Thrown when errors occur in reading / writing files.
      */
     private void createIfNotExist() throws RuntimeException {
         boolean needsDefaultWrite;
@@ -86,93 +126,7 @@ public class FastConfigFile<T> {
         }
 
         if(needsDefaultWrite) {
-            writeDefaultToDisk();
+            saveDefault();
         }
     }
-
-    /**
-     * Writes the current values to the targeted file
-     * @throws RuntimeException For errors in writing files
-     */
-    public void writeCurrentToDisk() throws RuntimeException {
-        try {
-            String json = GSON.toJson(INSTANCE);
-            FileWriter writer = new FileWriter(CONFIG_FILE);
-
-            writer.write(json);
-
-            writer.close();
-        } catch(Exception error) {
-            throw new RuntimeException("Error while writing Config file \"" + CONFIG_FILE.getName() + "\": " + error);
-        }
-    }
-
-    /**
-     * Writes the default values in the targeted file
-     * @throws RuntimeException For errors in writing files
-     */
-    public void writeDefaultToDisk() throws RuntimeException {
-        try {
-            String json = GSON.toJson(validateConfigInstance(CONFIG_TEMPLATE));
-            FileWriter writer = new FileWriter(CONFIG_FILE);
-
-            writer.write(json);
-
-            writer.close();
-        } catch(Exception error) {
-            throw new RuntimeException("Error while writing Config file \"" + CONFIG_FILE.getName() + "\": " + error);
-        }
-    }
-
-    /**
-     * Deletes a Config file. Full file path is based on the config directory that generated it.
-     * @return `true` if and only if the file or directory is successfully deleted, otherwise `false`
-     */
-    public boolean deleteFile() {
-        return CONFIG_FILE.exists() && CONFIG_FILE.delete();
-    }
-
-    /**
-     * Deletes a Config file's contents. Full file path is based on the config directory that generated it.
-     * @return `true` if and only if the file or directory is successfully deleted, otherwise `false`
-     */
-    public boolean deleteContents() {
-        if(CONFIG_FILE.exists()) {
-            try {
-                String json = GSON.toJson(validateConfigInstance(CONFIG_TEMPLATE));
-                FileWriter writer = new FileWriter(CONFIG_FILE);
-                writer.write(json);
-                writer.close();
-
-                return true;
-            } catch (Exception error) {
-                throw new RuntimeException("Error while writing Config file \"" + CONFIG_FILE.getName() + "\": " + error);
-            }
-        }
-
-        return false;
-    }
-    /**
-     * Validates that a class is suitable to become a Config
-     * @param configTemplate The class used as a Config template
-     * @return An instance of the class
-     */
-    private T validateConfigInstance(Class<T> configTemplate) {
-        Constructor<T> emptyConstructor;
-
-        try {
-            emptyConstructor = configTemplate.getDeclaredConstructor();
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException("Error during Config validation in class \"" + configTemplate.getSimpleName() + "\": Empty default constructor is not defined");
-        }
-
-        emptyConstructor.setAccessible(true);
-
-        try {
-            return emptyConstructor.newInstance();
-        } catch (Exception error) {
-            throw new RuntimeException("Error during Config validation in class \"" + configTemplate.getSimpleName() + "\": Could not call empty default constructor");
-        }
-    }
-
 }
