@@ -110,11 +110,6 @@ publishing {
     }
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-    options.release = 17
-}
-
 // TODO: Remove this when it's *probably* fixed with the new Loom version.
 sourceSets.each {
     def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
