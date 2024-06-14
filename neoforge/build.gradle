@@ -109,10 +109,3 @@ publishing {
         }
     }
 }
-
-// TODO: Remove this when it's *probably* fixed with the new Loom version.
-sourceSets.each {
-    def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
-    it.output.resourcesDir = dir
-    it.java.destinationDirectory = dir
-}
