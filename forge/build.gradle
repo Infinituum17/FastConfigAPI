@@ -45,6 +45,12 @@ processResources {
     filesMatching(["META-INF/mods.toml", "pack.mcmeta"]) {
         expand rep_properties
     }
+
+    // FIXME: Remove when Forge is more stable -- fixes "Invalid module name: '' is not a Java identifier"
+    doLast {
+        java.nio.file.Path.of(outputs.files.asPath).resolve("META-INF/MANIFEST.MF").text = "Manifest-Version: 1.0\nAutomatic-Module-Name: ignoreme\n"
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 shadowJar {
@@ -117,4 +123,11 @@ publishing {
             url "file://" + System.getenv("MOD_RESOURCES").toString() + "/maven"
         }
     }
+}
+
+// FIXME: Remove this when it's *probably* fixed with the new Loom version.
+sourceSets.each {
+    def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
+    it.output.resourcesDir = dir
+    it.java.destinationDirectory = dir
 }
