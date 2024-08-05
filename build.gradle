@@ -1,6 +1,7 @@
 plugins {
+    id "dev.architectury.loom" version "1.6-SNAPSHOT" apply false
     id "architectury-plugin" version "3.4-SNAPSHOT"
-    id "dev.architectury.loom" version "1.4-SNAPSHOT" apply false
+    id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
     id "me.shedaniel.unified-publishing" version "0.1.+" apply false
     id "maven-publish"
 }
@@ -9,39 +10,25 @@ architectury {
     minecraft = rootProject.minecraft_version
 }
 
-subprojects {
-    apply plugin: "dev.architectury.loom"
-    apply plugin: "me.shedaniel.unified-publishing"
-    apply plugin: "maven-publish"
-
-    loom {
-        silentMojangMappingsLicense()
-    }
-
-    dependencies {
-        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-        // The following line declares the mojmap mappings, you may use other mappings as well
-        mappings loom.officialMojangMappings()
-        // The following line declares the yarn mappings you may select this one as well.
-        // mappings "net.fabricmc:yarn:1.19.2+build.28:v2"
-    }
-}
-
 allprojects {
-    apply plugin: "java"
-    apply plugin: "architectury-plugin"
-    apply plugin: "maven-publish"
-
-    base {
-        archivesName = rootProject.archives_base_name
-    }
-
-    version = rootProject.mod_version
     group = rootProject.maven_group
+    version = rootProject.mod_version
     forge_version = rootProject.forge_version
     minecraft_version = rootProject.minecraft_version
     pack_format_version = rootProject.pack_format_version
     archives_base_name = rootProject.archives_base_name
+}
+
+subprojects {
+    apply plugin: "dev.architectury.loom"
+    apply plugin: "architectury-plugin"
+    apply plugin: "maven-publish"
+    apply plugin: "me.shedaniel.unified-publishing"
+    apply plugin: "java"
+
+    base {
+        archivesName = rootProject.archives_base_name
+    }
 
     repositories {
         // Add repositories to retrieve artifacts from in here.
@@ -65,13 +52,27 @@ allprojects {
         }
     }
 
-    tasks.withType(JavaCompile) {
-        options.encoding = "UTF-8"
-        options.release = 17
+    loom {
+        silentMojangMappingsLicense()
+    }
+
+    dependencies {
+        minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
+        // The following line declares the mojmap mappings, you may use other mappings as well
+        mappings loom.officialMojangMappings()
+        // The following line declares the yarn mappings you may select this one as well.
+        // mappings "net.fabricmc:yarn:1.19.2+build.28:v2"
     }
 
     java {
         withSourcesJar()
+
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = 17
     }
 
     if ((project.name == "fabric" || project.name == "forge") && project.version != "0.0.0") {
