@@ -1,7 +1,7 @@
 package infinituum.fastconfigapi;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import infinituum.fastconfigapi.apiV2.serializers.SerializerWrapper;
+import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 
 import java.nio.file.Path;
 

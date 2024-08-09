@@ -1,11 +1,11 @@
-package infinituum.fastconfigapi.apiV2.config;
+package infinituum.fastconfigapi.api.config;
 
 
 import com.google.common.base.CaseFormat;
 import infinituum.fastconfigapi.PlatformHelper;
-import infinituum.fastconfigapi.apiV2.annotations.FastConfig;
-import infinituum.fastconfigapi.apiV2.serializers.SerializerWrapper;
-import infinituum.fastconfigapi.apiV2.utils.UnsafeLoader;
+import infinituum.fastconfigapi.api.annotations.FastConfig;
+import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
+import infinituum.fastconfigapi.api.utils.UnsafeLoader;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;

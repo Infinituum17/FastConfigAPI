@@ -1,7 +1,7 @@
 package infinituum.fastconfigapi.forge;
 
-import infinituum.fastconfigapi.apiV2.config.FastConfigs;
-import infinituum.fastconfigapi.apiV2.utils.Global;
+import infinituum.fastconfigapi.api.config.FastConfigs;
+import infinituum.fastconfigapi.api.utils.Global;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod(FastConfigs.MOD_ID)

@@ -1,8 +1,8 @@
-package infinituum.fastconfigapi.apiV2.serializers;
+package infinituum.fastconfigapi.api.serializers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import infinituum.fastconfigapi.apiV2.config.FastConfigFile;
+import infinituum.fastconfigapi.api.config.FastConfigFile;
 
 import java.io.FileWriter;
 import java.io.IOException;

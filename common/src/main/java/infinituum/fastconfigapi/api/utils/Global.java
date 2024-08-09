@@ -1,4 +1,4 @@
-package infinituum.fastconfigapi.apiV2.utils;
+package infinituum.fastconfigapi.api.utils;
 
 import org.slf4j.LoggerFactory;
 

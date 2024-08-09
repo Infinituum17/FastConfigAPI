@@ -1,7 +1,7 @@
 package infinituum.fastconfigapi.fabric.utils;
 
-import infinituum.fastconfigapi.apiV2.annotations.FastConfig;
-import infinituum.fastconfigapi.apiV2.utils.UnsafeLoader;
+import infinituum.fastconfigapi.api.annotations.FastConfig;
+import infinituum.fastconfigapi.api.utils.UnsafeLoader;
 
 import java.io.File;
 import java.io.IOException;

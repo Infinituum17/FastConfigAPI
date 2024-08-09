@@ -1,7 +1,7 @@
-package infinituum.fastconfigapi.apiV2.serializers;
+package infinituum.fastconfigapi.api.serializers;
 
 
-import infinituum.fastconfigapi.apiV2.config.FastConfigFile;
+import infinituum.fastconfigapi.api.config.FastConfigFile;
 
 import java.io.IOException;
 

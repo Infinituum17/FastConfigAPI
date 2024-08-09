@@ -1,7 +1,7 @@
 package infinituum.fastconfigapi.fabric;
 
-import infinituum.fastconfigapi.apiV2.serializers.JSONSerializer;
-import infinituum.fastconfigapi.apiV2.serializers.SerializerWrapper;
+import infinituum.fastconfigapi.api.serializers.JSONSerializer;
+import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.nio.file.Path;

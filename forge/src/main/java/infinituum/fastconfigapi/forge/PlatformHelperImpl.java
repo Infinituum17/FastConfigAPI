@@ -1,7 +1,7 @@
 package infinituum.fastconfigapi.forge;
 
-import infinituum.fastconfigapi.apiV2.serializers.SerializerWrapper;
-import infinituum.fastconfigapi.apiV2.serializers.TOMLSerializer;
+import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
+import infinituum.fastconfigapi.api.serializers.TOMLSerializer;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.nio.file.Path;

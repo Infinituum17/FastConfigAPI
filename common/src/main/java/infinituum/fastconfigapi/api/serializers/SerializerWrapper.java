@@ -1,4 +1,4 @@
-package infinituum.fastconfigapi.apiV2.serializers;
+package infinituum.fastconfigapi.api.serializers;
 
 public interface SerializerWrapper<T> {
     ConfigSerializer<T> get();

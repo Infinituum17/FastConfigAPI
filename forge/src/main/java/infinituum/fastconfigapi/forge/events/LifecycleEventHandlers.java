@@ -1,7 +1,7 @@
 package infinituum.fastconfigapi.forge.events;
 
-import infinituum.fastconfigapi.apiV2.annotations.FastConfig;
-import infinituum.fastconfigapi.apiV2.config.FastConfigs;
+import infinituum.fastconfigapi.api.annotations.FastConfig;
+import infinituum.fastconfigapi.api.config.FastConfigs;
 import infinituum.fastconfigapi.forge.utils.ModScanner;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -9,7 +9,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 
-import static infinituum.fastconfigapi.apiV2.config.FastConfigs.MOD_ID;
+import static infinituum.fastconfigapi.api.config.FastConfigs.MOD_ID;
 
 @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class LifecycleEventHandlers {

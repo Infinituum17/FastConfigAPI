@@ -1,4 +1,4 @@
-package infinituum.fastconfigapi.apiV2.config;
+package infinituum.fastconfigapi.api.config;
 
 public interface ConfigFile {
     void save();

@@ -1,6 +1,6 @@
-package infinituum.fastconfigapi.apiV2.annotations;
+package infinituum.fastconfigapi.api.annotations;
 
-import infinituum.fastconfigapi.apiV2.serializers.SerializerWrapper;
+import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

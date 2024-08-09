@@ -1,4 +1,4 @@
-package infinituum.fastconfigapi.apiV2.utils;
+package infinituum.fastconfigapi.api.utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

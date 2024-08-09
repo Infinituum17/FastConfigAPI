@@ -1,8 +1,8 @@
-package infinituum.fastconfigapi.apiV2.serializers;
+package infinituum.fastconfigapi.api.serializers;
 
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
-import infinituum.fastconfigapi.apiV2.config.FastConfigFile;
+import infinituum.fastconfigapi.api.config.FastConfigFile;
 
 import java.io.IOException;
 
@@ -10,7 +10,7 @@ import java.io.IOException;
 public final class TOMLSerializer<T> implements SerializerWrapper<T> {
     private static ConfigSerializer<?> INSTANCE;
 
-    public infinituum.fastconfigapi.apiV2.serializers.ConfigSerializer<T> get() {
+    public ConfigSerializer<T> get() {
         if (INSTANCE == null) {
             INSTANCE = new TOML<T>();
         }
