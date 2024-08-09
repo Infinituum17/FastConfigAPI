@@ -12,8 +12,10 @@ import java.nio.file.Path;
 
 /**
  * Fast Config File class.
+ *
  * @param <T> The type of the class which this Fast Config File is based on.
  */
+@Deprecated(forRemoval = true)
 public class FastConfigFile<T> {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private final File CONFIG_FILE;
@@ -25,9 +27,10 @@ public class FastConfigFile<T> {
     /**
      * Default constructor. You aren't supposed to directly use this.
      * Use the {@link FastConfig} class to create a {@link FastConfigFile} instance.
-     * @param file The targeted Config file.
+     *
+     * @param file            The targeted Config file.
      * @param defaultInstance A default instance of the Config class.
-     * @param configDir The path to the Config directory where the Config file is created.
+     * @param configDir       The path to the Config directory where the Config file is created.
      */
     @SuppressWarnings("unchecked")
     public FastConfigFile(File file, T defaultInstance, Path configDir) {
@@ -42,6 +45,7 @@ public class FastConfigFile<T> {
 
     /**
      * Gets the Config directory targeted by <code>this</code> specific {@link FastConfigFile}.
+     *
      * @return The Config directory targeted by <code>this</code> specific {@link FastConfigFile}.
      */
     public Path getConfigDir() {
@@ -50,6 +54,7 @@ public class FastConfigFile<T> {
 
     /**
      * Gets the cached Config instance.
+     *
      * @return The cached Config instance, <code>null</code> if the file doesn't exist.
      */
     public T getConfig() {
@@ -58,10 +63,13 @@ public class FastConfigFile<T> {
 
     /**
      * Reads a Config file from disk and updates the cached Config instance.
+     *
      * @throws RuntimeException Thrown when errors occur in reading / writing files.
      */
     public void reloadConfig() throws RuntimeException {
-        if(!CONFIG_FILE.exists()) return;
+        if (!CONFIG_FILE.exists()) {
+            return;
+        }
 
         Reader configFileReader;
 
@@ -76,6 +84,7 @@ public class FastConfigFile<T> {
 
     /**
      * Writes the current cached values to the targeted Config file on disk.
+     *
      * @throws RuntimeException Thrown when errors occur in reading / writing files.
      */
     public void saveCurrent() throws RuntimeException {
@@ -86,13 +95,14 @@ public class FastConfigFile<T> {
             writer.write(json);
 
             writer.close();
-        } catch(Exception error) {
+        } catch (Exception error) {
             throw new RuntimeException("Error while writing Config file \"" + CONFIG_FILE.getName() + "\": " + error);
         }
     }
 
     /**
      * Writes the default values to the targeted Config file on disk.
+     *
      * @throws RuntimeException Thrown when errors occur in reading / writing files.
      */
     public void saveDefault() throws RuntimeException {
@@ -103,13 +113,14 @@ public class FastConfigFile<T> {
             writer.write(json);
 
             writer.close();
-        } catch(Exception error) {
+        } catch (Exception error) {
             throw new RuntimeException("Error while writing Config file \"" + CONFIG_FILE.getName() + "\": " + error);
         }
     }
 
     /**
      * Creates a new Config file if it doesn't already exist.
+     *
      * @throws RuntimeException Thrown when errors occur in reading / writing files.
      */
     private void createIfNotExist() throws RuntimeException {
@@ -121,11 +132,11 @@ public class FastConfigFile<T> {
             throw new RuntimeException("Could not create Config file \"" + CONFIG_FILE.getName() + "\": " + error);
         }
 
-        if(!needsDefaultWrite && CONFIG_FILE.length() == 0) {
+        if (!needsDefaultWrite && CONFIG_FILE.length() == 0) {
             needsDefaultWrite = true;
         }
 
-        if(needsDefaultWrite) {
+        if (needsDefaultWrite) {
             saveDefault();
         }
     }

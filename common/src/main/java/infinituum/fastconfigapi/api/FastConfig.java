@@ -8,12 +8,14 @@ import java.nio.file.Path;
 /**
  * Fast Config class.
  */
+@Deprecated(forRemoval = true)
 public class FastConfig {
     private final Path CONFIG_DIR_PATH;
     private FastConfig SUB_DIR_CONFIG;
 
     /**
      * {@link FastConfig} constructor.
+     *
      * @param configDirectory Path to the ".minecraft/config" directory (or custom).
      */
     public FastConfig(Path configDirectory) {
@@ -24,7 +26,8 @@ public class FastConfig {
 
     /**
      * {@link FastConfig} constructor.
-     * @param configDirectory Path to the ".minecraft/config" directory (or custom).
+     *
+     * @param configDirectory  Path to the ".minecraft/config" directory (or custom).
      * @param subDirectoryName Name of the subdirectory (created if it doesn't exist).
      *                         This name is used to directly create a sub-FastConfig instance for files in a specific directory.
      */
@@ -36,6 +39,7 @@ public class FastConfig {
 
     /**
      * Gets the directory path this {@link FastConfig} is targeting.
+     *
      * @return Path to the current Config target directory.
      */
     public Path getConfigDirPath() {
@@ -44,6 +48,7 @@ public class FastConfig {
 
     /**
      * Gets the {@link FastConfig} associated with the subdirectory, if one exists.
+     *
      * @return The subdirectory {@link FastConfig}.
      */
     public FastConfig getSubDirConfig() {
@@ -52,6 +57,7 @@ public class FastConfig {
 
     /**
      * Creates a subdirectory {@link FastConfig} from a subdirectory name.
+     *
      * @param subDirectoryName Name of a subdirectory (created if it doesn't exist).
      */
     public void createSubDirConfig(String subDirectoryName) {
@@ -60,6 +66,7 @@ public class FastConfig {
 
     /**
      * Checks if the current Config target directory exists.
+     *
      * @return `true` if the current Config target directory exists, otherwise `false`.
      */
     private boolean existsDir() {
@@ -68,6 +75,7 @@ public class FastConfig {
 
     /**
      * Creates the current Config target directory.
+     *
      * @return `true` if the current Config target directory is created, otherwise `false`.
      */
     private boolean createDir() {
@@ -76,6 +84,7 @@ public class FastConfig {
 
     /**
      * If it doesn't exist, creates a directory (based on Config location).
+     *
      * @throws RuntimeException if the Config directory cannot not be created.
      */
     private void createDirIfNotExist() throws RuntimeException {
@@ -86,6 +95,7 @@ public class FastConfig {
 
     /**
      * Checks if a file has a JSON extension.
+     *
      * @param fileName The file name.
      * @return the complete file name, otherwise `null` if the file name is not correct.
      */
@@ -95,6 +105,7 @@ public class FastConfig {
 
     /**
      * Creates a new {@link FastConfigFile} based on attributes of the provided class' instance.
+     *
      * @param defaultInstance The class instance where the default values are set.
      * @return A {@link FastConfigFile} that contains an instance of the current class, modifiable at runtime.
      * @throws RuntimeException Thrown when errors occur in reading / writing files.
@@ -108,8 +119,9 @@ public class FastConfig {
 
     /**
      * Creates a new {@link FastConfigFile} based on attributes of the provided class' instance.
+     *
      * @param defaultInstance The class instance where the default values are set.
-     * @param fileName A custom name that will be used for the Config file.
+     * @param fileName        A custom name that will be used for the Config file.
      * @return A {@link FastConfigFile} that contains an instance of the current class, modifiable at runtime.
      * @throws RuntimeException Thrown when errors occur in reading / writing files.
      */
