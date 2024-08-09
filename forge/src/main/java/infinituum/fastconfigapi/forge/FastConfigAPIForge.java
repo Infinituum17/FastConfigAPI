@@ -1,15 +1,12 @@
 package infinituum.fastconfigapi.forge;
 
+import infinituum.fastconfigapi.apiV2.config.FastConfigs;
+import infinituum.fastconfigapi.apiV2.utils.Global;
 import net.minecraftforge.fml.common.Mod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-@Mod(FastConfigAPIForge.MOD_ID)
+@Mod(FastConfigs.MOD_ID)
 public class FastConfigAPIForge {
-    public static final String MOD_ID = "fastconfigapi";
-    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-
     public FastConfigAPIForge() {
-        LOGGER.info("FastConfigAPI has been initialized!");
+        Global.LOGGER.info("FastConfigAPI has been initialized!");
     }
 }

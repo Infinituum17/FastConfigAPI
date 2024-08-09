@@ -25,6 +25,9 @@ configurations {
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
 
+    forgeRuntimeLibrary 'com.moandjiezana.toml:toml4j:0.7.2'
+    include 'com.moandjiezana.toml:toml4j:0.7.2'
+
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionForge')
 }
