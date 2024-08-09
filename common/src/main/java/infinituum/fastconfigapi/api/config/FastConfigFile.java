@@ -3,7 +3,7 @@ package infinituum.fastconfigapi.api.config;
 
 import com.google.common.base.CaseFormat;
 import infinituum.fastconfigapi.PlatformHelper;
-import infinituum.fastconfigapi.api.annotations.FastConfig;
+import infinituum.fastconfigapi.api.config.annotations.FastConfig;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 import infinituum.fastconfigapi.api.utils.UnsafeLoader;
 import org.jetbrains.annotations.NotNull;

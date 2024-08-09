@@ -1,6 +1,6 @@
 package infinituum.fastconfigapi.forge;
 
-import infinituum.fastconfigapi.api.config.FastConfigs;
+import infinituum.fastconfigapi.api.FastConfigs;
 import infinituum.fastconfigapi.api.utils.Global;
 import net.minecraftforge.fml.common.Mod;
 

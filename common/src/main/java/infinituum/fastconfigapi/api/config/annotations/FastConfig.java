@@ -1,4 +1,4 @@
-package infinituum.fastconfigapi.api.annotations;
+package infinituum.fastconfigapi.api.config.annotations;
 
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 

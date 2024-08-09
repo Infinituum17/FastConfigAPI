@@ -1,8 +1,8 @@
 package infinituum.fastconfigapi.fabric.utils;
 
 import infinituum.fastconfigapi.PlatformHelper;
-import infinituum.fastconfigapi.api.annotations.FastConfig;
 import infinituum.fastconfigapi.api.config.FastConfigFile;
+import infinituum.fastconfigapi.api.config.annotations.FastConfig;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static infinituum.fastconfigapi.api.config.FastConfigs.MOD_ID;
+import static infinituum.fastconfigapi.api.FastConfigs.MOD_ID;
 
 public class ModScanner {
     public static <T> Map<Class<T>, FastConfigFile<T>> getSidedConfigs(FastConfig.Side side) {

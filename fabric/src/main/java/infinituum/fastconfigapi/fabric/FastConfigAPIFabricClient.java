@@ -1,7 +1,7 @@
 package infinituum.fastconfigapi.fabric;
 
-import infinituum.fastconfigapi.api.annotations.FastConfig;
-import infinituum.fastconfigapi.api.config.FastConfigs;
+import infinituum.fastconfigapi.api.FastConfigs;
+import infinituum.fastconfigapi.api.config.annotations.FastConfig;
 import infinituum.fastconfigapi.fabric.utils.ModScanner;
 import net.fabricmc.api.ClientModInitializer;
 
