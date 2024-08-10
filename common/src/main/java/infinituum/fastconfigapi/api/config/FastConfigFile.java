@@ -29,7 +29,7 @@ public final class FastConfigFile<T> implements ConfigFile {
             fileName = this.CLASS.getSimpleName();
         }
 
-        this.FILE_NAME = side.markFileName(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, fileName));
+        this.FILE_NAME = side.appendTo(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, fileName));
 
         if (serializerWrapper.isInterface()) {
             this.SERIALIZER = UnsafeLoader.loadInstance(platDefault);
