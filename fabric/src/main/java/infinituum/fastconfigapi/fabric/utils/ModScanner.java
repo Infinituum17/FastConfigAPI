@@ -59,7 +59,7 @@ public class ModScanner {
     public static <T> void scanJar(ModContainer container, List<Class<T>> classList) {
         List<Path> rootPaths = container.getRootPaths();
 
-        // Workaround to make it work
+        // Workaround to make it work (partially)
         if (container.getMetadata().getId().equals("fastconfigapi") && FabricLoader.getInstance().isDevelopmentEnvironment()) {
             rootPaths = List.of(
                     rootPaths.get(0)
