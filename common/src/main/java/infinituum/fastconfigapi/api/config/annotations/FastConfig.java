@@ -120,6 +120,12 @@ public @interface FastConfig {
             this.fileModifier = fileModifier;
         }
 
+        /**
+         * This method adds a post-fix to the file name passed in to denote the side on which the config was created.
+         *
+         * @param fileName The file name
+         * @return A new file name with a post-fix (ex. "filename-common")
+         */
         public String appendTo(String fileName) {
             return fileName + "-" + fileModifier;
         }
