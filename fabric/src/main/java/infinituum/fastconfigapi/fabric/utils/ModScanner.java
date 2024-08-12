@@ -73,7 +73,7 @@ public class ModScanner {
 
         for (Path rootPath : rootPaths) {
             try {
-                ModVisitor<T> modVisitor = new ModVisitor<T>(rootPath);
+                ModVisitor<T> modVisitor = new ModVisitor<>(rootPath);
 
                 Files.walkFileTree(rootPath, modVisitor);
 

@@ -100,3 +100,7 @@ publishing {
         }
     }
 }
+
+tasks.test {
+    useJUnitPlatform()
+}

@@ -20,6 +20,7 @@ classes/
 
 # other
 **/*.png
+**/*.log
 **/.cache/
 
 .architectury-transformer/
