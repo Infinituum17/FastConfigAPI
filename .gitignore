@@ -22,6 +22,7 @@ classes/
 **/*.png
 **/*.log
 **/.cache/
+logs/
 
 .architectury-transformer/
 
