@@ -11,25 +11,35 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class ModAnnotationVisitor extends SimpleFileVisitor<Path> {
     private final Path basePath;
-    private final List<ModAnnotation> annotations;
+    private final Map<String, List<ModAnnotation>> classAnnotations;
+    private final String directory;
 
     public ModAnnotationVisitor(Path basePath) {
         this.basePath = basePath;
-        this.annotations = new ArrayList<>();
+        this.directory = null;
+        this.classAnnotations = new HashMap<>();
+    }
+
+    public ModAnnotationVisitor(Path basePath, String directory) {
+        this.basePath = basePath;
+        this.directory = directory;
+        this.classAnnotations = new HashMap<>();
+    }
+
+    public Path getBasePath() {
+        return basePath;
     }
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
         if (file.toString().endsWith(".class")) {
-            List<ModAnnotation> annotations = getClassAnnotations(file);
-
-            if (annotations != null && !annotations.isEmpty()) {
-                this.annotations.addAll(annotations);
-            }
+            getClassAnnotations(file);
         }
 
         return FileVisitResult.CONTINUE;
@@ -45,29 +55,39 @@ public final class ModAnnotationVisitor extends SimpleFileVisitor<Path> {
         return FileVisitResult.CONTINUE;
     }
 
-    private List<ModAnnotation> getClassAnnotations(Path file) {
+    private void getClassAnnotations(Path file) {
         String relative = basePath.relativize(file).toString();
         String className = relative
                 .substring(0, relative.length() - ".class".length())
                 .replace(File.separatorChar, '.');
 
+        if (directory != null && className.startsWith(directory)) {
+            getClassAnnotations(className);
+        }
+
+        if (directory == null) {
+            getClassAnnotations(className);
+        }
+    }
+
+    private void getClassAnnotations(String className) {
         ClassReader classReader;
 
         try {
             classReader = new ClassReader(className);
         } catch (IOException ignored) {
-            return null;
+            return;
         }
 
         List<ModAnnotation> annotations = new ArrayList<>();
-        AnnotationClassVisitor classVisitor = new AnnotationClassVisitor(annotations);
+        AnnotationClassVisitor classVisitor = new AnnotationClassVisitor(annotations, className);
 
         classReader.accept(classVisitor, 0);
 
-        return annotations;
+        classAnnotations.put(className, annotations);
     }
 
-    public List<ModAnnotation> getAnnotations() {
-        return annotations;
+    public Map<String, List<ModAnnotation>> getClassAnnotations() {
+        return classAnnotations;
     }
 }

@@ -10,20 +10,22 @@ import java.util.List;
 
 public final class AnnotationMethodVisitor extends MethodVisitor {
     private final List<ModAnnotation> annotations;
+    private final String origin;
 
-    public AnnotationMethodVisitor(MethodVisitor methodVisitor, List<ModAnnotation> annotations) {
+    public AnnotationMethodVisitor(MethodVisitor methodVisitor, List<ModAnnotation> annotations, String origin) {
         super(Opcodes.ASM9, methodVisitor);
         this.annotations = annotations;
+        this.origin = origin;
     }
 
     @Override
     public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
         String annotationName = Type.getType(descriptor).getClassName();
-        ModAnnotation annotation = new ModAnnotation(annotationName);
+        ModAnnotation annotation = new ModAnnotation(annotationName, origin);
 
         annotations.add(annotation);
 
-        return new AnnotationDataVisitor(annotation);
+        return new AnnotationDataVisitor(annotation, origin);
     }
 
     // TODO: Implement other visitors

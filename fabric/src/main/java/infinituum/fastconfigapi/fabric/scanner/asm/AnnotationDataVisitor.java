@@ -7,10 +7,12 @@ import org.objectweb.asm.Type;
 
 public final class AnnotationDataVisitor extends AnnotationVisitor {
     private final ModAnnotation annotation;
+    private final String origin;
 
-    public AnnotationDataVisitor(ModAnnotation annotation) {
+    public AnnotationDataVisitor(ModAnnotation annotation, String origin) {
         super(Opcodes.ASM9);
         this.annotation = annotation;
+        this.origin = origin;
     }
 
     @Override
@@ -27,11 +29,11 @@ public final class AnnotationDataVisitor extends AnnotationVisitor {
     @Override
     public AnnotationVisitor visitAnnotation(String name, String descriptor) {
         String annotationName = Type.getType(descriptor).getClassName();
-        ModAnnotation nestedAnnotation = new ModAnnotation(annotationName);
+        ModAnnotation nestedAnnotation = new ModAnnotation(annotationName, origin);
 
         annotation.addField(name, nestedAnnotation);
 
-        return new AnnotationDataVisitor(nestedAnnotation);
+        return new AnnotationDataVisitor(nestedAnnotation, origin);
     }
 
 

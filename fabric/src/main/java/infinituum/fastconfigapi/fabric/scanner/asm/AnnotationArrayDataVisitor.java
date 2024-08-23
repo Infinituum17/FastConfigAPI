@@ -26,11 +26,11 @@ public final class AnnotationArrayDataVisitor extends AnnotationVisitor {
     @Override
     public AnnotationVisitor visitAnnotation(String name, String descriptor) {
         String annotationName = Type.getType(descriptor).getClassName();
-        ModAnnotation nestedAnnotation = new ModAnnotation(annotationName);
+        ModAnnotation nestedAnnotation = new ModAnnotation(annotationName, this.name);
 
         annotation.addField(name, nestedAnnotation);
 
-        return new AnnotationDataVisitor(nestedAnnotation);
+        return new AnnotationDataVisitor(nestedAnnotation, this.name);
     }
 
     @Override
