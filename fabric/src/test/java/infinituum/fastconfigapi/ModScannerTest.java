@@ -1,46 +1,45 @@
 package infinituum.fastconfigapi;
 
-import infinituum.fastconfigapi.fabric.scanner.ModAnnotationScanner.ModAnnotation;
-import infinituum.fastconfigapi.utils.Utils;
+import infinituum.fastconfigapi.examples.annotated_classes.AnnotationInnerClass;
+import infinituum.fastconfigapi.examples.annotated_classes.AnnotationNoParams;
+import infinituum.fastconfigapi.examples.annotated_classes.AnnotationOneString;
+import infinituum.fastconfigapi.examples.annotations.NoParam;
+import infinituum.fastconfigapi.examples.annotations.OneString;
+import infinituum.fastconfigapi.fabric.scanner.api.AnnotatedClass;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import static infinituum.fastconfigapi.utils.Utils.setupEnv;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ModScannerTest {
-    @Test
-    public void canSetupEnvironment() {
-        assertDoesNotThrow(Utils::setupEnv);
-    }
+    private final static Set<AnnotatedClass> annotatedClasses;
 
-    @Test
-    public void testNoParam() {
-        Map<String, List<ModAnnotation>> annotatedClasses;
-
+    static {
         try {
             annotatedClasses = setupEnv();
         } catch (Exception e) {
             throw new RuntimeException("Cannot setup environment: ", e);
         }
+    }
 
+    @Test
+    public void testNoParam() {
         // Test: AnnotationNoParams should be present and AnnotationNoParams.NoParam.isEmpty should be true
         boolean classExists = false;
         boolean annotationExists = false;
         boolean isEmpty = false;
 
-        for (var classEntry : annotatedClasses.entrySet()) {
-            if (classEntry.getKey().endsWith("AnnotationNoParams")) {
+        for (var annotatedClass : annotatedClasses) {
+            if (annotatedClass.is(AnnotationNoParams.class)) {
                 classExists = true;
 
-                for (var annotation : classEntry.getValue()) {
-                    if (annotation.getAnnotationName().endsWith("NoParam")) {
+                for (var annotation : annotatedClass.getAnnotations()) {
+                    if (annotation.is(NoParam.class)) {
                         annotationExists = true;
 
-                        if (annotation.getFields().isEmpty()) {
+                        if (!annotation.hasFields()) {
                             isEmpty = true;
                         }
                     }
@@ -48,35 +47,27 @@ public class ModScannerTest {
             }
         }
 
-        assertTrue(classExists, "Annotation NoParam is not present");
-        assertTrue(annotationExists, "Annotation NoParam is not present");
+        assertTrue(classExists, "ModAnnotation NoParam is not present");
+        assertTrue(annotationExists, "ModAnnotation NoParam is not present");
         assertTrue(isEmpty, "AnnotationNoParams.value.isEmpty() is false");
     }
 
     @Test
     public void testOneString() {
-        Map<String, List<ModAnnotation>> annotatedClasses;
-
-        try {
-            annotatedClasses = setupEnv();
-        } catch (Exception e) {
-            throw new RuntimeException("Cannot setup environment: ", e);
-        }
-
         // Test: AnnotationOneString and a string field should be present
         boolean classExists = false;
         boolean annotationExists = false;
         boolean hasField = false;
 
-        for (var classEntry : annotatedClasses.entrySet()) {
-            if (classEntry.getKey().endsWith("AnnotationOneString")) {
+        for (var annotatedClass : annotatedClasses) {
+            if (annotatedClass.is(AnnotationOneString.class)) {
                 classExists = true;
 
-                for (var annotation : classEntry.getValue()) {
-                    if (annotation.getAnnotationName().endsWith("OneString")) {
+                for (var annotation : annotatedClass.getAnnotations()) {
+                    if (annotation.is(OneString.class)) {
                         annotationExists = true;
 
-                        if (annotation.getFields().containsKey("str")) {
+                        if (annotation.containsField("str")) {
                             hasField = true;
                         }
                     }
@@ -84,38 +75,49 @@ public class ModScannerTest {
             }
         }
 
-        assertTrue(classExists, "Annotation OneString is not present");
-        assertTrue(annotationExists, "Annotation OneString is not present");
-        assertTrue(hasField, "Annotation OneString hasField is false");
+        assertTrue(classExists, "ModAnnotation OneString is not present");
+        assertTrue(annotationExists, "ModAnnotation OneString is not present");
+        assertTrue(hasField, "ModAnnotation OneString hasField is false");
     }
 
     @Test
     public void testInnerClass() {
-        Map<String, List<ModAnnotation>> annotatedClasses;
+        boolean innerClassExists = false;
+        boolean innerClassHasAnnotation = false;
+        boolean nestedInnerClassExists = false;
+        boolean nestedInnerClassHasAnnotation = false;
+        boolean nestedInnerClassHasAnnotationField = false;
 
-        try {
-            annotatedClasses = setupEnv();
-        } catch (Exception e) {
-            throw new RuntimeException("Cannot setup environment: ", e);
-        }
+        for (var annotatedClass : annotatedClasses) {
+            if (annotatedClass.is(AnnotationInnerClass.AnnotatedInnerClass.class)) {
+                innerClassExists = true;
 
-        boolean classExists = false;
-        boolean annotationExists = false;
+                for (var annotation : annotatedClass.getAnnotations()) {
+                    if (annotation.is(NoParam.class)) {
+                        innerClassHasAnnotation = true;
+                    }
+                }
+            }
 
-        for (var classEntry : annotatedClasses.entrySet()) {
-            if (classEntry.getKey().endsWith("AnnotatedInnerClass")) {
-                classExists = true;
+            if (annotatedClass.is(AnnotationInnerClass.AnnotatedInnerClass.AnnotatedNestedInnerClass.class)) {
+                nestedInnerClassExists = true;
 
-                for (var annotation : classEntry.getValue()) {
-                    if (annotation.getAnnotationName().endsWith("NoParam")) {
-                        annotationExists = true;
-                        break;
+                for (var annotation : annotatedClass.getAnnotations()) {
+                    if (annotation.is(OneString.class)) {
+                        nestedInnerClassHasAnnotation = true;
+
+                        if (annotation.containsField("str")) {
+                            nestedInnerClassHasAnnotationField = true;
+                        }
                     }
                 }
             }
         }
 
-        assertTrue(classExists, "Annotation OneString is not present");
-        assertTrue(annotationExists, "Annotation OneString is not present");
+        assertTrue(innerClassExists, "Class AnnotationInnerClass.AnnotatedInnerClass does not exist");
+        assertTrue(innerClassHasAnnotation, "Class AnnotationInnerClass.AnnotatedInnerClass does not have any annotation");
+        assertTrue(nestedInnerClassExists, "Class AnnotationInnerClass.AnnotatedInnerClass.AnnotatedNestedInnerClass does not exist");
+        assertTrue(nestedInnerClassHasAnnotation, "Class AnnotationInnerClass.AnnotatedInnerClass.AnnotatedNestedInnerClass does not have any annotations");
+        assertTrue(nestedInnerClassHasAnnotationField, "Class AnnotationInnerClass.AnnotatedInnerClass.AnnotatedNestedInnerClass annotation does not have any fields");
     }
 }

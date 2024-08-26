@@ -101,6 +101,6 @@ publishing {
     }
 }
 
-tasks.test {
+test {
     useJUnitPlatform()
 }

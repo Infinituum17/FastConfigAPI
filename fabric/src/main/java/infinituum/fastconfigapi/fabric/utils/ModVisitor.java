@@ -3,7 +3,6 @@ package infinituum.fastconfigapi.fabric.utils;
 import infinituum.fastconfigapi.api.config.annotations.FastConfig;
 import infinituum.fastconfigapi.api.utils.UnsafeLoader;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
@@ -11,6 +10,8 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+
+import static infinituum.fastconfigapi.fabric.utils.Misc.classPathStringToJavaPath;
 
 public class ModVisitor<T> extends SimpleFileVisitor<Path> {
     private final Path basePath;
@@ -46,9 +47,7 @@ public class ModVisitor<T> extends SimpleFileVisitor<Path> {
 
     private Class<T> pathToClass(Path file) {
         Path relative = basePath.relativize(file);
-        String className = relative.toString()
-                .substring(0, relative.toString().length() - ".class".length())
-                .replace(File.separatorChar, '.');
+        String className = classPathStringToJavaPath(relative.toString());
 
         return UnsafeLoader.loadClass(className, FastConfig.class.getClassLoader());
     }
