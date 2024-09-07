@@ -17,6 +17,7 @@ allprojects {
     minecraft_version = rootProject.minecraft_version
     pack_format_version = rootProject.pack_format_version
     archives_base_name = rootProject.archives_base_name
+    void_lib_version = rootProject.void_lib_version
 }
 
 subprojects {

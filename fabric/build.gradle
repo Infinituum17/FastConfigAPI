@@ -33,9 +33,10 @@ dependencies {
 
 processResources {
     var rep_properties = [
-            "version"   : project.version,
-            "mc_version": project.minecraft_version,
-            "modid"     : project.archives_base_name
+            "version"         : project.version,
+            "mc_version"      : project.minecraft_version,
+            "modid"           : project.archives_base_name,
+            "void_lib_version": project.void_lib_version
     ]
 
     inputs.properties rep_properties

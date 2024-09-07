@@ -5,7 +5,7 @@ import infinituum.fastconfigapi.api.config.FastConfigFile;
 import infinituum.fastconfigapi.api.config.annotations.FastConfig;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 import infinituum.fastconfigapi.api.utils.Global;
-import infinituum.fastconfigapi.api.utils.UnsafeLoader;
+import infinituum.void_lib.api.utils.UnsafeLoader;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.moddiscovery.ModAnnotation.EnumHolder;
@@ -22,15 +22,15 @@ import java.util.stream.Stream;
 
 import static infinituum.fastconfigapi.api.FastConfigs.MOD_ID;
 
-public final class ModScanner {
+public final class ConfigScanner {
     public static <T> Map<Class<T>, FastConfigFile<T>> getSidedConfigs(FastConfig.Side side) {
         return ModList.get()
                 .getModFiles()
                 .stream()
-                .filter(ModScanner::dependents)
-                .map(ModScanner::getAnnotationScanResult)
-                .flatMap(ModScanner::getValidAnnotations)
-                .map(annotation -> ModScanner.<T>toTuple(annotation, side))
+                .filter(ConfigScanner::dependents)
+                .map(ConfigScanner::getAnnotationScanResult)
+                .flatMap(ConfigScanner::getValidAnnotations)
+                .map(annotation -> ConfigScanner.<T>toTuple(annotation, side))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(Tuple::getA, Tuple::getB));
     }
@@ -63,7 +63,7 @@ public final class ModScanner {
     private static Stream<AnnotationData> getValidAnnotations(ModFileScanData mod) {
         return mod.getAnnotations()
                 .stream()
-                .filter(ModScanner::hasAnnotation);
+                .filter(ConfigScanner::hasAnnotation);
     }
 
     private static boolean hasAnnotation(AnnotationData annotation) {
@@ -104,7 +104,7 @@ public final class ModScanner {
 
         try {
             var fileName = Objects.requireNonNull(getFileName(annotationData.get("fileName")));
-            var serializer = Objects.requireNonNull(ModScanner.<T>getSerializer(annotationData.get("serializer")));
+            var serializer = Objects.requireNonNull(ConfigScanner.<T>getSerializer(annotationData.get("serializer")));
             var side = Objects.requireNonNull(getSide(annotationData.get("side")));
 
             return new FastConfigFile<>(clazz, fileName, serializer, side);

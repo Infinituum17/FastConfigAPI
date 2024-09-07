@@ -5,7 +5,7 @@ import com.google.common.base.CaseFormat;
 import infinituum.fastconfigapi.PlatformHelper;
 import infinituum.fastconfigapi.api.config.annotations.FastConfig;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
-import infinituum.fastconfigapi.api.utils.UnsafeLoader;
+import infinituum.void_lib.api.utils.UnsafeLoader;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
@@ -31,7 +31,7 @@ public final class FastConfigFile<T> implements ConfigFile {
 
         this.FILE_NAME = side.appendTo(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, fileName));
 
-        if (serializerWrapper.isInterface()) {
+        if (serializerWrapper.isInterface() || serializerWrapper == null) {
             this.SERIALIZER = UnsafeLoader.loadInstance(platDefault);
         } else {
             this.SERIALIZER = UnsafeLoader.loadInstance(serializerWrapper);

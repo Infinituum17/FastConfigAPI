@@ -2,7 +2,7 @@ package infinituum.fastconfigapi.fabric;
 
 import infinituum.fastconfigapi.api.FastConfigs;
 import infinituum.fastconfigapi.api.config.annotations.FastConfig;
-import infinituum.fastconfigapi.fabric.utils.ModScanner;
+import infinituum.fastconfigapi.fabric.utils.ConfigScanner;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,7 @@ public class FastConfigAPIFabricCommon implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        FastConfigs.register(ModScanner.getSidedConfigs(FastConfig.Side.COMMON));
+        FastConfigs.register(ConfigScanner.getSidedConfigs(FastConfig.Side.COMMON));
 
         LOGGER.info("FastConfigAPI has been initialized!");
     }

@@ -26,3 +26,10 @@ mandatory = true
 versionRange = "[${mc_version},)"
 ordering = "NONE"
 side = "BOTH"
+
+[[dependencies.${modid}]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[${void_lib_version},)"
+ordering = "AFTER"
+side = "BOTH"

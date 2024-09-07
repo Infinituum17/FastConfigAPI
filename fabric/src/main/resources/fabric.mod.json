@@ -26,6 +26,7 @@
     },
     "mixins": [],
     "depends": {
-        "minecraft": ">=${mc_version}"
+        "minecraft": ">=${mc_version}",
+        "void_lib": ">=${void_lib_version}"
     }
 }

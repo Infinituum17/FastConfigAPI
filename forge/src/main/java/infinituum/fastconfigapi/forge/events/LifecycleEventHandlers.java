@@ -2,7 +2,7 @@ package infinituum.fastconfigapi.forge.events;
 
 import infinituum.fastconfigapi.api.FastConfigs;
 import infinituum.fastconfigapi.api.config.annotations.FastConfig;
-import infinituum.fastconfigapi.forge.utils.ModScanner;
+import infinituum.fastconfigapi.forge.utils.ConfigScanner;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -15,16 +15,16 @@ import static infinituum.fastconfigapi.api.FastConfigs.MOD_ID;
 public class LifecycleEventHandlers {
     @SubscribeEvent
     public static void commonHandler(FMLCommonSetupEvent event) {
-        FastConfigs.register(ModScanner.getSidedConfigs(FastConfig.Side.COMMON));
+        FastConfigs.register(ConfigScanner.getSidedConfigs(FastConfig.Side.COMMON));
     }
 
     @SubscribeEvent
     public static void clientHandler(FMLClientSetupEvent event) {
-        FastConfigs.register(ModScanner.getSidedConfigs(FastConfig.Side.CLIENT));
+        FastConfigs.register(ConfigScanner.getSidedConfigs(FastConfig.Side.CLIENT));
     }
 
     @SubscribeEvent
     public static void serverHandler(FMLDedicatedServerSetupEvent event) {
-        FastConfigs.register(ModScanner.getSidedConfigs(FastConfig.Side.SERVER));
+        FastConfigs.register(ConfigScanner.getSidedConfigs(FastConfig.Side.SERVER));
     }
 }
