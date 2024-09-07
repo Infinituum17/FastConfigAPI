@@ -51,6 +51,11 @@ subprojects {
             name = "Modrinth"
             url = "https://api.modrinth.com/maven"
         }
+
+        maven {
+            name = "Infinituum Mod Resources"
+            url = "https://raw.githubusercontent.com/Infinituum17/ModResources/main/maven/"
+        }
     }
 
     loom {
