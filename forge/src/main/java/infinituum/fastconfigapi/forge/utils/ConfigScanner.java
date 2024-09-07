@@ -101,16 +101,23 @@ public final class ConfigScanner {
 
     private static <T> FastConfigFile<T> getFile(AnnotationData data, Class<T> clazz) {
         Map<String, Object> annotationData = data.annotationData();
+        var fileName = getFileName(annotationData.get("fileName"));
+        var serializer = ConfigScanner.<T>getSerializer(annotationData.get("serializer"));
+        var side = getSide(annotationData.get("side"));
 
-        try {
-            var fileName = Objects.requireNonNull(getFileName(annotationData.get("fileName")));
-            var serializer = Objects.requireNonNull(ConfigScanner.<T>getSerializer(annotationData.get("serializer")));
-            var side = Objects.requireNonNull(getSide(annotationData.get("side")));
-
-            return new FastConfigFile<>(clazz, fileName, serializer, side);
-        } catch (Exception e) {
-            return null;
+        if (fileName == null) {
+            fileName = "";
         }
+
+        if (serializer == null) {
+            serializer = (Class<? extends SerializerWrapper<T>>) (Class<?>) SerializerWrapper.class;
+        }
+
+        if (side == null) {
+            side = FastConfig.Side.COMMON;
+        }
+
+        return new FastConfigFile<>(clazz, fileName, serializer, side);
     }
 
     private static String getFileName(Object obj) {
