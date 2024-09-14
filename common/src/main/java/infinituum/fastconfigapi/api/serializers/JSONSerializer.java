@@ -2,11 +2,12 @@ package infinituum.fastconfigapi.api.serializers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import infinituum.fastconfigapi.api.config.FastConfigFile;
+import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.nio.file.Files;
 
 
@@ -25,15 +26,22 @@ public final class JSONSerializer<T> implements SerializerWrapper<T> {
         private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
         @Override
-        public void serialize(FastConfigFile<T> config) throws IOException {
-            try (FileWriter writer = new FileWriter(config.getFullPath().toFile())) {
+        public void serialize(FastConfigFileImpl<T> config) throws IOException {
+            try (FileWriter writer = new FileWriter(config.getFullFilePath().toFile())) {
                 writer.write(GSON.toJson(config.getInstance()));
             }
         }
 
         @Override
-        public void deserialize(FastConfigFile<T> config) throws IOException {
-            Reader reader = Files.newBufferedReader(config.getFullPath());
+        public void deserialize(FastConfigFileImpl<T> config) throws IOException {
+            Reader reader = Files.newBufferedReader(config.getFullFilePath());
+
+            config.setInstance(GSON.fromJson(reader, config.getConfigClass()));
+        }
+
+        @Override
+        public void deserialize(FastConfigFileImpl<T> config, String content) {
+            Reader reader = new StringReader(content);
 
             config.setInstance(GSON.fromJson(reader, config.getConfigClass()));
         }

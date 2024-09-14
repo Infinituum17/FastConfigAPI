@@ -1,29 +1,25 @@
 package infinituum.fastconfigapi.forge.utils;
 
-import infinituum.fastconfigapi.PlatformHelper;
-import infinituum.fastconfigapi.api.config.FastConfigFile;
-import infinituum.fastconfigapi.api.config.annotations.FastConfig;
-import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
-import infinituum.fastconfigapi.api.utils.Global;
+import infinituum.fastconfigapi.api.annotations.FastConfig;
+import infinituum.fastconfigapi.api.helpers.FastConfigHelper;
+import infinituum.fastconfigapi.impl.FastConfigFileImpl;
+import infinituum.fastconfigapi.utils.Global;
 import infinituum.void_lib.api.utils.UnsafeLoader;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.moddiscovery.ModAnnotation.EnumHolder;
 import net.minecraftforge.forgespi.language.IModFileInfo;
 import net.minecraftforge.forgespi.language.ModFileScanData;
 import net.minecraftforge.forgespi.language.ModFileScanData.AnnotationData;
-import org.objectweb.asm.Type;
 
-import java.lang.reflect.Constructor;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static infinituum.fastconfigapi.api.FastConfigs.MOD_ID;
+import static infinituum.fastconfigapi.utils.Global.MOD_ID;
 
 public final class ConfigScanner {
-    public static <T> Map<Class<T>, FastConfigFile<T>> getSidedConfigs(FastConfig.Side side) {
+    public static <T> Map<Class<T>, FastConfigFileImpl<T>> getSidedConfigs(FastConfig.Side side) {
         return ModList.get()
                 .getModFiles()
                 .stream()
@@ -35,29 +31,29 @@ public final class ConfigScanner {
                 .collect(Collectors.toMap(Tuple::getA, Tuple::getB));
     }
 
-    private static <T> Tuple<Class<T>, FastConfigFile<T>> toTuple(AnnotationData annotation, FastConfig.Side side) {
+    private static <T> Tuple<Class<T>, FastConfigFileImpl<T>> toTuple(AnnotationData annotation, FastConfig.Side side) {
         Class<T> clazz = getClass(annotation);
 
         if (clazz == null) {
             return null;
         }
 
-        FastConfigFile<T> configFile = getFile(annotation, clazz);
+        FastConfigFileImpl<T> configFile;
 
-        if (configFile == null || configFile.getSide().ordinal() != side.ordinal()) {
+        try {
+            configFile = FastConfigHelper.toFile(clazz, annotation.annotationData(), side);
+        } catch (Exception e) {
+            Global.LOGGER.error("Could not load config class {}: {}", clazz.getName(), e);
             return null;
         }
 
-        Constructor<?>[] constructors = clazz.getConstructors();
-
-        if (constructors.length > 1 || (constructors.length == 1 && constructors[0].getParameterCount() > 0)) {
-            throw new RuntimeException("Fast Config class " + clazz.getName() + " should not define any constructors.");
+        if (configFile == null) {
+            return null;
         }
 
         Global.LOGGER.info("Config '{}' was successfully loaded", configFile.getFileName());
 
         return new Tuple<>(clazz, configFile);
-
     }
 
     private static Stream<AnnotationData> getValidAnnotations(ModFileScanData mod) {
@@ -90,69 +86,12 @@ public final class ConfigScanner {
 
     private static <T> Class<T> getClass(AnnotationData data) {
         String className = data.clazz().getClassName();
-        Class<T> result = UnsafeLoader.loadClass(className, FastConfig.class.getClassLoader());
+        Class<T> result = UnsafeLoader.loadClassNoInit(className, FastConfig.class.getClassLoader());
 
         if (result == null) {
             Global.LOGGER.error("Could not load class {}", className);
         }
 
         return result;
-    }
-
-    private static <T> FastConfigFile<T> getFile(AnnotationData data, Class<T> clazz) {
-        Map<String, Object> annotationData = data.annotationData();
-        var fileName = getFileName(annotationData.get("fileName"));
-        var serializer = ConfigScanner.<T>getSerializer(annotationData.get("serializer"));
-        var side = getSide(annotationData.get("side"));
-
-        if (fileName == null) {
-            fileName = "";
-        }
-
-        if (serializer == null) {
-            serializer = (Class<? extends SerializerWrapper<T>>) (Class<?>) SerializerWrapper.class;
-        }
-
-        if (side == null) {
-            side = FastConfig.Side.COMMON;
-        }
-
-        return new FastConfigFile<>(clazz, fileName, serializer, side);
-    }
-
-    private static String getFileName(Object obj) {
-        if (obj instanceof String name) {
-            return name;
-        }
-
-        return null;
-    }
-
-    private static FastConfig.Side getSide(Object obj) {
-        if (obj instanceof EnumHolder holder) {
-            return Enum.valueOf(FastConfig.Side.class, holder.getValue());
-        }
-
-        return null;
-    }
-
-    private static <T> Class<? extends SerializerWrapper<T>> getSerializer(Object obj) {
-        if (obj == null) {
-            return null;
-        }
-
-        if (obj instanceof Type serType) {
-            String className = serType.getClassName();
-            Class<? extends SerializerWrapper<T>> loadedClass = UnsafeLoader.loadClass(className);
-
-            if (loadedClass == null) {
-                Global.LOGGER.error("Could not parse serializer {}", className);
-                return null;
-            }
-
-            return loadedClass;
-        }
-
-        return PlatformHelper.getDefaultSerializer();
     }
 }

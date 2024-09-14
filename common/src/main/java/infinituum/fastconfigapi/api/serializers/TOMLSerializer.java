@@ -2,7 +2,7 @@ package infinituum.fastconfigapi.api.serializers;
 
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
-import infinituum.fastconfigapi.api.config.FastConfigFile;
+import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 
 import java.io.IOException;
 
@@ -22,15 +22,24 @@ public final class TOMLSerializer<T> implements SerializerWrapper<T> {
         private static final TomlWriter TOML_WRITER = new TomlWriter();
 
         @Override
-        public void serialize(FastConfigFile<T> config) throws IOException {
-            TOML_WRITER.write(config.getInstance(), config.getFullPath().toFile());
+        public void serialize(FastConfigFileImpl<T> config) throws IOException {
+            TOML_WRITER.write(config.getInstance(), config.getFullFilePath().toFile());
         }
 
         @Override
-        public void deserialize(FastConfigFile<T> config) {
+        public void deserialize(FastConfigFileImpl<T> config) {
             Toml toml = new Toml();
 
-            T instance = toml.read(config.getFullPath().toFile()).to(config.getConfigClass());
+            T instance = toml.read(config.getFullFilePath().toFile()).to(config.getConfigClass());
+
+            config.setInstance(instance);
+        }
+
+        @Override
+        public void deserialize(FastConfigFileImpl<T> config, String content) throws IOException {
+            Toml toml = new Toml();
+
+            T instance = toml.read(content).to(config.getConfigClass());
 
             config.setInstance(instance);
         }

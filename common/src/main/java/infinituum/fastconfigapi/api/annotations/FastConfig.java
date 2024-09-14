@@ -1,13 +1,11 @@
-package infinituum.fastconfigapi.api.config.annotations;
+package infinituum.fastconfigapi.api.annotations;
 
 import com.google.common.base.CaseFormat;
+import infinituum.fastconfigapi.FastConfigs;
 import infinituum.fastconfigapi.PlatformHelper;
-import infinituum.fastconfigapi.api.FastConfigs;
-import infinituum.fastconfigapi.api.config.FastConfigFile;
-import infinituum.fastconfigapi.api.serializers.ConfigSerializer;
-import infinituum.fastconfigapi.api.serializers.JSONSerializer;
+import infinituum.fastconfigapi.api.annotations.Loader.Type;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
-import infinituum.fastconfigapi.api.serializers.TOMLSerializer;
+import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -20,24 +18,13 @@ import java.util.UUID;
  * <i>Auto-Registered</i> Class Annotation.
  * <p>
  * Indicates that a Class should be used as a FastConfig.
- * This Annotation is <i>automatically registered</i> on the correct {@link Side} and you can access its {@link FastConfigFile} (Config data) using the {@link FastConfigs}'s class.
+ * This Annotation is <i>automatically registered</i> on the correct {@link Side} and you can access its {@link FastConfigFileImpl} (Config data) using the {@link FastConfigs}'s class.
  * <p>
  * A FastConfig class is instantiated through the default (parameterless) constructor, for this reason it mustn't
  * define any other constructor except one without parameters (otherwise the default one will be used).
  * <p>
  * Class' fields special keywords: <ul>
  * <li>{@code transient}: Used to denote that this field will not be serialized.
- * </ul>
- * <p>
- * Options: <ul>
- * <li> {@link FastConfig#fileName() fileName}: Defines a file name that will be used to create the Config file.
- * <br/><b><i>default value</i></b>: The Class' file name (formatted in {@link CaseFormat#LOWER_HYPHEN} case)
- * <li> {@link FastConfig#serializer() serializer}: Defines the {@link ConfigSerializer} that will serialize the Class.
- * <br/><b><i>default value</i></b>: The {@link PlatformHelper#getDefaultSerializer() Default Serializer} for the current Mod Loader: <ul>
- * <li>Forge: {@link TOMLSerializer}
- * <li>Fabric: {@link JSONSerializer}</ul>
- * <li> {@link FastConfig#side() side}: Defines the Physical side where the FastConfig will be stored.
- * <br/><b><i>default value</i></b>: {@link Side#COMMON}
  * </ul>
  * <p><br/>
  * <b>Example</b>: Let's define a class that will store the position of all the waypoints of the current player.
@@ -91,6 +78,22 @@ public @interface FastConfig {
      * @return {@link Side} - default: {@link Side#COMMON}
      */
     Side side() default Side.COMMON;
+
+    /**
+     * The subdirectory where the config will be stored.
+     *
+     * @return {@link String} - default: None
+     */
+    String subdirectory() default "";
+
+    /**
+     * The default loader of the config.
+     * <p>
+     * This loader is checked when the config needs to be created.
+     *
+     * @return {@link Loader} - default: {@link Loader @Loader}
+     */
+    Loader loader() default @Loader(type = Type.DEFAULT);
 
     /**
      * Side Enum.

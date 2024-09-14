@@ -1,12 +1,10 @@
 package infinituum.fastconfigapi.forge;
 
-import infinituum.fastconfigapi.api.FastConfigs;
-import infinituum.fastconfigapi.api.utils.Global;
+import infinituum.fastconfigapi.utils.Global;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod(FastConfigs.MOD_ID)
-public class FastConfigAPIForge {
+@Mod(Global.MOD_ID)
+public final class FastConfigAPIForge {
     public FastConfigAPIForge() {
-        Global.LOGGER.info("FastConfigAPI has been initialized!");
     }
 }
