@@ -1,12 +1,15 @@
 package infinituum.fastconfigapi.api;
 
 import infinituum.fastconfigapi.api.annotations.FastConfig.Side;
+import infinituum.fastconfigapi.api.annotations.Loader;
 import infinituum.fastconfigapi.api.annotations.Loader.Type;
 import infinituum.fastconfigapi.api.serializers.ConfigSerializer;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
  * Interface that defines all config file's methods.
@@ -113,9 +116,22 @@ public interface FastConfigFile<T> extends ConfigFile {
 
     /**
      * Gets the latest instance of this config file.
+     * <p>
+     * Calling this method with a {@link Loader} that could take some time to process a data request
+     * (e.g. {@link Type#URL Loader.Type.URL}) can result in errors and incorrect values, so you should
+     * look at {@link #getInstanceAsync()} instead.
      *
      * @return The instance's type {@link T}.
      */
     @NotNull
     T getInstance();
+
+    /**
+     * Returns a wrapper around the instance value. Using {@link CompletableFuture#thenAccept(Consumer) CompletableFuture.thenAccept(...)}
+     * will consume the actual instance value when it's ready.
+     * <p>
+     * This method is useful if this {@link FastConfigFile} is using a {@link Loader} that could take some time to process
+     * a data request (e.g. {@link Type#URL Loader.Type.URL}).
+     */
+    CompletableFuture<T> getInstanceAsync();
 }

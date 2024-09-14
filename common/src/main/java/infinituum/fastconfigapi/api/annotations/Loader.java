@@ -136,7 +136,6 @@ public @interface Loader {
             config.setPendingRequest(futureResponse);
         });
 
-
         private final Consumer<FastConfigFileImpl<?>> loaderFunction;
 
         Type(Consumer<FastConfigFileImpl<?>> loaderFunction) {

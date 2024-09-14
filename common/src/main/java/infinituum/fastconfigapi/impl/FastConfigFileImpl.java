@@ -162,6 +162,15 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     }
 
     @Override
+    public CompletableFuture<T> getInstanceAsync() {
+        return CompletableFuture.supplyAsync(() -> {
+            pendingRequest.join();
+
+            return this.instance;
+        });
+    }
+
+    @Override
     public Loader.@NotNull Type getLoaderType() {
         return loaderType;
     }
