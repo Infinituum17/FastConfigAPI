@@ -51,6 +51,8 @@ public @interface Loader {
      */
     boolean silentlyFail() default false;
 
+    // TODO: Add 'serializer' field to apply translation
+
     /**
      * Type enum.
      * <p>
@@ -117,7 +119,7 @@ public @interface Loader {
                     })
                     .exceptionally(e -> {
                         Thread.currentThread().setName("HttpRequest thread");
-                        
+
                         useDefaultLoaderAfterException(config, e);
                         Global.LOGGER.info("Config '{}' was successfully loaded", config.getFileNameWithExtension());
                         return null;

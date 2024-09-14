@@ -7,7 +7,6 @@ import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.nio.file.Files;
 
 
@@ -40,9 +39,7 @@ public final class JSONSerializer<T> implements SerializerWrapper<T> {
         }
 
         @Override
-        public void deserialize(FastConfigFileImpl<T> config, String content) {
-            Reader reader = new StringReader(content);
-
+        public void deserialize(FastConfigFileImpl<T> config, Reader reader) {
             config.setInstance(GSON.fromJson(reader, config.getConfigClass()));
         }
 

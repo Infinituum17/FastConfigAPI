@@ -4,13 +4,14 @@ package infinituum.fastconfigapi.api.serializers;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 
 import java.io.IOException;
+import java.io.Reader;
 
 /**
  * A Serializer interface that defines all methods that are used in the serialization / deserialization of a {@link FastConfigFileImpl}.
  *
  * @param <T> The type contained inside the {@link FastConfigFileImpl}.
  */
-public interface ConfigSerializer<T> { // TODO: Implement serializer translation
+public interface ConfigSerializer<T> {
     /**
      * Tries to serialize the class associated with the {@link FastConfigFileImpl} passed in.
      *
@@ -38,7 +39,7 @@ public interface ConfigSerializer<T> { // TODO: Implement serializer translation
      * @param content The string that will be deserialized.
      * @throws IOException Exception during deserialization.
      */
-    void deserialize(FastConfigFileImpl<T> config, String content) throws IOException;
+    void deserialize(FastConfigFileImpl<T> config, Reader reader) throws IOException;
 
     /**
      * Gets the file extension associated with this serializer.

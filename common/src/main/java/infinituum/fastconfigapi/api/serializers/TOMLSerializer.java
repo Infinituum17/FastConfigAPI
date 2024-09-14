@@ -5,6 +5,7 @@ import com.moandjiezana.toml.TomlWriter;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 
 import java.io.IOException;
+import java.io.Reader;
 
 
 public final class TOMLSerializer<T> implements SerializerWrapper<T> {
@@ -36,10 +37,10 @@ public final class TOMLSerializer<T> implements SerializerWrapper<T> {
         }
 
         @Override
-        public void deserialize(FastConfigFileImpl<T> config, String content) throws IOException {
+        public void deserialize(FastConfigFileImpl<T> config, Reader reader) throws IOException {
             Toml toml = new Toml();
 
-            T instance = toml.read(content).to(config.getConfigClass());
+            T instance = toml.read(reader).to(config.getConfigClass());
 
             config.setInstance(instance);
         }

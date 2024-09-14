@@ -1,6 +1,7 @@
 package infinituum.fastconfigapi.impl;
 
 import infinituum.fastconfigapi.PlatformHelper;
+import infinituum.fastconfigapi.api.FastConfigFile;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
 import infinituum.fastconfigapi.api.annotations.Loader;
 import infinituum.fastconfigapi.api.helpers.FastConfigHelper;
@@ -12,12 +13,18 @@ import infinituum.void_lib.api.utils.UnsafeLoader;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Actual implementation of the interface {@link FastConfigFile}.
+ *
+ * @param <T> The type of the class instance contained in the current config file.
+ */
 public final class FastConfigFileImpl<T> implements infinituum.fastconfigapi.api.FastConfigFile<T> {
     private final Class<T> clazz;
     private final FastConfig.Side side;
@@ -70,8 +77,8 @@ public final class FastConfigFileImpl<T> implements infinituum.fastconfigapi.api
     }
 
     @Override
-    public void loadStateUnsafely(String state) throws IOException {
-        serializer.get().deserialize(this, state);
+    public void loadStateUnsafely(String content) throws IOException {
+        serializer.get().deserialize(this, new StringReader(content));
     }
 
     @Override
