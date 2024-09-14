@@ -1,5 +1,6 @@
 package infinituum.fastconfigapi.forge.utils;
 
+import infinituum.fastconfigapi.api.FastConfigFile;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
 import infinituum.fastconfigapi.api.helpers.FastConfigHelper;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
@@ -19,7 +20,7 @@ import java.util.stream.Stream;
 import static infinituum.fastconfigapi.utils.Global.MOD_ID;
 
 public final class ConfigScanner {
-    public static <T> Map<Class<T>, FastConfigFileImpl<T>> getSidedConfigs(FastConfig.Side side) {
+    public static <T> Map<Class<T>, FastConfigFile<T>> getSidedConfigs(FastConfig.Side side) {
         return ModList.get()
                 .getModFiles()
                 .stream()

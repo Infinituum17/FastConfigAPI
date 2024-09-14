@@ -1,5 +1,6 @@
 package infinituum.fastconfigapi.fabric.utils;
 
+import infinituum.fastconfigapi.api.FastConfigFile;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
 import infinituum.fastconfigapi.api.helpers.FastConfigHelper;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
@@ -18,9 +19,9 @@ import static infinituum.fastconfigapi.utils.Global.MOD_ID;
 public final class ConfigScanner {
     private static volatile Set<ScannedFile> scannedFiles;
 
-    public static <T> Map<Class<T>, FastConfigFileImpl<T>> getSidedConfigs(FastConfig.Side side) {
+    public static <T> Map<Class<T>, FastConfigFile<T>> getSidedConfigs(FastConfig.Side side) {
         ModAnnotationScanner scanner = ModAnnotationScanner.init();
-        Map<Class<T>, FastConfigFileImpl<T>> result = new HashMap<>();
+        Map<Class<T>, FastConfigFile<T>> result = new HashMap<>();
 
         if (scannedFiles == null) {
             scannedFiles = scanner.search(FastConfig.class, MOD_ID);
@@ -33,7 +34,7 @@ public final class ConfigScanner {
         return result;
     }
 
-    public static <T> void analyzeFile(ScannedFile file, FastConfig.Side side, Map<Class<T>, FastConfigFileImpl<T>> result) {
+    public static <T> void analyzeFile(ScannedFile file, FastConfig.Side side, Map<Class<T>, FastConfigFile<T>> result) {
         for (AnnotatedClass annotatedClass : file.getAnnotatedClasses()) {
             if (!annotatedClass.hasClassAnnotations()) {
                 continue;
@@ -43,7 +44,7 @@ public final class ConfigScanner {
         }
     }
 
-    public static <T> void analyzeAnnotations(AnnotatedClass annotatedClass, FastConfig.Side side, Map<Class<T>, FastConfigFileImpl<T>> result) {
+    public static <T> void analyzeAnnotations(AnnotatedClass annotatedClass, FastConfig.Side side, Map<Class<T>, FastConfigFile<T>> result) {
         for (var annotation : annotatedClass.getAnnotations()) {
             if (!annotation.is(FastConfig.class)) {
                 continue;

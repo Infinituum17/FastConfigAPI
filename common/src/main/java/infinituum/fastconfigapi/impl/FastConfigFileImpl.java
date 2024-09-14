@@ -41,7 +41,7 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
 
     public FastConfigFileImpl(@NotNull Class<T> clazz, @NotNull FastConfig.Side side, @NotNull Map<String, Object> data) {
         String subdirectoryStringPath = FastConfigHelper.getSubdirectoryOrDefault(data);
-        
+
         this.clazz = clazz;
         this.side = side;
         this.fileName = FastConfigHelper.getFileNameOrDefault(data, clazz.getSimpleName(), side);
@@ -59,12 +59,12 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     }
 
     @Override
-    public void loadDefault() {
+    public void loadDefault() throws RuntimeException {
         this.loaderType.load(this);
     }
 
     @Override
-    public void load() {
+    public void load() throws RuntimeException {
         try {
             deserializer.deserialize(this);
             Global.LOGGER.info("Config '{}' was successfully loaded", this.getFileNameWithExtension());
@@ -83,7 +83,7 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     }
 
     @Override
-    public void save() {
+    public void save() throws RuntimeException {
         if (pendingRequest == null) {
             try {
                 Files.createDirectories(this.getConfigSubdirectoryPath());
