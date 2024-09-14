@@ -101,7 +101,10 @@ subprojects {
                 }
 
                 relations {
-                    depends "void_lib"
+                    depends {
+                        curseforge = "void_lib"
+                        modrinth = "void_lib"
+                    }
                 }
 
                 mainPublication remapJar
