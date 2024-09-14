@@ -28,7 +28,7 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.${modid}]]
-modId = "minecraft"
+modId = "void_lib"
 mandatory = true
 versionRange = "[${void_lib_version},)"
 ordering = "AFTER"

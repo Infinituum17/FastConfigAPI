@@ -91,6 +91,8 @@ subprojects {
                 displayName = "Fast Config API ${project.minecraft_version}-${project.name} - ${project.mod_version}"
                 gameVersions = [project.minecraft_version]
                 gameLoaders = [project.name]
+                releaseType = "beta"
+                version = project.version
 
                 def clog = new File(project.getRootDir(), "changelog.md")
 
@@ -98,7 +100,9 @@ subprojects {
                     changelog = clog.getText()
                 }
 
-                version = project.version
+                relations {
+                    depends "void_lib"
+                }
 
                 mainPublication remapJar
 
