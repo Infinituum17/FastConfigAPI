@@ -1,5 +1,6 @@
 package infinituum.fastconfigapi.api.annotations;
 
+import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 import infinituum.fastconfigapi.utils.Global;
 
@@ -36,6 +37,13 @@ public @interface Loader {
     Type type();
 
     /**
+     * If this is set to {@code true}, all the error messages regarding the config loading phase will be suppressed.
+     *
+     * @return {@link Boolean} - default: {@code false}.
+     */
+    boolean silentlyFail() default false;
+
+    /**
      * Defines a target for a specific {@link Type}.
      * <p>
      * The {@link Type#DEFAULT default type} doesn't need to check this field, so by default it's empty.
@@ -45,13 +53,13 @@ public @interface Loader {
     String target() default ""; // TODO: Check target (filter available domains)
 
     /**
-     * If this is set to {@code true}, all the error messages regarding the config loading phase will be suppressed.
+     * Defines a deserializer used to parse the content loaded by this {@link Loader}.
+     * <p>
+     * The {@link Type#DEFAULT default type} doesn't need to check this field, so by default it's empty.
      *
-     * @return {@link Boolean} - default: {@code false}.
+     * @return {@link Class Class<? extends SerializeWrapper>} - default: None ({@link FastConfig}'s serializer will be used).
      */
-    boolean silentlyFail() default false;
-
-    // TODO: Add 'serializer' field to apply translation
+    Class<? extends SerializerWrapper> deserializer() default SerializerWrapper.class;
 
     /**
      * Type enum.
@@ -142,8 +150,7 @@ public @interface Loader {
                 Global.LOGGER.error("Could not load config '{}' from url '{}', falling back to default loader: {}", config.getFileNameWithExtension(), config.getLoaderTarget(), e.getMessage());
             }
 
-            config.setLoaderType(DEFAULT);
-            config.setLoaderTarget("");
+            config.setDefaultLoader();
 
             config.loadDefault();
             config.save();

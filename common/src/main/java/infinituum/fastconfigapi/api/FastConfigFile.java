@@ -65,14 +65,6 @@ public interface FastConfigFile<T> extends ConfigFile {
     Path getConfigDirectoryPath();
 
     /**
-     * Gets the name of the subdirectory that stores this config file.
-     *
-     * @return {@link String}.
-     */
-    @NotNull
-    String getConfigSubdirectoryName();
-
-    /**
      * Gets the full path to the file that will contain the data stored in this config file.
      *
      * @return {@link Path}.
@@ -87,6 +79,14 @@ public interface FastConfigFile<T> extends ConfigFile {
      */
     @NotNull
     ConfigSerializer<T> getSerializer();
+
+    /**
+     * Gets the loader-serializer instance used to deserialize this config file.
+     *
+     * @return A {@link ConfigSerializer} instance.
+     */
+    @NotNull
+    ConfigSerializer<T> getDeserializer();
 
     /**
      * If {@code true} all the file loading logging has been disabled.

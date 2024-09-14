@@ -7,7 +7,6 @@ import infinituum.fastconfigapi.api.annotations.Loader;
 import infinituum.fastconfigapi.api.helpers.FastConfigHelper;
 import infinituum.fastconfigapi.api.helpers.LoaderHelper;
 import infinituum.fastconfigapi.api.serializers.ConfigSerializer;
-import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 import infinituum.fastconfigapi.utils.Global;
 import infinituum.void_lib.api.utils.UnsafeLoader;
 import org.jetbrains.annotations.NotNull;
@@ -25,33 +24,35 @@ import java.util.concurrent.CompletableFuture;
  *
  * @param <T> The type of the class instance contained in the current config file.
  */
-public final class FastConfigFileImpl<T> implements infinituum.fastconfigapi.api.FastConfigFile<T> {
+public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     private final Class<T> clazz;
     private final FastConfig.Side side;
     private final String fileName;
-    private final String subdirectoryName;
     private final Path configDirectoryPath;
     private final Path configSubdirectoryPath;
     private final Path fullFilePath;
-    private final SerializerWrapper<T> serializer;
+    private final ConfigSerializer<T> serializer;
     private final boolean silentlyFail;
+    private ConfigSerializer<T> deserializer;
     private CompletableFuture<HttpResponse<String>> pendingRequest;
-    private Loader.Type loader;
+    private Loader.Type loaderType;
     private String loaderTarget;
     private T instance;
 
     public FastConfigFileImpl(@NotNull Class<T> clazz, @NotNull FastConfig.Side side, @NotNull Map<String, Object> data) {
+        String subdirectoryStringPath = FastConfigHelper.getSubdirectoryOrDefault(data);
+        
         this.clazz = clazz;
         this.side = side;
         this.fileName = FastConfigHelper.getFileNameOrDefault(data, clazz.getSimpleName(), side);
         this.serializer = FastConfigHelper.getSerializerOrDefault(data);
-        this.subdirectoryName = FastConfigHelper.getSubdirectoryOrDefault(data);
         this.configDirectoryPath = PlatformHelper.getDefaultConfigDirPath();
-        this.configSubdirectoryPath = (!subdirectoryName.isEmpty()) ? configDirectoryPath.resolve(subdirectoryName) : configDirectoryPath;
+        this.configSubdirectoryPath = (!subdirectoryStringPath.isEmpty()) ? configDirectoryPath.resolve(subdirectoryStringPath) : configDirectoryPath;
         this.fullFilePath = this.configSubdirectoryPath.resolve(this.getFileNameWithExtension());
-        this.loader = LoaderHelper.getLoaderOrDefault(data);
+        this.loaderType = LoaderHelper.getLoaderOrDefault(data);
         this.loaderTarget = LoaderHelper.getTargetOrDefault(data);
         this.silentlyFail = LoaderHelper.getSilentlyFailOrDefault(data);
+        this.deserializer = LoaderHelper.getDeserializerOrDefault(data, this.serializer, loaderType);
         this.pendingRequest = null;
 
         this.load();
@@ -59,13 +60,13 @@ public final class FastConfigFileImpl<T> implements infinituum.fastconfigapi.api
 
     @Override
     public void loadDefault() {
-        this.loader.load(this);
+        this.loaderType.load(this);
     }
 
     @Override
     public void load() {
         try {
-            serializer.get().deserialize(this);
+            deserializer.deserialize(this);
             Global.LOGGER.info("Config '{}' was successfully loaded", this.getFileNameWithExtension());
         } catch (Exception e) {
             try {
@@ -78,7 +79,7 @@ public final class FastConfigFileImpl<T> implements infinituum.fastconfigapi.api
 
     @Override
     public void loadStateUnsafely(String content) throws IOException {
-        serializer.get().deserialize(this, new StringReader(content));
+        deserializer.deserialize(this, new StringReader(content));
     }
 
     @Override
@@ -87,7 +88,7 @@ public final class FastConfigFileImpl<T> implements infinituum.fastconfigapi.api
             try {
                 Files.createDirectories(this.getConfigSubdirectoryPath());
 
-                serializer.get().serialize(this);
+                serializer.serialize(this);
 
                 return;
             } catch (Exception e) {
@@ -104,17 +105,12 @@ public final class FastConfigFileImpl<T> implements infinituum.fastconfigapi.api
 
     @Override
     public @NotNull String getFileNameWithExtension() {
-        return fileName + "." + this.serializer.get().getFileExtension();
+        return fileName + "." + this.serializer.getFileExtension();
     }
 
     @Override
     public @NotNull Path getConfigSubdirectoryPath() {
         return configSubdirectoryPath;
-    }
-
-    @Override
-    public @NotNull String getConfigSubdirectoryName() {
-        return subdirectoryName;
     }
 
     @Override
@@ -139,7 +135,12 @@ public final class FastConfigFileImpl<T> implements infinituum.fastconfigapi.api
 
     @Override
     public @NotNull ConfigSerializer<T> getSerializer() {
-        return serializer.get();
+        return serializer;
+    }
+
+    @Override
+    public @NotNull ConfigSerializer<T> getDeserializer() {
+        return deserializer;
     }
 
     @Override
@@ -156,26 +157,18 @@ public final class FastConfigFileImpl<T> implements infinituum.fastconfigapi.api
         throw new RuntimeException("Config HttpRequest is still pending, waiting until timeout...");
     }
 
-    public void setInstance(T instance) {
+    public void setInstance(@NotNull T instance) {
         this.instance = instance;
     }
 
     @Override
     public Loader.@NotNull Type getLoaderType() {
-        return loader;
-    }
-
-    public void setLoaderType(Loader.Type loader) {
-        this.loader = loader;
+        return loaderType;
     }
 
     @Override
     public @NotNull String getLoaderTarget() {
         return loaderTarget;
-    }
-
-    public void setLoaderTarget(String loaderTarget) {
-        this.loaderTarget = loaderTarget;
     }
 
     @Override
@@ -185,5 +178,11 @@ public final class FastConfigFileImpl<T> implements infinituum.fastconfigapi.api
 
     public void setPendingRequest(CompletableFuture<HttpResponse<String>> pendingRequest) {
         this.pendingRequest = pendingRequest;
+    }
+
+    public void setDefaultLoader() {
+        this.loaderType = Loader.Type.DEFAULT;
+        this.loaderTarget = "";
+        this.deserializer = this.serializer;
     }
 }

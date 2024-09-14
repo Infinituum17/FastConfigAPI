@@ -51,8 +51,6 @@ public final class ConfigScanner {
             return null;
         }
 
-        Global.LOGGER.info("Config '{}' was successfully loaded", configFile.getFileName());
-
         return new Tuple<>(clazz, configFile);
     }
 

@@ -3,6 +3,7 @@ package infinituum.fastconfigapi.api.helpers;
 import com.google.common.base.CaseFormat;
 import infinituum.fastconfigapi.PlatformHelper;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
+import infinituum.fastconfigapi.api.serializers.ConfigSerializer;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 import infinituum.fastconfigapi.utils.Global;
@@ -29,7 +30,7 @@ public final class FastConfigHelper {
         return side.appendTo(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, fileName));
     }
 
-    public static <T> @NotNull SerializerWrapper<T> getSerializerOrDefault(Map<String, Object> data) {
+    public static <T> @NotNull ConfigSerializer<T> getSerializerOrDefault(Map<String, Object> data) {
         Class<? extends SerializerWrapper<T>> clazz = null;
 
         if (data.containsKey("serializer")) {
@@ -49,7 +50,7 @@ public final class FastConfigHelper {
             clazz = PlatformHelper.getDefaultSerializer();
         }
 
-        return UnsafeLoader.loadInstance(clazz);
+        return UnsafeLoader.loadInstance(clazz).get();
     }
 
     public static @NotNull FastConfig.Side getSideOrDefault(Map<String, Object> data) {

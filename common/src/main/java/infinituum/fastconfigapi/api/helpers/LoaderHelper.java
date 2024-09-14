@@ -2,6 +2,10 @@ package infinituum.fastconfigapi.api.helpers;
 
 import infinituum.fastconfigapi.PlatformHelper;
 import infinituum.fastconfigapi.api.annotations.Loader;
+import infinituum.fastconfigapi.api.serializers.ConfigSerializer;
+import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
+import infinituum.void_lib.api.utils.UnsafeLoader;
+import org.objectweb.asm.Type;
 
 import java.util.Map;
 
@@ -42,5 +46,38 @@ public final class LoaderHelper {
         }
 
         return false;
+    }
+
+    public static <T> ConfigSerializer<T> getDeserializerOrDefault(Map<String, Object> data, ConfigSerializer<T> currentSerializer, Loader.Type loaderType) {
+        if (loaderType.ordinal() == Loader.Type.DEFAULT.ordinal()) {
+            return currentSerializer;
+        }
+
+        Map<String, Object> innerData = getAnnotationFields(data);
+
+        if (innerData == null) {
+            return currentSerializer;
+        }
+
+        Class<? extends SerializerWrapper<T>> clazz = null;
+
+        if (innerData.containsKey("deserializer")) {
+            Object object = innerData.get("deserializer");
+
+            if (object instanceof Type type) {
+                clazz = UnsafeLoader.loadClass(type.getClassName());
+            } else if (object != null) {
+                try {
+                    clazz = (Class<? extends SerializerWrapper<T>>) object;
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        if (clazz == null) {
+            return currentSerializer;
+        }
+
+        return UnsafeLoader.loadInstance(clazz).get();
     }
 }

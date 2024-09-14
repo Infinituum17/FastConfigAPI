@@ -22,4 +22,6 @@ public final class FastConfigs {
     public static <T> FastConfigFileImpl<T> get(Class<T> clazz) {
         return (FastConfigFileImpl<T>) CONFIGS.get(clazz);
     }
+
+    // TODO: Create run-in-place method
 }
