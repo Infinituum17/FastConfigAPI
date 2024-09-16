@@ -50,7 +50,7 @@ public @interface Loader {
      *
      * @return {@link String} - default: None.
      */
-    String target() default ""; // TODO: Check target (filter available domains)
+    String target() default "";
 
     /**
      * Defines a deserializer used to parse the content loaded by this {@link Loader}.
@@ -102,7 +102,7 @@ public @interface Loader {
             HttpClient httpClient = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(uri)
-                    .timeout(Duration.ofSeconds(30))
+                    .timeout(Duration.ofSeconds(10))
                     .GET()
                     .build();
 
