@@ -1,132 +1,137 @@
 package infinituum.fastconfigapi.api;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import infinituum.fastconfigapi.api.annotations.FastConfig.Side;
+import infinituum.fastconfigapi.api.annotations.Loader;
+import infinituum.fastconfigapi.api.annotations.Loader.Type;
+import infinituum.fastconfigapi.api.serializers.ConfigSerializer;
+import infinituum.fastconfigapi.impl.FastConfigFileImpl;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
- * Fast Config File class.
- * @param <T> The type of the class which this Fast Config File is based on.
+ * Interface that defines all config file's methods.
+ * <p>
+ * Implementation: {@link FastConfigFileImpl}.
+ *
+ * @param <T> The type of the class instance contained in the current config file.
  */
-public class FastConfigFile<T> {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final File CONFIG_FILE;
-    private final T CONFIG_DEFAULT_INSTANCE;
-    private final Class<T> CONFIG_CLASS;
-    private final Path CONFIG_DIR;
-    private T CACHED_INSTANCE;
+public interface FastConfigFile<T> extends ConfigFile {
+    /**
+     * Gets the class contained in the current config file.
+     *
+     * @return A class of type {@link T}.
+     */
+    @NotNull
+    Class<T> getConfigClass();
 
     /**
-     * Default constructor. You aren't supposed to directly use this.
-     * Use the {@link FastConfig} class to create a {@link FastConfigFile} instance.
-     * @param file The targeted Config file.
-     * @param defaultInstance A default instance of the Config class.
-     * @param configDir The path to the Config directory where the Config file is created.
+     * Gets the {@link Side side} on which this config file will be accessible.
+     *
+     * @return {@link Side Side}.
      */
-    @SuppressWarnings("unchecked")
-    public FastConfigFile(File file, T defaultInstance, Path configDir) {
-        this.CONFIG_FILE = file;
-        this.CONFIG_DEFAULT_INSTANCE = defaultInstance;
-        this.CONFIG_CLASS = (Class<T>) defaultInstance.getClass();
-        this.CONFIG_DIR = configDir;
-
-        this.createIfNotExist();
-        this.reloadConfig();
-    }
+    @NotNull
+    Side getSide();
 
     /**
-     * Gets the Config directory targeted by <code>this</code> specific {@link FastConfigFile}.
-     * @return The Config directory targeted by <code>this</code> specific {@link FastConfigFile}.
+     * Gets the file name (used on disk) of this config file.
+     *
+     * @return {@link String}.
      */
-    public Path getConfigDir() {
-        return CONFIG_DIR;
-    }
+    @NotNull
+    String getFileName();
 
     /**
-     * Gets the cached Config instance.
-     * @return The cached Config instance, <code>null</code> if the file doesn't exist.
+     * Gets the file name + extension (used on disk) of this config file.
+     *
+     * @return {@link String}.
      */
-    public T getConfig() {
-        return CACHED_INSTANCE;
-    }
+    @NotNull
+    String getFileNameWithExtension();
 
     /**
-     * Reads a Config file from disk and updates the cached Config instance.
-     * @throws RuntimeException Thrown when errors occur in reading / writing files.
+     * Gets the full path to the subdirectory where the config file is stored.
+     *
+     * @return {@link Path}.
      */
-    public void reloadConfig() throws RuntimeException {
-        if(!CONFIG_FILE.exists()) return;
-
-        Reader configFileReader;
-
-        try {
-            configFileReader = Files.newBufferedReader(CONFIG_FILE.toPath());
-        } catch (IOException error) {
-            throw new RuntimeException("Could not read Config file \"" + CONFIG_FILE.getName() + "\" in directory \"" + CONFIG_DIR + "\": " + error);
-        }
-
-        this.CACHED_INSTANCE = GSON.fromJson(configFileReader, this.CONFIG_CLASS);
-    }
+    @NotNull
+    Path getConfigSubdirectoryPath();
 
     /**
-     * Writes the current cached values to the targeted Config file on disk.
-     * @throws RuntimeException Thrown when errors occur in reading / writing files.
+     * Gets the full path to the mod-loader's config directory (platform-specific).
+     *
+     * @return {@link Path}.
      */
-    public void saveCurrent() throws RuntimeException {
-        try {
-            String json = GSON.toJson(CACHED_INSTANCE);
-            FileWriter writer = new FileWriter(CONFIG_FILE);
-
-            writer.write(json);
-
-            writer.close();
-        } catch(Exception error) {
-            throw new RuntimeException("Error while writing Config file \"" + CONFIG_FILE.getName() + "\": " + error);
-        }
-    }
+    @NotNull
+    Path getConfigDirectoryPath();
 
     /**
-     * Writes the default values to the targeted Config file on disk.
-     * @throws RuntimeException Thrown when errors occur in reading / writing files.
+     * Gets the full path to the file that will contain the data stored in this config file.
+     *
+     * @return {@link Path}.
      */
-    public void saveDefault() throws RuntimeException {
-        try {
-            String json = GSON.toJson(CONFIG_DEFAULT_INSTANCE);
-            FileWriter writer = new FileWriter(CONFIG_FILE);
-
-            writer.write(json);
-
-            writer.close();
-        } catch(Exception error) {
-            throw new RuntimeException("Error while writing Config file \"" + CONFIG_FILE.getName() + "\": " + error);
-        }
-    }
+    @NotNull
+    Path getFullFilePath();
 
     /**
-     * Creates a new Config file if it doesn't already exist.
-     * @throws RuntimeException Thrown when errors occur in reading / writing files.
+     * Gets the serializer instance used to serialize this config file.
+     *
+     * @return A {@link ConfigSerializer} instance.
      */
-    private void createIfNotExist() throws RuntimeException {
-        boolean needsDefaultWrite;
+    @NotNull
+    ConfigSerializer<T> getSerializer();
 
-        try {
-            needsDefaultWrite = CONFIG_FILE.createNewFile();
-        } catch (IOException error) {
-            throw new RuntimeException("Could not create Config file \"" + CONFIG_FILE.getName() + "\": " + error);
-        }
+    /**
+     * Gets the loader-serializer instance used to deserialize this config file.
+     *
+     * @return A {@link ConfigSerializer} instance.
+     */
+    @NotNull
+    ConfigSerializer<T> getDeserializer();
 
-        if(!needsDefaultWrite && CONFIG_FILE.length() == 0) {
-            needsDefaultWrite = true;
-        }
+    /**
+     * If {@code true} all the file loading logging has been disabled.
+     *
+     * @return {@link Boolean}.
+     */
+    boolean isSilentlyFailing();
 
-        if(needsDefaultWrite) {
-            saveDefault();
-        }
-    }
+    /**
+     * Gets the loader type used to load the default values of this config file.
+     *
+     * @return {@link Type}.
+     */
+    @NotNull
+    Type getLoaderType();
+
+    /**
+     * Gets the loader target (if specified) of the current config file's loader.
+     *
+     * @return {@link String}.
+     */
+    @NotNull
+    String getLoaderTarget();
+
+    /**
+     * Gets the latest instance of this config file.
+     * <p>
+     * Calling this method with a {@link Loader} that could take some time to process a data request
+     * (e.g. {@link Type#URL Loader.Type.URL}) can result in errors and incorrect values, so you should
+     * look at {@link #getInstanceAsync()} instead.
+     *
+     * @return The instance's type {@link T}.
+     */
+    @NotNull
+    T getInstance();
+
+    /**
+     * Returns a wrapper around the instance value. Using {@link CompletableFuture#thenAccept(Consumer) CompletableFuture.thenAccept(...)}
+     * will consume the actual instance value when it's ready.
+     * <p>
+     * This method is useful if this {@link FastConfigFile} is using a {@link Loader} that could take some time to process
+     * a data request (e.g. {@link Type#URL Loader.Type.URL}).
+     */
+    CompletableFuture<T> getInstanceAsync();
 }

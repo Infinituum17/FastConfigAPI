@@ -17,6 +17,7 @@ allprojects {
     minecraft_version = rootProject.minecraft_version
     pack_format_version = rootProject.pack_format_version
     archives_base_name = rootProject.archives_base_name
+    void_lib_version = rootProject.void_lib_version
 }
 
 subprojects {
@@ -50,6 +51,11 @@ subprojects {
             name = "Modrinth"
             url = "https://api.modrinth.com/maven"
         }
+
+        maven {
+            name = "Infinituum Mod Resources"
+            url = "https://raw.githubusercontent.com/Infinituum17/ModResources/main/maven/"
+        }
     }
 
     loom {
@@ -62,6 +68,10 @@ subprojects {
         mappings loom.officialMojangMappings()
         // The following line declares the yarn mappings you may select this one as well.
         // mappings "net.fabricmc:yarn:1.19.2+build.28:v2"
+        implementation 'com.moandjiezana.toml:toml4j:0.7.2'
+
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     }
 
     java {
@@ -81,6 +91,8 @@ subprojects {
                 displayName = "Fast Config API ${project.minecraft_version}-${project.name} - ${project.mod_version}"
                 gameVersions = [project.minecraft_version]
                 gameLoaders = [project.name]
+                releaseType = "beta"
+                version = project.version
 
                 def clog = new File(project.getRootDir(), "changelog.md")
 
@@ -88,7 +100,12 @@ subprojects {
                     changelog = clog.getText()
                 }
 
-                version = project.version
+                relations {
+                    depends {
+                        curseforge = "void_lib"
+                        modrinth = "void_lib"
+                    }
+                }
 
                 mainPublication remapJar
 

@@ -1,25 +1,32 @@
 {
-  "schemaVersion": 1,
-  "id": "${modid}",
-  "version": "${version}",
-  "name": "Fast Config API",
-  "description": "A mod that makes creating Configs easy and fast",
-  "authors": [
-    "Infinituum"
-  ],
-  "contact": {
-    "sources": "https://github.com/Infinituum17/FastConfigAPI"
-  },
-  "license": "MIT",
-  "icon": "assets/${modid}/icon.png",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "infinituum.fastconfigapi.fabric.FastConfigAPIFabric"
-    ]
-  },
-  "mixins": [],
-  "depends": {
-    "minecraft": ">=${mc_version}"
-  }
+    "schemaVersion": 1,
+    "id": "${modid}",
+    "version": "${version}",
+    "name": "Fast Config API",
+    "description": "A mod that makes creating Configs easy and fast",
+    "authors": [
+        "Infinituum"
+    ],
+    "contact": {
+        "sources": "https://github.com/Infinituum17/FastConfigAPI"
+    },
+    "license": "MIT",
+    "icon": "assets/${modid}/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "infinituum.fastconfigapi.fabric.FastConfigAPIFabricCommon"
+        ],
+        "client": [
+            "infinituum.fastconfigapi.fabric.FastConfigAPIFabricClient"
+        ],
+        "server": [
+            "infinituum.fastconfigapi.fabric.FastConfigAPIFabricServer"
+        ]
+    },
+    "mixins": [],
+    "depends": {
+        "minecraft": ">=${mc_version}",
+        "void_lib": ">=${void_lib_version}"
+    }
 }

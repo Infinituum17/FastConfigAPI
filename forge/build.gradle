@@ -25,8 +25,13 @@ configurations {
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
 
+    forgeRuntimeLibrary 'com.moandjiezana.toml:toml4j:0.7.2'
+    include 'com.moandjiezana.toml:toml4j:0.7.2'
+
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionForge')
+
+    modApi("infinituum.void_lib:void_lib-forge:${rootProject.minecraft_version}-${rootProject.void_lib_version}")
 }
 
 processResources {
@@ -35,7 +40,8 @@ processResources {
             "forge_maj_version"  : ((String) project.forge_version).split("-")[1].split("\\.")[0],
             "mc_version"         : project.minecraft_version,
             "pack_format_version": project.pack_format_version,
-            "modid"              : project.archives_base_name
+            "modid"              : project.archives_base_name,
+            "void_lib_version"   : project.void_lib_version
     ]
 
     inputs.properties rep_properties

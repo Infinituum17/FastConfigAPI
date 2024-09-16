@@ -25,15 +25,20 @@ configurations {
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 
+    include 'com.moandjiezana.toml:toml4j:0.7.2'
+
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
+
+    modApi("infinituum.void_lib:void_lib-fabric:${rootProject.minecraft_version}-${rootProject.void_lib_version}")
 }
 
 processResources {
     var rep_properties = [
-            "version"     : project.version,
-            "mc_version"  : project.minecraft_version,
-            "modid"       : project.archives_base_name
+            "version"         : project.version,
+            "mc_version"      : project.minecraft_version,
+            "modid"           : project.archives_base_name,
+            "void_lib_version": project.void_lib_version
     ]
 
     inputs.properties rep_properties
@@ -97,4 +102,8 @@ publishing {
             url "file://" + System.getenv("MOD_RESOURCES").toString() + "/maven"
         }
     }
+}
+
+test {
+    useJUnitPlatform()
 }
