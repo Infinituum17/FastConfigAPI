@@ -23,7 +23,7 @@ public class MinecraftMixin {
     private ConfigManager configManager;
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/resources/ReloadableResourceManager;createReload(Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Ljava/util/List;)Lnet/minecraft/server/packs/resources/ReloadInstance;"))
-    public CompletableFuture<Unit> createReload(CompletableFuture<Unit> completableFuture) {
+    private CompletableFuture<Unit> createReload(CompletableFuture<Unit> completableFuture) {
         this.configManager = new ConfigManager(FastConfig.Side.CLIENT);
 
         this.resourceManager.registerReloadListener(configManager);
