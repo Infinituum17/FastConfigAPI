@@ -1,13 +1,9 @@
 package infinituum.fastconfigapi;
 
 import infinituum.fastconfigapi.api.FastConfigFile;
-import infinituum.fastconfigapi.api.annotations.Loader;
-import infinituum.fastconfigapi.api.annotations.Loader.Type;
-import infinituum.fastconfigapi.utils.Global;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * Main class used to manage {@link infinituum.fastconfigapi.api.FastConfigFile FastConfigFiles}.
@@ -59,42 +55,9 @@ public final class FastConfigs {
     }
 
     /**
-     * Runs code on a class' instance that a {@link FastConfigFile} manages and saves the new state to disk.
-     *
-     * @param clazz          Class that the {@link FastConfigFile} manages.
-     * @param configConsumer A consumer that accepts a class' instance as a parameter.
-     * @param <T>            The type of the class' instance contained in the {@link FastConfigFile}.
-     * @throws RuntimeException Thrown when we're trying to access a non-existent class or if the new state could not be saved.
+     * Reloads all configs from disk.
      */
-    public static <T> void run(Class<T> clazz, Consumer<T> configConsumer) throws RuntimeException {
-        FastConfigFile<T> config = get(clazz);
-
-        configConsumer.accept(config.getInstance());
-
-        config.save();
-    }
-
-    /**
-     * Runs asynchronous code on a class' instance that a {@link FastConfigFile} manages and saves the new state to disk.
-     * <p>
-     * This method is useful if this {@link FastConfigFile} is using a {@link Loader} that could take some time to process
-     * a data request (e.g. {@link Type#URL Loader.Type.URL}).
-     *
-     * @param clazz          Class that the {@link FastConfigFile} manages.
-     * @param configConsumer A consumer that accepts a class' instance as a parameter.
-     * @param <T>            The type of the class' instance contained in the {@link FastConfigFile}.
-     * @throws RuntimeException Thrown when we're trying to access a non-existent class or if the new state could not be saved.
-     */
-    public static <T> void runAsync(Class<T> clazz, Consumer<T> configConsumer) throws RuntimeException {
-        FastConfigFile<T> config = get(clazz);
-
-        config.getInstanceAsync().thenAccept(instance -> {
-            configConsumer.accept(instance);
-            config.save();
-        }).exceptionally(t -> {
-            Thread.currentThread().setName("RunAsync Method");
-            Global.LOGGER.info("Config '{}' could not be saved: {}", config.getFileNameWithExtension(), t);
-            return null;
-        });
+    public static void reloadAll() {
+        CONFIGS.forEach((clazz, config) -> config.load());
     }
 }

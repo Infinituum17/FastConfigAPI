@@ -1,9 +1,11 @@
 package infinituum.fastconfigapi.forge;
 
+import infinituum.fastconfigapi.api.FastConfigFile;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
 import infinituum.fastconfigapi.api.annotations.Loader;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 import infinituum.fastconfigapi.api.serializers.TOMLSerializer;
+import infinituum.fastconfigapi.forge.utils.ConfigScanner;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.moddiscovery.ModAnnotation;
 
@@ -37,5 +39,9 @@ public final class PlatformHelperImpl {
 
     public static Map<String, Object> getPlatformLoaderData(Object object) {
         return (Map<String, Object>) object;
+    }
+
+    public static <T> Map<Class<T>, FastConfigFile<T>> getSidedConfigs(FastConfig.Side side) {
+        return ConfigScanner.getSidedConfigs(side);
     }
 }

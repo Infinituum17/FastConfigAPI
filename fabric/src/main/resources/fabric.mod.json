@@ -16,15 +16,11 @@
     "entrypoints": {
         "main": [
             "infinituum.fastconfigapi.fabric.FastConfigAPIFabricCommon"
-        ],
-        "client": [
-            "infinituum.fastconfigapi.fabric.FastConfigAPIFabricClient"
-        ],
-        "server": [
-            "infinituum.fastconfigapi.fabric.FastConfigAPIFabricServer"
         ]
     },
-    "mixins": [],
+    "mixins": [
+        "${modid}-common.mixins.json"
+    ],
     "depends": {
         "minecraft": ">=${mc_version}",
         "void_lib": ">=${void_lib_version}"

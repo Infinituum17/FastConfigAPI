@@ -1,6 +1,7 @@
 package infinituum.fastconfigapi;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import infinituum.fastconfigapi.api.FastConfigFile;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
 import infinituum.fastconfigapi.api.annotations.Loader;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
@@ -31,6 +32,11 @@ public final class PlatformHelper {
 
     @ExpectPlatform
     public static Loader.Type getPlatformLoaderType(Object object) {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    public static <T> Map<Class<T>, FastConfigFile<T>> getSidedConfigs(FastConfig.Side side) {
         throw new AssertionError();
     }
 }

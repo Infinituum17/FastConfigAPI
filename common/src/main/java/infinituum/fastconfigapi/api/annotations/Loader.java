@@ -14,7 +14,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
@@ -74,11 +73,7 @@ public @interface Loader {
          * <p>
          * The '{@link Loader#target() target}' field of a {@link Loader} annotation will always be ignored.
          */
-        DEFAULT(config -> {
-            config.setDefaultClassInstance();
-
-            config.save();
-        }),
+        DEFAULT(FastConfigFileImpl::setDefaultClassInstance),
 
         /**
          * The URL loader type.
@@ -86,6 +81,7 @@ public @interface Loader {
          * This loader attempts to load a config file from a URL (making an HTTP request).
          * <p>
          * The '{@link Loader#target() target}' field of a {@link Loader} annotation will contain the URL we're trying to load the config from.
+         * This loader runs synchronously, so it's recommended to run it in a separate thread.
          * <p>
          * If the resource we're trying to access with this URL isn't available, the config will be initialized with the {@link Type#DEFAULT default} loader.
          */
@@ -106,34 +102,22 @@ public @interface Loader {
                     .GET()
                     .build();
 
-            CompletableFuture<HttpResponse<String>> futureResponse = httpClient
-                    .sendAsync(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<?> response;
 
-            futureResponse.thenApply(HttpResponse::body)
-                    .thenAccept(response -> {
-                        Thread.currentThread().setName("HttpRequest thread");
-                        config.setPendingRequest(null);
+            try {
+                response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (Exception e) {
+                useDefaultLoaderAfterException(config, e);
+                return;
+            }
 
-                        try {
-                            config.loadStateUnsafely(response);
-                            Global.LOGGER.info("Config '{}' was successfully loaded", config.getFileNameWithExtension());
-                        } catch (Exception e) {
-                            useDefaultLoaderAfterException(config, e);
-                            Global.LOGGER.info("Config '{}' was successfully loaded", config.getFileNameWithExtension());
-                            return;
-                        }
+            String body = (String) response.body();
 
-                        config.save();
-                    })
-                    .exceptionally(e -> {
-                        Thread.currentThread().setName("HttpRequest thread");
-
-                        useDefaultLoaderAfterException(config, e);
-                        Global.LOGGER.info("Config '{}' was successfully loaded", config.getFileNameWithExtension());
-                        return null;
-                    });
-
-            config.setPendingRequest(futureResponse);
+            try {
+                config.loadStateUnsafely(body);
+            } catch (Exception e) {
+                useDefaultLoaderAfterException(config, e);
+            }
         });
 
         private final Consumer<FastConfigFileImpl<?>> loaderFunction;
@@ -143,16 +127,12 @@ public @interface Loader {
         }
 
         private static <T> void useDefaultLoaderAfterException(FastConfigFileImpl<T> config, Throwable e) {
-            config.setPendingRequest(null);
-
             if (!config.isSilentlyFailing()) {
                 Global.LOGGER.error("Could not load config '{}' from url '{}', falling back to default loader: {}", config.getFileNameWithExtension(), config.getLoaderTarget(), e.getMessage());
             }
 
             config.setDefaultLoader();
-
             config.loadDefault();
-            config.save();
         }
 
         public <T> void load(FastConfigFileImpl<T> configFile) {

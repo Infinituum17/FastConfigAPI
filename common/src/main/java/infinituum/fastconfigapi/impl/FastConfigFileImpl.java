@@ -13,11 +13,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Actual implementation of the interface {@link FastConfigFile}.
@@ -34,7 +32,6 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     private final ConfigSerializer<T> serializer;
     private final boolean silentlyFail;
     private ConfigSerializer<T> deserializer;
-    private CompletableFuture<HttpResponse<String>> pendingRequest;
     private Loader.Type loaderType;
     private String loaderTarget;
     private T instance;
@@ -53,21 +50,18 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
         this.loaderTarget = LoaderHelper.getTargetOrDefault(data);
         this.silentlyFail = LoaderHelper.getSilentlyFailOrDefault(data);
         this.deserializer = LoaderHelper.getDeserializerOrDefault(data, this.serializer, loaderType);
-        this.pendingRequest = null;
-
-        this.load();
     }
 
     @Override
     public void loadDefault() throws RuntimeException {
         this.loaderType.load(this);
+        this.save();
     }
 
     @Override
     public void load() throws RuntimeException {
         try {
             deserializer.deserialize(this);
-            Global.LOGGER.info("Config '{}' was successfully loaded", this.getFileNameWithExtension());
         } catch (Exception e) {
             try {
                 this.loadDefault();
@@ -75,6 +69,8 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
                 throw new RuntimeException("Config '" + getFileNameWithExtension() + "' could not be loaded");
             }
         }
+
+        Global.LOGGER.info("Config '{}' was successfully loaded", this.getFileNameWithExtension());
     }
 
     @Override
@@ -84,19 +80,13 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
 
     @Override
     public void save() throws RuntimeException {
-        if (pendingRequest == null) {
-            try {
-                Files.createDirectories(this.getConfigSubdirectoryPath());
+        try {
+            Files.createDirectories(this.getConfigSubdirectoryPath());
 
-                serializer.serialize(this);
-
-                return;
-            } catch (Exception e) {
-                throw new RuntimeException("Contents of Config '" + getFileNameWithExtension() + "' could not be saved");
-            }
+            serializer.serialize(this);
+        } catch (Exception e) {
+            throw new RuntimeException("Contents of Config '" + getFileNameWithExtension() + "' could not be saved");
         }
-
-        throw new RuntimeException("Config HttpRequest is still pending, waiting until timeout...");
     }
 
     public void setDefaultClassInstance() {
@@ -150,24 +140,11 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
 
     @Override
     public @NotNull T getInstance() throws RuntimeException {
-        if (pendingRequest == null) {
-            return instance;
-        }
-
-        throw new RuntimeException("Config HttpRequest is still pending, waiting until timeout...");
+        return instance;
     }
 
     public void setInstance(@NotNull T instance) {
         this.instance = instance;
-    }
-
-    @Override
-    public CompletableFuture<T> getInstanceAsync() {
-        return CompletableFuture.supplyAsync(() -> {
-            pendingRequest.join();
-
-            return this.instance;
-        });
     }
 
     @Override
@@ -183,10 +160,6 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     @Override
     public boolean isSilentlyFailing() {
         return silentlyFail;
-    }
-
-    public void setPendingRequest(CompletableFuture<HttpResponse<String>> pendingRequest) {
-        this.pendingRequest = pendingRequest;
     }
 
     public void setDefaultLoader() {

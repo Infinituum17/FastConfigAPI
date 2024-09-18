@@ -6,15 +6,12 @@ import infinituum.fastconfigapi.api.annotations.FastConfig;
 import infinituum.fastconfigapi.api.serializers.ConfigSerializer;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
-import infinituum.fastconfigapi.utils.Global;
 import infinituum.void_lib.api.utils.UnsafeLoader;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Type;
 
 import java.lang.reflect.Constructor;
 import java.util.Map;
-
-import static infinituum.fastconfigapi.api.annotations.Loader.Type.DEFAULT;
 
 public final class FastConfigHelper {
     private FastConfigHelper() {
@@ -82,10 +79,6 @@ public final class FastConfigHelper {
 
         if (constructors.length > 1 || (constructors.length == 1 && constructors[0].getParameterCount() > 0)) {
             throw new RuntimeException("Fast Config class " + clazz.getName() + " should not define any constructors");
-        }
-
-        if (configFile.getLoaderType().ordinal() == DEFAULT.ordinal()) {
-            Global.LOGGER.info("Config '{}' was successfully loaded", configFile.getFileNameWithExtension());
         }
 
         return configFile;

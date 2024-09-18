@@ -1,9 +1,11 @@
 package infinituum.fastconfigapi.fabric;
 
+import infinituum.fastconfigapi.api.FastConfigFile;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
 import infinituum.fastconfigapi.api.annotations.Loader;
 import infinituum.fastconfigapi.api.serializers.JSONSerializer;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
+import infinituum.fastconfigapi.fabric.utils.ConfigScanner;
 import infinituum.void_lib.fabric.scanner.impl.AnnotationData;
 import infinituum.void_lib.fabric.scanner.impl.ModAnnotation;
 import net.fabricmc.loader.api.FabricLoader;
@@ -32,5 +34,9 @@ public final class PlatformHelperImpl {
         ModAnnotation data = (ModAnnotation) object;
 
         return data.getFields();
+    }
+
+    public static <T> Map<Class<T>, FastConfigFile<T>> getSidedConfigs(FastConfig.Side side) {
+        return ConfigScanner.getSidedConfigs(side);
     }
 }

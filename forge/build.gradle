@@ -22,6 +22,12 @@ configurations {
     }
 }
 
+loom {
+    forge {
+        mixinConfig "fastconfigapi-common.mixins.json"
+    }
+}
+
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
 
@@ -30,6 +36,9 @@ dependencies {
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionForge')
+
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
+    implementation(include("io.github.llamalad7:mixinextras-forge:0.4.1"))
 
     modApi("infinituum.void_lib:void_lib-forge:${rootProject.minecraft_version}-${rootProject.void_lib_version}")
 }
