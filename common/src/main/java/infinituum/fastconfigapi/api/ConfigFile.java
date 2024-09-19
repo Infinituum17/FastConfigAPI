@@ -27,6 +27,8 @@ public interface ConfigFile {
 
     /**
      * Method that loads the default values of the Fast Config class.
+     * <p>
+     * Should not be called directly since it performs async operations in sync ways (the thread can be blocked).
      */
     void loadDefault() throws RuntimeException;
 }

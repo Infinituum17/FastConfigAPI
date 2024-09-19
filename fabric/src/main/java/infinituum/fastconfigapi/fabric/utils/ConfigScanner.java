@@ -23,7 +23,7 @@ public final class ConfigScanner {
         ModAnnotationScanner scanner = ModAnnotationScanner.init();
         Map<Class<T>, FastConfigFile<T>> result = new HashMap<>();
 
-        if (scannedFiles == null) {
+        if (scannedFiles == null || scannedFiles.isEmpty()) {
             scannedFiles = scanner.search(FastConfig.class, MOD_ID);
         }
 
