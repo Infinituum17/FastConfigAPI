@@ -73,10 +73,9 @@ public final class ConfigScanner {
                 .anyMatch(modInfo -> modInfo
                         .getDependencies()
                         .stream()
-                        .anyMatch(dependencies -> dependencies
-                                .getModId()
-                                .equals(MOD_ID))
-                        || modInfo.getModId().equals(MOD_ID));
+                        .anyMatch(dependency -> MOD_ID.equals(dependency.getModId()))
+                        || MOD_ID.equals(modInfo.getModId())
+                        || modInfo.getModId().startsWith("generated_"));
     }
 
     private static ModFileScanData getAnnotationScanResult(IModFileInfo mod) {
