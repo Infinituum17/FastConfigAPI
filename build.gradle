@@ -79,7 +79,7 @@ subprojects {
                 displayName = "Fast Config API ${project.minecraft_version}-${project.name} - ${project.mod_version}"
                 gameVersions = [project.minecraft_version]
                 gameLoaders = [project.name]
-                releaseType = "beta"
+                releaseType = "release"
                 version = project.version
 
                 def clog = new File(project.getRootDir(), "changelog.md")
