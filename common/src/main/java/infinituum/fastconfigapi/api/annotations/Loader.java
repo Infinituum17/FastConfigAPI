@@ -89,14 +89,16 @@ public @interface Loader {
             URI uri;
 
             try {
-                uri = new URL(config.getLoaderTarget()).toURI();
+                URL url = new URL(config.getLoaderTarget());
+
+                if (!url.getProtocol().equals("https")) {
+                    useDefaultLoaderAfterException(config, new RuntimeException("Only \"https\" domains are valid"));
+                    return;
+                }
+
+                uri = url.toURI();
             } catch (Exception e) {
                 useDefaultLoaderAfterException(config, e);
-                return;
-            }
-
-            if (!config.getLoaderTarget().startsWith("https://")) {
-                useDefaultLoaderAfterException(config, new RuntimeException("Only \"https://\" domains are valid"));
                 return;
             }
 
@@ -106,6 +108,8 @@ public @interface Loader {
                     .timeout(Duration.ofSeconds(10))
                     .GET()
                     .build();
+
+            Global.LOGGER.info("Config '{}' is requesting data from url '{}'...", config.getFileNameWithExtension(), config.getLoaderTarget());
 
             HttpResponse<?> response;
 
