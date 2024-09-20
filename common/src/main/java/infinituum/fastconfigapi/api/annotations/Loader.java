@@ -95,6 +95,11 @@ public @interface Loader {
                 return;
             }
 
+            if (!config.getLoaderTarget().startsWith("https://")) {
+                useDefaultLoaderAfterException(config, new RuntimeException("Only \"https://\" domains are valid"));
+                return;
+            }
+
             HttpClient httpClient = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(uri)
@@ -128,7 +133,7 @@ public @interface Loader {
 
         private static <T> void useDefaultLoaderAfterException(FastConfigFileImpl<T> config, Throwable e) {
             if (!config.isSilentlyFailing()) {
-                Global.LOGGER.error("Could not load config '{}' from url '{}', falling back to default loader: {}", config.getFileNameWithExtension(), config.getLoaderTarget(), e.getMessage());
+                Global.LOGGER.error("Could not load config '{}' from url '{}', using default loader: {}", config.getFileNameWithExtension(), config.getLoaderTarget(), e.getMessage());
             }
 
             config.setDefaultLoader();
