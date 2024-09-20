@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import java.util.concurrent.CompletableFuture;
 
 @Mixin(Minecraft.class)
-public class MinecraftMixin {
+public class MinecraftMixin implements ConfigManager.ConfigResource {
     @Shadow
     @Final
     private ReloadableResourceManager resourceManager;
@@ -29,5 +29,10 @@ public class MinecraftMixin {
         this.resourceManager.registerReloadListener(configManager);
 
         return completableFuture;
+    }
+
+    @Override
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
 }

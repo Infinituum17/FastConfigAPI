@@ -10,6 +10,7 @@ import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.flag.FeatureFlagSet;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @Mixin(ReloadableServerResources.class)
 public class ReloadableServerResourcesMixin implements ConfigResource {
+    @Unique
     private ConfigManager configManager;
 
     @Inject(method = "<init>", at = @At("TAIL"))
