@@ -1,6 +1,0 @@
-{
-  "pack": {
-    "description": "FastConfigAPI",
-    "pack_format": ${pack_format_version}
-  }
-}

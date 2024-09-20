@@ -1,13 +1,13 @@
-package infinituum.fastconfigapi.forge;
+package infinituum.fastconfigapi.neoforge;
 
 import infinituum.fastconfigapi.api.FastConfigFile;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
 import infinituum.fastconfigapi.api.annotations.Loader;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 import infinituum.fastconfigapi.api.serializers.TOMLSerializer;
-import infinituum.fastconfigapi.forge.utils.ConfigScanner;
-import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.fml.loading.moddiscovery.ModAnnotation;
+import infinituum.fastconfigapi.neoforge.utils.ConfigScanner;
+import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.fml.loading.modscan.ModAnnotation;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -23,7 +23,7 @@ public final class PlatformHelperImpl {
 
     public static FastConfig.Side getPlatformSide(Object object) {
         if (object instanceof ModAnnotation.EnumHolder holder) {
-            return Enum.valueOf(FastConfig.Side.class, holder.getValue());
+            return Enum.valueOf(FastConfig.Side.class, holder.value());
         }
 
         return FastConfig.Side.COMMON;
@@ -31,7 +31,7 @@ public final class PlatformHelperImpl {
 
     public static Loader.Type getPlatformLoaderType(Object object) {
         if (object instanceof ModAnnotation.EnumHolder holder) {
-            return Enum.valueOf(Loader.Type.class, holder.getValue());
+            return Enum.valueOf(Loader.Type.class, holder.value());
         }
 
         return Loader.Type.DEFAULT;

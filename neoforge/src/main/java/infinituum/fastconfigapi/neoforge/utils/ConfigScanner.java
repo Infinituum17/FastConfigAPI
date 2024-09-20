@@ -1,4 +1,4 @@
-package infinituum.fastconfigapi.forge.utils;
+package infinituum.fastconfigapi.neoforge.utils;
 
 import infinituum.fastconfigapi.api.FastConfigFile;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
@@ -7,10 +7,9 @@ import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 import infinituum.fastconfigapi.utils.Global;
 import infinituum.void_lib.api.utils.UnsafeLoader;
 import net.minecraft.util.Tuple;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.forgespi.language.IModFileInfo;
-import net.minecraftforge.forgespi.language.ModFileScanData;
-import net.minecraftforge.forgespi.language.ModFileScanData.AnnotationData;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforgespi.language.IModFileInfo;
+import net.neoforged.neoforgespi.language.ModFileScanData;
 
 import java.util.Map;
 import java.util.Objects;
@@ -32,7 +31,7 @@ public final class ConfigScanner {
                 .collect(Collectors.toMap(Tuple::getA, Tuple::getB));
     }
 
-    private static <T> Tuple<Class<T>, FastConfigFileImpl<T>> toTuple(AnnotationData annotation, FastConfig.Side side) {
+    private static <T> Tuple<Class<T>, FastConfigFileImpl<T>> toTuple(ModFileScanData.AnnotationData annotation, FastConfig.Side side) {
         Class<T> clazz = getClass(annotation);
 
         if (clazz == null) {
@@ -55,13 +54,13 @@ public final class ConfigScanner {
         return new Tuple<>(clazz, configFile);
     }
 
-    private static Stream<AnnotationData> getValidAnnotations(ModFileScanData mod) {
+    private static Stream<ModFileScanData.AnnotationData> getValidAnnotations(ModFileScanData mod) {
         return mod.getAnnotations()
                 .stream()
                 .filter(ConfigScanner::hasAnnotation);
     }
 
-    private static boolean hasAnnotation(AnnotationData annotation) {
+    private static boolean hasAnnotation(ModFileScanData.AnnotationData annotation) {
         String annDescriptor = annotation.annotationType().getDescriptor();
 
         return annDescriptor.equals(FastConfig.class.descriptorString());
@@ -82,7 +81,7 @@ public final class ConfigScanner {
         return mod.getFile().getScanResult();
     }
 
-    private static <T> Class<T> getClass(AnnotationData data) {
+    private static <T> Class<T> getClass(ModFileScanData.AnnotationData data) {
         String className = data.clazz().getClassName();
         Class<T> result = UnsafeLoader.loadClassNoInit(className, FastConfig.class.getClassLoader());
 

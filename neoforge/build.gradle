@@ -4,7 +4,7 @@ plugins {
 
 architectury {
     platformSetupLoomIde()
-    forge()
+    neoForge()
 }
 
 configurations {
@@ -14,7 +14,7 @@ configurations {
     }
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
-    developmentForge.extendsFrom common
+    developmentNeoForge.extendsFrom common
 
     shadowBundle {
         canBeResolved = true
@@ -22,40 +22,38 @@ configurations {
     }
 }
 
-loom {
-    forge {
-        mixinConfig "fastconfigapi-common.mixins.json"
-    }
+repositories {
+    maven { url "https://maven.neoforged.net/releases/" }
 }
 
 dependencies {
-    forge "net.minecraftforge:forge:${rootProject.forge_version}"
+    neoForge "net.neoforged:neoforge:$rootProject.neoforge_version"
 
     forgeRuntimeLibrary 'com.moandjiezana.toml:toml4j:0.7.2'
+    compileOnly 'com.moandjiezana.toml:toml4j:0.7.2'
     include 'com.moandjiezana.toml:toml4j:0.7.2'
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
-    shadowBundle project(path: ':common', configuration: 'transformProductionForge')
+    shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
 
-    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
-    implementation(include("io.github.llamalad7:mixinextras-forge:0.4.1"))
-
-    modApi("infinituum.void_lib:void_lib-forge:${rootProject.minecraft_version}-${rootProject.void_lib_version}")
+    modApi("infinituum.void_lib:void_lib-neoforge:${rootProject.minecraft_version}-${rootProject.void_lib_version}")
 }
 
 processResources {
+    String version = rootProject.neoforge_version;
+    var base_version = version.substring(0, version.lastIndexOf('.'))
+
     var rep_properties = [
-            "version"            : project.version,
-            "forge_maj_version"  : ((String) project.forge_version).split("-")[1].split("\\.")[0],
-            "mc_version"         : project.minecraft_version,
-            "pack_format_version": project.pack_format_version,
-            "modid"              : project.archives_base_name,
-            "void_lib_version"   : project.void_lib_version
+            "version"              : rootProject.version,
+            "loader_version"       : rootProject.neoforge_loader_version,
+            "neoforge_base_version": base_version,
+            "minecraft_version"    : rootProject.minecraft_version,
+            "void_lib_version"     : rootProject.void_lib_version
     ]
 
     inputs.properties rep_properties
 
-    filesMatching(["META-INF/mods.toml", "pack.mcmeta"]) {
+    filesMatching('META-INF/neoforge.mods.toml') {
         expand rep_properties
     }
 }

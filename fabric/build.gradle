@@ -25,6 +25,7 @@ configurations {
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 
+    compileOnly 'com.moandjiezana.toml:toml4j:0.7.2'
     include 'com.moandjiezana.toml:toml4j:0.7.2'
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
@@ -35,10 +36,9 @@ dependencies {
 
 processResources {
     var rep_properties = [
-            "version"         : project.version,
-            "mc_version"      : project.minecraft_version,
-            "modid"           : project.archives_base_name,
-            "void_lib_version": project.void_lib_version
+            "version"          : rootProject.version,
+            "minecraft_version": rootProject.minecraft_version,
+            "void_lib_version" : rootProject.void_lib_version
     ]
 
     inputs.properties rep_properties

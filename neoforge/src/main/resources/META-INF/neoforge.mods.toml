@@ -1,35 +1,38 @@
 modLoader = "javafml"
-loaderVersion = "[${forge_maj_version},)"
+loaderVersion = "[${loader_version},)"
 issueTrackerURL = "https://github.com/Infinituum17/FastConfigAPI/issues"
 license = "MIT"
 
 [[mods]]
-modId = "${modid}"
+modId = "fastconfigapi"
 version = "${version}"
 displayName = "Fast Config API"
 authors = "Infinituum"
 description = '''
 A mod that makes creating Configs easy and fast
 '''
-logoFile = "assets/${modid}/icon.png"
+logoFile = "assets/fastconfigapi/icon.png"
 
-[[dependencies.${modid}]]
-modId = "forge"
-mandatory = true
-versionRange = "[${forge_maj_version},)"
+[[dependencies.fastconfigapi]]
+modId = "neoforge"
+type = "required"
+versionRange = "[${neoforge_base_version},)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.${modid}]]
+[[dependencies.fastconfigapi]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[${mc_version},)"
+versionRange = "[${minecraft_version},)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.${modid}]]
+[[dependencies.fastconfigapi]]
 modId = "void_lib"
 mandatory = true
 versionRange = "[${void_lib_version},)"
 ordering = "AFTER"
 side = "BOTH"
+
+[[mixins]]
+config = "fastconfigapi-common.mixins.json"
