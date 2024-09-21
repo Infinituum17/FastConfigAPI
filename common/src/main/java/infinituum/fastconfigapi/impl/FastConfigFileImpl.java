@@ -55,6 +55,11 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     @Override
     public void loadDefault() throws RuntimeException {
         this.loaderType.load(this);
+
+        if (!this.deserializer.getClass().equals(this.serializer.getClass())) {
+            this.deserializer = this.serializer;
+        }
+
         this.save();
     }
 
