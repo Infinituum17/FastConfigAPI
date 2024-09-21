@@ -7,6 +7,8 @@ import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 import infinituum.void_lib.api.utils.UnsafeLoader;
 import org.objectweb.asm.Type;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.Map;
 
 public final class LoaderHelper {
@@ -48,7 +50,7 @@ public final class LoaderHelper {
         return false;
     }
 
-    public static <T> ConfigSerializer<T> getDeserializerOrDefault(Map<String, Object> data, ConfigSerializer<T> currentSerializer, Loader.Type loaderType) {
+    public static <T> ConfigSerializer<T> getDeserializerOrDefault(Map<String, Object> data, ConfigSerializer<T> currentSerializer, Loader.Type loaderType, Path filePath) {
         if (loaderType.ordinal() == Loader.Type.DEFAULT.ordinal()) {
             return currentSerializer;
         }
@@ -57,6 +59,15 @@ public final class LoaderHelper {
 
         if (innerData == null) {
             return currentSerializer;
+        }
+
+        try {
+            File file = filePath.toFile();
+            
+            if (file.exists()) {
+                return currentSerializer;
+            }
+        } catch (Exception ignored) {
         }
 
         Class<? extends SerializerWrapper<T>> clazz = null;
