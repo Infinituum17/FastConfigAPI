@@ -49,7 +49,7 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
         this.loaderType = LoaderHelper.getLoaderOrDefault(data);
         this.loaderTarget = LoaderHelper.getTargetOrDefault(data);
         this.silentlyFail = LoaderHelper.getSilentlyFailOrDefault(data);
-        this.deserializer = LoaderHelper.getDeserializerOrDefault(data, this.serializer, loaderType);
+        this.deserializer = LoaderHelper.getDeserializerOrDefault(data, this.serializer, this.loaderType, this.fullFilePath);
     }
 
     @Override
