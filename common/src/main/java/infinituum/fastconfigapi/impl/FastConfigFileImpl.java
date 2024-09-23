@@ -31,6 +31,7 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     private final Path fullFilePath;
     private final ConfigSerializer<T> serializer;
     private final boolean silentlyFail;
+    private final ConfigSerializer<T> originalDeserializer;
     private ConfigSerializer<T> deserializer;
     private Loader.Type loaderType;
     private String loaderTarget;
@@ -50,6 +51,7 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
         this.loaderTarget = LoaderHelper.getTargetOrDefault(data);
         this.silentlyFail = LoaderHelper.getSilentlyFailOrDefault(data);
         this.deserializer = LoaderHelper.getDeserializerOrDefault(data, this.serializer, this.loaderType, this.fullFilePath);
+        this.originalDeserializer = this.deserializer;
     }
 
     @Override
@@ -78,9 +80,8 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
         Global.LOGGER.info("Config '{}' was successfully loaded", this.getFileNameWithExtension());
     }
 
-    @Override
     public void loadStateUnsafely(String content) throws IOException {
-        deserializer.deserialize(this, new StringReader(content));
+        originalDeserializer.deserialize(this, new StringReader(content));
     }
 
     @Override

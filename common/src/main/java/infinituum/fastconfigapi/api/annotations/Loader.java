@@ -9,7 +9,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -89,14 +88,12 @@ public @interface Loader {
             URI uri;
 
             try {
-                URL url = new URL(config.getLoaderTarget());
+                uri = URI.create(config.getLoaderTarget());
 
-                if (!url.getProtocol().equals("https")) {
+                if (!uri.toURL().getProtocol().equals("https")) {
                     useDefaultLoaderAfterException(config, new RuntimeException("Only \"https\" domains are valid"));
                     return;
                 }
-
-                uri = url.toURI();
             } catch (Exception e) {
                 useDefaultLoaderAfterException(config, e);
                 return;
@@ -109,7 +106,7 @@ public @interface Loader {
                     .GET()
                     .build();
 
-            Global.LOGGER.info("Config '{}' is requesting data from url '{}'...", config.getFileNameWithExtension(), config.getLoaderTarget());
+            Global.LOGGER.info("Config '{}' is requesting data from url '{}'", config.getFileNameWithExtension(), config.getLoaderTarget());
 
             HttpResponse<?> response;
 

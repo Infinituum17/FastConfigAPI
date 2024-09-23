@@ -2,8 +2,6 @@ package infinituum.fastconfigapi.api;
 
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 
-import java.io.IOException;
-
 /**
  * Interface that defines Config's methods to handle Files.
  * <p>
@@ -19,11 +17,6 @@ public interface ConfigFile {
      * Method that loads the current state (on disk) into the Fast Config class.
      */
     void load() throws RuntimeException;
-
-    /**
-     * Method that loads the provided state into the Fast Config class.
-     */
-    void loadStateUnsafely(String state) throws IOException;
 
     /**
      * Method that loads the default values of the Fast Config class.
