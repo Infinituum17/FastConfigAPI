@@ -50,7 +50,20 @@ public final class LoaderHelper {
         return false;
     }
 
-    public static <T> ConfigSerializer<T> getDeserializerOrDefault(Map<String, Object> data, ConfigSerializer<T> currentSerializer, Loader.Type loaderType, Path filePath) {
+    public static boolean isCurrentDeserializerOriginal(Path filePath) {
+        try {
+            File file = filePath.toFile();
+
+            if (file.exists()) {
+                return false;
+            }
+        } catch (Exception ignored) {
+        }
+
+        return true;
+    }
+
+    public static <T> ConfigSerializer<T> getOriginalDeserializerOrDefault(Map<String, Object> data, ConfigSerializer<T> currentSerializer, Loader.Type loaderType) {
         if (loaderType.ordinal() == Loader.Type.DEFAULT.ordinal()) {
             return currentSerializer;
         }
@@ -59,15 +72,6 @@ public final class LoaderHelper {
 
         if (innerData == null) {
             return currentSerializer;
-        }
-
-        try {
-            File file = filePath.toFile();
-            
-            if (file.exists()) {
-                return currentSerializer;
-            }
-        } catch (Exception ignored) {
         }
 
         Class<? extends SerializerWrapper<T>> clazz = null;
