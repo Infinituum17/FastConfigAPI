@@ -8,7 +8,8 @@
 
 A lightweight API to manage your Configs easily.
 
-Check out the ["Getting started"]() page to get started immediately.
+Check out the ["Getting started"](https://github.com/Infinituum17/FastConfigAPI/wiki/Getting-Started) page to get
+started immediately.
 
 ## How it works
 
@@ -18,7 +19,7 @@ The whole purpose of this mod is to have a simple and easy-to-follow api,
 so you can start creating your configs as fast as possible and also make them platform-independent,
 so that you can use it with all the mod loaders you like.
 
-Check out the [wiki](https://github.com/Infinituum17/FastConfigAPI/wiki) to get started.
+Check out the [wiki](https://github.com/Infinituum17/FastConfigAPI/wiki/Getting-Started) to get started.
 
 ## Additional resources
 
