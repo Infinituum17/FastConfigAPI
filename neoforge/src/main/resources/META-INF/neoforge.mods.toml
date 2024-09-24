@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "[${loader_version},)"
 issueTrackerURL = "https://github.com/Infinituum17/FastConfigAPI/issues"
-license = "MIT"
+license = "Infinituum License v.1.0"
 
 [[mods]]
 modId = "fastconfigapi"

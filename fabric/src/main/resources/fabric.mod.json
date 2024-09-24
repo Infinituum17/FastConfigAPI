@@ -10,7 +10,7 @@
     "contact": {
         "sources": "https://github.com/Infinituum17/FastConfigAPI"
     },
-    "license": "MIT",
+    "license": "Infinituum License v.1.0",
     "icon": "assets/fastconfigapi/icon.png",
     "environment": "*",
     "entrypoints": {
