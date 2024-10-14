@@ -74,7 +74,7 @@ public final class TOMLSerializer<T> implements SerializerWrapper<T> {
             }
 
             Class<T> configClass = config.getConfigClass();
-            T instance = toml.read(reader).to(config.getConfigClass());
+            T instance = toml.read(reader).to(configClass);
 
             if (instance == null) {
                 throw new RuntimeException("Could not set Config instance value for class '"
