@@ -85,12 +85,18 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
 
             serializer.serialize(this);
         } catch (Exception e) {
-            throw new RuntimeException("Contents of Config '" + getFileNameWithExtension() + "' could not be saved");
+            throw new RuntimeException("Contents of Config '" + getFileNameWithExtension() + "' could not be saved: " + e);
         }
     }
 
     public void setDefaultClassInstance() {
-        this.setInstance(UnsafeLoader.loadInstance(clazz));
+        T instance = UnsafeLoader.loadInstance(clazz);
+
+        if (instance == null) {
+            throw new RuntimeException("Could not load default instance for class '" + clazz.getSimpleName() + "'");
+        }
+
+        this.setInstance(instance);
     }
 
     @Override

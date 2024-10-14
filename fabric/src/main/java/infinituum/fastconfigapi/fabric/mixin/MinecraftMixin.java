@@ -1,4 +1,4 @@
-package infinituum.fastconfigapi.mixin;
+package infinituum.fastconfigapi.fabric.mixin;
 
 import infinituum.fastconfigapi.api.annotations.FastConfig;
 import infinituum.fastconfigapi.utils.ConfigManager;

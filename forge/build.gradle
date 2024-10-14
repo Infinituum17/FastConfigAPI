@@ -22,12 +22,6 @@ configurations {
     }
 }
 
-loom {
-    forge {
-        mixinConfig "fastconfigapi-common.mixins.json"
-    }
-}
-
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
 
