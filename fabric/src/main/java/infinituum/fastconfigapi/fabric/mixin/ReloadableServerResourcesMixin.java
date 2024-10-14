@@ -1,4 +1,4 @@
-package infinituum.fastconfigapi.mixin;
+package infinituum.fastconfigapi.fabric.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import infinituum.fastconfigapi.api.annotations.FastConfig;

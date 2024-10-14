@@ -52,7 +52,7 @@ public final class FastConfigs {
             throw new RuntimeException("Tried to retrieve config of non-existent class '" + clazz.getSimpleName() + "'");
         }
 
-        return (FastConfigFile<T>) CONFIGS.get(clazz);
+        return (FastConfigFile<T>) fastConfigFile;
     }
 
     /**

@@ -83,7 +83,8 @@ public final class ConfigScanner {
 
     private static <T> Class<T> getClass(ModFileScanData.AnnotationData data) {
         String className = data.clazz().getClassName();
-        Class<T> result = UnsafeLoader.loadClassNoInit(className, FastConfig.class.getClassLoader());
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        Class<T> result = UnsafeLoader.loadClassNoInit(className, contextClassLoader);
 
         if (result == null) {
             Global.LOGGER.error("Could not load class {}", className);

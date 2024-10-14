@@ -15,11 +15,11 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "infinituum.fastconfigapi.fabric.FastConfigAPIFabricCommon"
+            "infinituum.fastconfigapi.fabric.FastConfigAPIFabric"
         ]
     },
     "mixins": [
-        "fastconfigapi-common.mixins.json"
+        "fastconfigapi-fabric.mixins.json"
     ],
     "depends": {
         "minecraft": ">=${minecraft_version}",

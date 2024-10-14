@@ -33,6 +33,3 @@ mandatory = true
 versionRange = "[${void_lib_version},)"
 ordering = "AFTER"
 side = "BOTH"
-
-[[mixins]]
-config = "fastconfigapi-common.mixins.json"

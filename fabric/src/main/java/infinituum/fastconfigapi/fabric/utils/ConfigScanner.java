@@ -50,7 +50,8 @@ public final class ConfigScanner {
                 continue;
             }
 
-            Class<T> clazz = UnsafeLoader.loadClassNoInit(annotatedClass.getName(), FastConfig.class.getClassLoader());
+            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            Class<T> clazz = UnsafeLoader.loadClassNoInit(annotatedClass.getName(), contextClassLoader);
 
             if (clazz == null) {
                 continue;
