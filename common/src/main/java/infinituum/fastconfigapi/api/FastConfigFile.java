@@ -15,7 +15,7 @@ import java.nio.file.Path;
  *
  * @param <T> The type of the class instance contained in the current config file.
  */
-public interface FastConfigFile<T> extends ConfigFile {
+public interface FastConfigFile<T> extends GenericConfigFile {
     /**
      * Gets the class contained in the current config file.
      *
@@ -118,4 +118,18 @@ public interface FastConfigFile<T> extends ConfigFile {
      */
     @NotNull
     T getInstance();
+
+    /**
+     * Gets a human-readable representation of the class name / file name used.
+     *
+     * @return The human-readable {@link String}.
+     */
+    String getHumanReadableName();
+
+    /**
+     * Gets the mod-id of the mod which manages this config.
+     *
+     * @return A mod-id {@link String}.
+     */
+    String getModId();
 }

@@ -1,5 +1,6 @@
 package infinituum.fastconfigapi.impl;
 
+import infinituum.fastconfigapi.FastConfigAPI;
 import infinituum.fastconfigapi.PlatformHelper;
 import infinituum.fastconfigapi.api.FastConfigFile;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
@@ -7,7 +8,6 @@ import infinituum.fastconfigapi.api.annotations.Loader;
 import infinituum.fastconfigapi.api.helpers.FastConfigHelper;
 import infinituum.fastconfigapi.api.helpers.LoaderHelper;
 import infinituum.fastconfigapi.api.serializers.ConfigSerializer;
-import infinituum.fastconfigapi.utils.Global;
 import infinituum.void_lib.api.utils.UnsafeLoader;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,6 +32,8 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     private final ConfigSerializer<T> serializer;
     private final boolean silentlyFail;
     private final ConfigSerializer<T> originalDeserializer;
+    private final String humanReadableName;
+    private final String modId;
     private ConfigSerializer<T> deserializer;
     private Loader.Type loaderType;
     private String loaderTarget;
@@ -42,6 +44,8 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
 
         this.clazz = clazz;
         this.side = side;
+        this.modId = FastConfigHelper.getModId(clazz, data);
+        this.humanReadableName = FastConfigHelper.getHumanReadableNameOrDefault(data, clazz.getSimpleName());
         this.fileName = FastConfigHelper.getFileNameOrDefault(data, clazz.getSimpleName(), side);
         this.serializer = FastConfigHelper.getSerializerOrDefault(data);
         this.configDirectoryPath = PlatformHelper.getDefaultConfigDirPath();
@@ -82,7 +86,7 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
             }
         }
 
-        Global.LOGGER.info("Config '{}' was successfully loaded", this.getFileNameWithExtension());
+        FastConfigAPI.LOGGER.info("Config '{}' was successfully loaded", this.getFileNameWithExtension());
     }
 
     public void loadStateUnsafely(String content) throws IOException {
@@ -96,12 +100,18 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
 
             serializer.serialize(this);
         } catch (Exception e) {
-            throw new RuntimeException("Contents of Config '" + getFileNameWithExtension() + "' could not be saved");
+            throw new RuntimeException("Contents of Config '" + getFileNameWithExtension() + "' could not be saved: " + e);
         }
     }
 
     public void setDefaultClassInstance() {
-        this.setInstance(UnsafeLoader.loadInstance(clazz));
+        T instance = UnsafeLoader.loadInstance(clazz);
+
+        if (instance == null) {
+            throw new RuntimeException("Could not load default instance for class '" + clazz.getSimpleName() + "'");
+        }
+
+        this.setInstance(instance);
     }
 
     @Override
@@ -177,5 +187,15 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
         this.loaderType = Loader.Type.DEFAULT;
         this.loaderTarget = "";
         this.deserializer = this.serializer;
+    }
+
+    @Override
+    public String getHumanReadableName() {
+        return humanReadableName;
+    }
+
+    @Override
+    public String getModId() {
+        return modId;
     }
 }

@@ -3,11 +3,11 @@ package infinituum.fastconfigapi.api;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 
 /**
- * Interface that defines Config's methods to handle Files.
+ * Interface that defines generic Config methods to handle Files.
  * <p>
  * See {@link FastConfigFileImpl}.
  */
-public interface ConfigFile {
+public interface GenericConfigFile {
     /**
      * Method that saves the current state of the Fast Config class.
      */

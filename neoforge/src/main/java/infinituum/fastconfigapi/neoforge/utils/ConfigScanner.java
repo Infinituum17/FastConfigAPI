@@ -1,10 +1,10 @@
 package infinituum.fastconfigapi.neoforge.utils;
 
+import infinituum.fastconfigapi.FastConfigAPI;
 import infinituum.fastconfigapi.api.FastConfigFile;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
 import infinituum.fastconfigapi.api.helpers.FastConfigHelper;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
-import infinituum.fastconfigapi.utils.Global;
 import infinituum.void_lib.api.utils.UnsafeLoader;
 import net.minecraft.util.Tuple;
 import net.neoforged.fml.ModList;
@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static infinituum.fastconfigapi.utils.Global.MOD_ID;
+import static infinituum.fastconfigapi.FastConfigAPI.MOD_ID;
 
 public final class ConfigScanner {
     public static <T> Map<Class<T>, FastConfigFile<T>> getSidedConfigs(FastConfig.Side side) {
@@ -43,7 +43,7 @@ public final class ConfigScanner {
         try {
             configFile = FastConfigHelper.toFile(clazz, annotation.annotationData(), side);
         } catch (Exception e) {
-            Global.LOGGER.error("Could not load config class {}: {}", clazz.getName(), e);
+            FastConfigAPI.LOGGER.error("Could not load config class {}: {}", clazz.getName(), e);
             return null;
         }
 
@@ -83,10 +83,11 @@ public final class ConfigScanner {
 
     private static <T> Class<T> getClass(ModFileScanData.AnnotationData data) {
         String className = data.clazz().getClassName();
-        Class<T> result = UnsafeLoader.loadClassNoInit(className, FastConfig.class.getClassLoader());
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        Class<T> result = UnsafeLoader.loadClassNoInit(className, contextClassLoader);
 
         if (result == null) {
-            Global.LOGGER.error("Could not load class {}", className);
+            FastConfigAPI.LOGGER.error("Could not load class {}", className);
         }
 
         return result;

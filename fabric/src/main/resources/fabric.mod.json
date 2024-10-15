@@ -10,12 +10,18 @@
     "contact": {
         "sources": "https://github.com/Infinituum17/FastConfigAPI"
     },
-    "license": "Infinituum License v.1.0",
+    "license": "Infinituum License",
     "icon": "assets/fastconfigapi/icon.png",
     "environment": "*",
     "entrypoints": {
         "main": [
-            "infinituum.fastconfigapi.fabric.FastConfigAPIFabricCommon"
+            "infinituum.fastconfigapi.fabric.FastConfigAPIFabric"
+        ],
+        "client": [
+            "infinituum.fastconfigapi.fabric.FastConfigAPIFabric"
+        ],
+        "server": [
+            "infinituum.fastconfigapi.fabric.FastConfigAPIFabric"
         ]
     },
     "mixins": [

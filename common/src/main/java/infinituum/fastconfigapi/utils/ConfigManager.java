@@ -19,8 +19,4 @@ public final class ConfigManager implements ResourceManagerReloadListener {
     public void onResourceManagerReload(ResourceManager resourceManager) {
         FastConfigs.reloadAll();
     }
-
-    public interface ConfigResource {
-        ConfigManager getConfigManager();
-    }
 }

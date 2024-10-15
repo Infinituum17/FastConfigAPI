@@ -59,12 +59,19 @@ import java.util.UUID;
 @Target(ElementType.TYPE)
 public @interface FastConfig {
     /**
+     * The mod-id of the mod that manages this Config file.
+     *
+     * @return {@link String} mod-id
+     */
+    String modId();
+
+    /**
      * The file name used to create the Config file.
      *
      * @return {@link String} - default: The Class' file name (formatted in {@link CaseFormat#LOWER_HYPHEN} case)
      */
     String fileName() default "";
-
+    
     /**
      * The serializer used to Serialize.
      *

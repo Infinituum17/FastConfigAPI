@@ -3,7 +3,9 @@ package infinituum.fastconfigapi;
 import infinituum.fastconfigapi.api.FastConfigFile;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -52,7 +54,7 @@ public final class FastConfigs {
             throw new RuntimeException("Tried to retrieve config of non-existent class '" + clazz.getSimpleName() + "'");
         }
 
-        return (FastConfigFile<T>) CONFIGS.get(clazz);
+        return (FastConfigFile<T>) fastConfigFile;
     }
 
     /**
@@ -69,6 +71,15 @@ public final class FastConfigs {
      */
     public static <T> T get(Class<T> clazz) throws RuntimeException {
         return getFile(clazz).getInstance();
+    }
+
+    /**
+     * Gets all available {@link FastConfigFile FastConfigFiles}.
+     *
+     * @return A {@link Set} of {@link FastConfigFile FastConfigFiles}.
+     */
+    public static List<FastConfigFile<?>> getAll() {
+        return CONFIGS.values().stream().toList();
     }
 
     /**

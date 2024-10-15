@@ -27,6 +27,16 @@ public final class FastConfigHelper {
         return side.appendTo(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, fileName));
     }
 
+    public static @NotNull String getHumanReadableNameOrDefault(Map<String, Object> data, String className) {
+        String name = className;
+
+        if (data.containsKey("fileName") && data.get("fileName") instanceof String fileName) {
+            name = fileName;
+        }
+
+        return name;
+    }
+
     public static <T> @NotNull ConfigSerializer<T> getSerializerOrDefault(Map<String, Object> data) {
         Class<? extends SerializerWrapper<T>> clazz = null;
 
@@ -90,5 +100,13 @@ public final class FastConfigHelper {
         }
 
         return clazz;
+    }
+
+    public static <T> @NotNull String getModId(Class<T> clazz, @NotNull Map<String, Object> data) {
+        if (!data.containsKey("modId")) {
+            throw new RuntimeException("Class " + clazz.getSimpleName() + " did not specify a mod-id");
+        }
+
+        return (String) data.get("modId");
     }
 }

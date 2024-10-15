@@ -1,0 +1,5 @@
+{
+    "options.config": "Configuration",
+    "menu.fastconfigapi.config": "Configuration",
+    "menu.fastconfigapi.config.list": "Available Configs"
+}
