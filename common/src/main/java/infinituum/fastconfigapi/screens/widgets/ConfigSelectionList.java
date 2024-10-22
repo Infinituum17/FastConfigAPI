@@ -1,43 +1,47 @@
 package infinituum.fastconfigapi.screens.widgets;
 
-import infinituum.fastconfigapi.api.FastConfigFile;
-import infinituum.fastconfigapi.screens.ConfigSelectionScreen;
 import infinituum.fastconfigapi.screens.models.ConfigSelectionModel;
-import net.minecraft.client.Minecraft;
+import infinituum.fastconfigapi.screens.utils.Refreshable;
+import infinituum.fastconfigapi.screens.utils.Repositionable;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent.ArrowNavigation;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent.TabNavigation;
 import org.jetbrains.annotations.Nullable;
 
-import static infinituum.fastconfigapi.FastConfigAPI.MOD_ID;
-
-public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelectionList.FastConfigEntry> implements Refreshable {
-    private final ConfigSelectionScreen parent;
+public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelectionEntry> implements Refreshable, Repositionable {
+    private final ExpansionListManager manager;
     private final ConfigSelectionModel model;
-    private ConfigOptionsList configOptions;
 
-    /**
-     * {@code x} = 0 (default, unless set via setX)<br/>
-     * {@code k} -> y<br/>
-     * {@code i} -> width<br/>
-     * {@code j} -> height<br/>
-     * {@code l} -> itemHeight
-     */
-    public ConfigSelectionList(Minecraft minecraft, ConfigSelectionScreen parent, int i, int j, int k, int l, ConfigSelectionModel model) {
-        super(minecraft, i, j, k, l);
+    public ConfigSelectionList(ExpansionListManager manager) {
+        super(manager.getMinecraft(),
+                manager.getListWidth(),
+                manager.getListHeight(),
+                manager.getTopPadding(),
+                manager.getItemHeight());
 
-        this.parent = parent;
-        this.model = model;
+        this.manager = manager;
+        this.model = manager.getModel();
     }
 
-    /* Size of one list element (width) from center */
     @Override
     public int getRowWidth() {
-        return this.width; // this.width -> width of the whole list
+        return this.width;
+    }
+
+    @Override
+    public void setSelected(@Nullable ConfigSelectionEntry entry) {
+        super.setSelected(entry);
+
+        if (entry != null) {
+            this.model.setSelected(entry.getConfig());
+        }
+
+        this.manager.getOptions().setSelected(null);
+        this.manager.getOptions().setFocused(null);
+        this.manager.refreshOptions();
     }
 
     @Override
@@ -46,14 +50,15 @@ public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelecti
     }
 
     @Override
-    public void setSelected(@Nullable ConfigSelectionList.FastConfigEntry entry) {
-        super.setSelected(entry);
+    public boolean mouseClicked(double d, double e, int i) {
+        boolean isProcessedClick = super.mouseClicked(d, e, i);
 
-        if (entry != null) {
-            this.model.setSelected(entry.getConfig());
+        if (isProcessedClick) {
+            this.manager.getOptions().setFocused(null);
+            this.manager.getOptions().setSelected(null);
         }
 
-        configOptions.refresh();
+        return isProcessedClick;
     }
 
     @Override
@@ -62,7 +67,7 @@ public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelecti
         this.setSelected(null);
 
         this.model.getConfigs().forEach(config -> {
-            var entry = new FastConfigEntry(this.minecraft, config, this);
+            var entry = new ConfigSelectionEntry(this.manager, config, this);
             this.children().add(entry);
 
             if (config.equals(this.model.getSelected())) {
@@ -73,98 +78,96 @@ public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelecti
 
     @Nullable
     @Override
-    public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
-        if (focusNavigationEvent instanceof FocusNavigationEvent.TabNavigation tabNavigation) {
+    public ComponentPath nextFocusPath(FocusNavigationEvent event) {
+        if (event instanceof TabNavigation tabNavigation) {
             if (tabNavigation.forward()) {
-                if (this.getItemCount() == 0) {
-                    return ComponentPath.leaf(this.parent.getDoneButton());
-                }
+                return tabForward(tabNavigation);
+            } else {
+                return tabBackwards(tabNavigation);
+            }
+        } else if (event instanceof ArrowNavigation arrowNavigation) {
+            return arrowNavigate(arrowNavigation);
+        }
 
-                if (this.isFocused()) {
-                    ComponentPath componentPath = this.configOptions.nextFocusPath(focusNavigationEvent);
+        return super.nextFocusPath(event);
+    }
 
-                    if (componentPath != null) {
-                        return componentPath;
-                    }
-                }
+    private ComponentPath tabForward(TabNavigation navigation) {
+        if (!this.isFocused() && !this.manager.getOptions().isFocused()) {
+            this.manager.resetLists();
 
-                if (!this.isFocused()) {
-                    FastConfigEntry next = this.nextEntry(focusNavigationEvent.getVerticalDirectionForInitialFocus());
+            return ComponentPath.path(this);
+        }
 
-                    if (next != null) {
-                        return ComponentPath.path(this, ComponentPath.leaf(next));
-                    }
+        if (this.isFocused()) {
+            ConfigOptionsList options = this.manager.getOptions();
+            ComponentPath nextOptionsEntry = options.nextFocusPath(navigation);
 
-                    return ComponentPath.leaf(this.parent.getDoneButton());
-                }
-
-                return super.nextFocusPath(focusNavigationEvent);
+            if (nextOptionsEntry != null) {
+                this.setFocused(null);
+                return nextOptionsEntry;
             }
         }
 
-        return null;
+        ConfigSelectionEntry nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
+
+        if (nextEntry != null) {
+            ConfigOptionsList options = this.manager.getOptions();
+
+            if (options.isFocused()) {
+                options.setFocused(null);
+            }
+
+            return ComponentPath.path(this, ComponentPath.leaf(nextEntry));
+        }
+
+        // No more configs, no more options
+
+        this.setFocused(null);
+        this.manager.getOptions().setSelected(null);
+
+        return this.manager.getEscapePath();
     }
 
-    public void setConfigOptions(ConfigOptionsList configOptions) {
-        this.configOptions = configOptions;
+    private ComponentPath tabBackwards(TabNavigation navigation) {
+        if (this.isFocused()) {
+            ConfigOptionsList options = this.manager.getOptions();
+            ComponentPath nextOptionsEntry = options.nextFocusPath(navigation);
+
+            if (nextOptionsEntry != null) {
+                this.setFocused(null);
+                return nextOptionsEntry;
+            }
+        }
+
+        ConfigSelectionEntry nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
+
+        if (nextEntry != null) {
+            ConfigOptionsList options = this.manager.getOptions();
+
+            if (!options.isFocused()) {
+                options.setFocused(true);
+                this.setSelected(nextEntry);
+
+                return ComponentPath.path(this, ComponentPath.leaf(nextEntry));
+            }
+
+            return options.nextFocusPath(navigation);
+        }
+
+        this.setFocused(null);
+        this.manager.getOptions().setSelected(null);
+
+        return this.manager.getEscapePath();
     }
 
-    public static class FastConfigEntry extends ObjectSelectionList.Entry<FastConfigEntry> {
-        private final Minecraft minecraft;
-        private final FastConfigFile<?> config;
-        private final ConfigSelectionList parent;
-        private final String modId;
-        private final String name;
+    private ComponentPath arrowNavigate(ArrowNavigation arrowNavigation) {
+        return super.nextFocusPath(arrowNavigation);
+    }
 
-        public FastConfigEntry(Minecraft minecraft, @NotNull FastConfigFile<?> config, ConfigSelectionList parent) {
-            this.minecraft = minecraft;
-            this.config = config;
-            this.parent = parent;
-
-            this.modId = config.getModId();
-            this.name = config.getHumanReadableName();
-        }
-
-        @Override
-        public @NotNull Component getNarration() {
-            return Component.translatable("narrator.select", this.config.getFileName());
-        }
-
-        /**
-         * @param i  -> x
-         * @param j  -> y
-         * @param k
-         * @param l
-         * @param m
-         * @param n  -> mx
-         * @param o  -> my
-         * @param bl
-         * @param f
-         */
-        @Override
-        public void render(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-            int itemHeight = this.parent.itemHeight;
-            int leftPadding = k + itemHeight;
-
-            guiGraphics.blitSprite(ResourceLocation.fromNamespaceAndPath(MOD_ID, "icon/config"), k, j - 2, itemHeight, itemHeight);
-
-            guiGraphics.drawString(
-                    this.minecraft.font,
-                    this.minecraft.font.plainSubstrByWidth(name, this.parent.getRowWidth() - 2 - leftPadding),
-                    leftPadding,
-                    j + 2,
-                    0xFFFFFF);
-
-            guiGraphics.drawString(
-                    this.minecraft.font,
-                    this.minecraft.font.plainSubstrByWidth(modId, this.parent.getRowWidth() - 2 - leftPadding),
-                    leftPadding,
-                    j + 2 + this.minecraft.font.lineHeight + 4,
-                    0xA0A0A0);
-        }
-
-        public @NotNull FastConfigFile<?> getConfig() {
-            return config;
-        }
+    @Override
+    public void reposition(HeaderAndFooterLayout layout) {
+        this.updateSize(this.manager.getListWidth(), layout);
+        this.setX(this.manager.getListX());
     }
 }
