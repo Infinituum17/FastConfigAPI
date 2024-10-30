@@ -1,5 +1,8 @@
 package infinituum.fastconfigapi.utils;
 
+import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
+import net.minecraft.client.gui.Font;
+
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -7,26 +10,28 @@ public class ConfigOption<T> {
     private final Consumer<T> setter;
     private final String fieldName;
     private final Supplier<T> getter;
-    // TODO: Implement this class (we need to store it in each entry so that we can create an element directly from here).
-    //  We probably need a setter (consumer-like) to set the original instance.
-    //  Maybe this can also be optimized and done directly with a FastConfigFile interaction. <.<
+    private final InputWidgetWrapper<T> widgetWrapper;
 
-    public ConfigOption(String fieldName, Supplier<T> getter, Consumer<T> setter) {
+    public ConfigOption(String fieldName, Supplier<T> getter, Consumer<T> setter, Font font) {
         this.fieldName = fieldName;
         this.getter = getter;
         this.setter = setter;
+        this.widgetWrapper = InputWidgetWrapper.createWidgetWrapper(getter.get(), font, fieldName);
     }
 
     public T getValue() {
         return this.getter.get();
     }
 
-    // TODO: Check casting String -> T
     public void setValue(T value) {
         this.setter.accept(value);
     }
 
     public String getFieldName() {
         return fieldName;
+    }
+
+    public InputWidgetWrapper<?> getWidgetWrapper() {
+        return this.widgetWrapper;
     }
 }

@@ -1,20 +1,24 @@
-package infinituum.fastconfigapi.screens.widgets;
+package infinituum.fastconfigapi.screens.utils;
 
 import infinituum.fastconfigapi.screens.ConfigSelectionScreen;
 import infinituum.fastconfigapi.screens.models.ConfigSelectionModel;
-import infinituum.fastconfigapi.screens.utils.Refreshable;
-import infinituum.fastconfigapi.screens.utils.Repositionable;
+import infinituum.fastconfigapi.screens.widgets.ConfigOptionsEntry;
+import infinituum.fastconfigapi.screens.widgets.ConfigOptionsList;
+import infinituum.fastconfigapi.screens.widgets.ConfigSelectionEntry;
+import infinituum.fastconfigapi.screens.widgets.ConfigSelectionList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 
+import java.util.List;
+
 public final class ExpansionListManager implements Refreshable, Repositionable {
     private final Minecraft minecraft;
     private final ConfigSelectionScreen parent;
     private final ConfigSelectionList list;
-    private final ConfigOptionsList options;
+    private final ConfigOptionsList<?> options;
     private final ConfigSelectionModel model;
 
     public ExpansionListManager(Minecraft minecraft, ConfigSelectionScreen parent) {
@@ -26,48 +30,52 @@ public final class ExpansionListManager implements Refreshable, Repositionable {
         this.options = new ConfigOptionsList(this);
     }
 
-    Minecraft getMinecraft() {
+    public Minecraft getMinecraft() {
         return this.minecraft;
     }
 
-    Font getFont() {
+    public Font getFont() {
         return this.minecraft.font;
     }
 
-    ConfigSelectionModel getModel() {
+    public ConfigSelectionModel getModel() {
         return this.model;
     }
 
-    int getListX() {
+    public int getListX() {
         return 0;
     }
 
-    int getListWidth() {
+    public int getListWidth() {
         return 175;
     }
 
-    int getListHeight() {
+    public int getListHeight() {
         return parent.height - 70;
     }
 
-    int getOptionsX() {
+    public int getListItemHeight() {
+        return 50;
+    }
+
+    public int getOptionsX() {
         return 180;
     }
 
-    int getOptionsWidth() {
+    public int getOptionsWidth() {
         return parent.width - 180;
     }
 
-    int getOptionsHeight() {
+    public int getOptionsHeight() {
         return parent.height - 70;
     }
 
-    int getTopPadding() {
-        return 33;
+    public int getOptionsItemHeight() {
+        return 30;
     }
 
-    int getItemHeight() {
-        return 43;
+    public int getTopPadding() {
+        return 33;
     }
 
     @Override
@@ -76,11 +84,11 @@ public final class ExpansionListManager implements Refreshable, Repositionable {
         this.repositionOptions(layout);
     }
 
-    void repositionList(HeaderAndFooterLayout layout) {
+    public void repositionList(HeaderAndFooterLayout layout) {
         this.list.reposition(layout);
     }
 
-    void repositionOptions(HeaderAndFooterLayout layout) {
+    public void repositionOptions(HeaderAndFooterLayout layout) {
         this.options.reposition(layout);
     }
 
@@ -90,16 +98,25 @@ public final class ExpansionListManager implements Refreshable, Repositionable {
         this.refreshOptions();
     }
 
-    void refreshList() {
+    public void refreshList() {
         this.list.refresh();
     }
 
-    void refreshOptions() {
+    public void refreshOptions() {
         this.options.refresh();
     }
 
-    public void save() {
-        // TODO: Implement onClose resolution
+    public void saveCurrent() {
+        List<? extends ConfigOptionsEntry<?>> options = this.getOptions().children();
+
+        for (ConfigOptionsEntry<?> option : options) {
+            // TODO: Uncomment
+            // option.save();
+        }
+    }
+
+    public ConfigOptionsList<?> getOptions() {
+        return options;
     }
 
     public boolean isOptionsEmpty() {
@@ -112,10 +129,6 @@ public final class ExpansionListManager implements Refreshable, Repositionable {
 
     public ConfigSelectionList getList() {
         return list;
-    }
-
-    public ConfigOptionsList getOptions() {
-        return options;
     }
 
     public ConfigSelectionScreen getScreen() {

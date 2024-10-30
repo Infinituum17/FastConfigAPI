@@ -6,6 +6,7 @@ import infinituum.fastconfigapi.PlatformHelper;
 import infinituum.fastconfigapi.api.annotations.Loader.Type;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
+import infinituum.fastconfigapi.screens.utils.Color;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -71,7 +72,7 @@ public @interface FastConfig {
      * @return {@link String} - default: The Class' file name (formatted in {@link CaseFormat#LOWER_HYPHEN} case)
      */
     String fileName() default "";
-    
+
     /**
      * The serializer used to Serialize.
      *
@@ -111,23 +112,43 @@ public @interface FastConfig {
         /**
          * Represents the Client side.
          */
-        CLIENT("client"),
+        CLIENT("client", Color.of(0xEBAC24)),
         /**
          * Represents the Server side.
          */
-        SERVER("server"),
+        SERVER("server", Color.of(0x6800F1)),
         /**
          * Represents both the client and the server side.
          */
-        COMMON("common");
+        COMMON("common", Color.of(0x84CF5D));
 
         /**
          * String that will be appended to the end of the file name to denote on which side the Config is loaded.
          */
         private final String fileModifier;
+        private final Color color;
 
-        Side(String fileModifier) {
+        Side(String fileModifier, Color color) {
             this.fileModifier = fileModifier;
+            this.color = color;
+        }
+
+        /**
+         * Returns the name of the side.
+         *
+         * @return {@link String} - name
+         */
+        public String getName() {
+            return fileModifier;
+        }
+
+        /**
+         * Returns the color associated with this side (used in GUIs).
+         *
+         * @return {@link Color} - color object
+         */
+        public Color getColor() {
+            return color;
         }
 
         /**

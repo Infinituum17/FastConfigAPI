@@ -1,6 +1,7 @@
 package infinituum.fastconfigapi.screens.widgets;
 
 import infinituum.fastconfigapi.screens.models.ConfigSelectionModel;
+import infinituum.fastconfigapi.screens.utils.ExpansionListManager;
 import infinituum.fastconfigapi.screens.utils.Refreshable;
 import infinituum.fastconfigapi.screens.utils.Repositionable;
 import net.minecraft.client.gui.ComponentPath;
@@ -11,6 +12,8 @@ import net.minecraft.client.gui.navigation.FocusNavigationEvent.ArrowNavigation;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent.TabNavigation;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelectionEntry> implements Refreshable, Repositionable {
     private final ExpansionListManager manager;
     private final ConfigSelectionModel model;
@@ -20,7 +23,7 @@ public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelecti
                 manager.getListWidth(),
                 manager.getListHeight(),
                 manager.getTopPadding(),
-                manager.getItemHeight());
+                manager.getListItemHeight());
 
         this.manager = manager;
         this.model = manager.getModel();
@@ -33,9 +36,13 @@ public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelecti
 
     @Override
     public void setSelected(@Nullable ConfigSelectionEntry entry) {
+        ConfigSelectionEntry previous = super.getSelected();
         super.setSelected(entry);
 
-        if (entry != null) {
+        if (entry != null && !entry.equals(previous)) {
+            if (previous != null) {
+                this.manager.saveCurrent();
+            }
             this.model.setSelected(entry.getConfig());
         }
 
@@ -51,9 +58,11 @@ public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelecti
 
     @Override
     public boolean mouseClicked(double d, double e, int i) {
+        ConfigSelectionEntry selectedEntry = this.getSelected();
+        ConfigSelectionEntry clickedEntry = getEntryAtPosition(d, e);
         boolean isProcessedClick = super.mouseClicked(d, e, i);
 
-        if (isProcessedClick) {
+        if (isProcessedClick && selectedEntry != null && clickedEntry != null && !Objects.equals(selectedEntry, clickedEntry)) {
             this.manager.getOptions().setFocused(null);
             this.manager.getOptions().setSelected(null);
         }

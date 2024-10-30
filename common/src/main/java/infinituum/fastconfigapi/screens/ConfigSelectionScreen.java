@@ -1,6 +1,6 @@
 package infinituum.fastconfigapi.screens;
 
-import infinituum.fastconfigapi.screens.widgets.ExpansionListManager;
+import infinituum.fastconfigapi.screens.utils.ExpansionListManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
@@ -37,7 +37,7 @@ public final class ConfigSelectionScreen extends Screen {
 
     @Override
     public void onClose() {
-        this.manager.save();
+        this.manager.saveCurrent();
 
         if (this.minecraft != null) {
             this.minecraft.setScreen(this.parent);
@@ -56,7 +56,8 @@ public final class ConfigSelectionScreen extends Screen {
         this.addRenderableWidget(this.manager.getList());
         this.addRenderableWidget(this.manager.getOptions());
 
-        this.doneButton = this.layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).width(200).build());
+        this.doneButton = this.layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose())
+                .width(200).build());
 
         this.layout.visitWidgets(this::addRenderableWidget);
         this.repositionElements();

@@ -1,71 +1,37 @@
 package infinituum.fastconfigapi.screens.utils.renderer;
 
 import infinituum.fastconfigapi.mixin.AbstractWidgetInvoker;
+import infinituum.fastconfigapi.screens.utils.Color;
 import net.minecraft.network.chat.Component;
 
-public class MessageComponent extends DrawableComponent implements Renderable {
+import java.util.function.Consumer;
+
+public class MessageComponent extends DrawableComponent implements BoxComponent.Boxed<MessageComponent> {
     private final FastRenderer renderer;
     private final String message;
-    private int x;
-    private int y;
-    private String prefix;
-    private int prefixColor;
-    private int messageColor;
+    private final MessageComponent parent;
+    private final int x;
+    private final int y;
+    private int leftMargin;
+    private Color messageColor;
     private boolean isScrolling;
     private int scrollingMaxWidth;
 
-    public MessageComponent(FastRenderer renderer, String message, int x, int y) {
+    public MessageComponent(FastRenderer renderer, MessageComponent parent, String message, int x, int y) {
         this.renderer = renderer;
         this.message = message;
+        this.parent = parent;
         this.x = x;
         this.y = y;
+        this.leftMargin = 0;
         this.isScrolling = false;
-        this.prefix = "";
-        this.prefixColor = 0xFFFFFF;
-        this.messageColor = 0xFFFFFF;
-        this.scrollingMaxWidth = 20;
-    }
-
-    @Override
-    public void render() {
-        if (!this.prefix.isEmpty()) {
-            drawString(prefix, prefixColor);
-            x += this.renderer.font().width(prefix);
-        }
-
-        if (!isScrolling) {
-            drawString(message, messageColor);
-        } else {
-            drawScrollingString(message, messageColor);
-        }
-    }
-
-    private void drawString(String message, int color) {
-        this.renderer.get().drawString(this.renderer.font(), message, x, y, color);
-    }
-
-    private void drawScrollingString(String message, int color) {
-        int maxWidth = scrollingMaxWidth;
-        int textWidth = this.renderer.font().width(message) + x;
-
-        if (textWidth < maxWidth) {
-            maxWidth = textWidth;
-        }
-
-        AbstractWidgetInvoker.invokeRenderScrollingString(
-                this.renderer.get(),
-                this.renderer.font(),
-                Component.nullToEmpty(message),
-                x,
-                y - 1,
-                maxWidth,
-                y + getHeight(),
-                color);
+        this.messageColor = Color.white();
+        this.scrollingMaxWidth = 100;
     }
 
     @Override
     protected int getX() {
-        return x;
+        return x + leftMargin;
     }
 
     @Override
@@ -75,18 +41,57 @@ public class MessageComponent extends DrawableComponent implements Renderable {
 
     @Override
     protected int getWidth() {
-        int width = this.renderer.font().width(message);
+        int textWidth = this.renderer.font().width(message);
 
-        if (!prefix.isEmpty()) {
-            width += this.renderer.font().width(prefix);
+        if (!isScrolling) {
+            return textWidth;
         }
 
-        return width;
+        int maxWidth = scrollingMaxWidth;
+
+        if (textWidth + x + leftMargin < maxWidth) {
+            maxWidth = textWidth;
+        }
+
+        return maxWidth;
     }
 
     @Override
     protected int getHeight() {
         return this.renderer.font().lineHeight;
+    }
+
+    @Override
+    protected DrawableComponent getParent() {
+        return parent;
+    }
+
+    @Override
+    public DrawableComponent render() {
+        if (!isScrolling) {
+            drawString(message, messageColor);
+        } else {
+            drawScrollingString(message, messageColor);
+        }
+
+        return this.parent;
+    }
+
+    private void drawString(String message, Color color) {
+        this.renderer.get().drawString(this.renderer.font(), message, x + leftMargin, y, color.toDecimal());
+    }
+
+    private void drawScrollingString(String message, Color color) {
+        AbstractWidgetInvoker.invokeRenderScrollingString(
+                this.renderer.get(),
+                this.renderer.font(),
+                Component.nullToEmpty(message),
+                x + leftMargin,
+                y - 1,
+                getWidth() + x + leftMargin,
+                y + getHeight(),
+                color.toDecimal()
+        );
     }
 
     public MessageComponent scrolling(int maxWidth) {
@@ -96,24 +101,35 @@ public class MessageComponent extends DrawableComponent implements Renderable {
         return this;
     }
 
-    public MessageComponent color(int color) {
+    public MessageComponent color(Color color) {
         this.messageColor = color;
 
         return this;
     }
 
-    public MessageComponent prefix(String prefix, int color) {
-        if (prefix.isEmpty()) {
-            return this;
-        }
-
-        this.prefix = prefix;
-        this.prefixColor = color;
+    @Override
+    public MessageComponent boxed(Consumer<BoxComponent<?>> consumer) {
+        consumer.accept(new BoxComponent<>(renderer, this, false));
 
         return this;
     }
 
-    public BoxComponent<MessageComponent> boxed() {
-        return new BoxComponent<>(renderer, this);
+    @Override
+    public MessageComponent boxed(boolean includeTree, Consumer<BoxComponent<?>> consumer) {
+        consumer.accept(new BoxComponent<>(renderer, this, includeTree));
+
+        return this;
+    }
+
+    public MessageComponent append(String message, Consumer<MessageComponent> consumer) {
+        consumer.accept(new MessageComponent(renderer, this, message, x + this.getWidth() + leftMargin, y));
+
+        return this;
+    }
+
+    public MessageComponent leftMargin(int leftMargin) {
+        this.leftMargin = leftMargin;
+
+        return this;
     }
 }

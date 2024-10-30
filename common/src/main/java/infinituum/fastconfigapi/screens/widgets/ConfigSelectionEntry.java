@@ -2,6 +2,8 @@ package infinituum.fastconfigapi.screens.widgets;
 
 import infinituum.fastconfigapi.api.FastConfigFile;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
+import infinituum.fastconfigapi.screens.utils.Color;
+import infinituum.fastconfigapi.screens.utils.ExpansionListManager;
 import infinituum.fastconfigapi.screens.utils.renderer.FastRenderer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
@@ -48,37 +50,63 @@ public final class ConfigSelectionEntry extends ObjectSelectionList.Entry<Config
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
         int lineHeight = this.manager.getFont().lineHeight;
-        int itemHeight = this.manager.getItemHeight();
+        int itemHeight = this.manager.getListItemHeight();
         int rowWidth = this.parent.getRowWidth();
-        int leftPadding = k + itemHeight + 2;
+        int leftPadding = k + itemHeight + 4;
+        int horizontalPadding = 2;
+        int verticalPadding = 1;
+        int lineSpacing = lineHeight + 4;
+        int maxScrollingDistance = rowWidth - 4;
+        int margin = 1;
+        int alphaAttenuation = 0x55;
+        double darkeningFactor = 0.8;
+
+        Color secondaryTextColor = Color.of(0xA0A0A0);
+        Color modIdColor = Color.of(0x5B97EF);
 
         FastRenderer renderer = FastRenderer.startRender(guiGraphics, this.manager.getFont());
 
         renderer.sprite(
                 ResourceLocation.fromNamespaceAndPath(MOD_ID, "icon/config"),
-                k,
-                j - 2,
-                itemHeight
+                k + 2,
+                j - 1,
+                itemHeight - 2
         ).render();
 
-        renderer.message(name, leftPadding, j + 2)
-                .scrolling(rowWidth - 4)
+        int y = j + 4;
+
+        renderer.message(name, leftPadding, y)
+                .scrolling(maxScrollingDistance)
+                .boxed((box) -> box.padding(horizontalPadding, verticalPadding)
+                        .outlineColor(secondaryTextColor)
+                        .render())
                 .render();
 
-        renderer.message(modId, leftPadding, j + 2 + lineHeight + 4)
-                .scrolling(rowWidth - 4)
-                .color(0x5B97EF)
-                .prefix("Mod id: ", 0xA0A0A0)
-                .boxed()
-                .outlineColor(0xFF5B97EF)
-                .backgroundColor(0x995B97EF)
-                .padding(2, 1)
+        y += 3 + lineSpacing;
+
+        renderer.message("Mod id: ", leftPadding, y)
+                .color(secondaryTextColor)
+                .append(modId, (message) -> message.leftMargin(margin)
+                        .color(modIdColor)
+                        .scrolling(maxScrollingDistance)
+                        .boxed((box) -> box.outlineColor(modIdColor.withLuminance(darkeningFactor))
+                                .backgroundColor(modIdColor.withAlpha(alphaAttenuation))
+                                .padding(horizontalPadding, verticalPadding)
+                                .render())
+                        .render())
                 .render();
 
-        renderer.message(side.toString(), leftPadding, j + 2 + (lineHeight + 4) * 2)
-                .scrolling(rowWidth - 4)
-                .color(0x84CF5D)
-                .prefix("Side: ", 0xA0A0A0)
+        y += 1 + lineSpacing;
+
+        renderer.message("Side: ", leftPadding, y)
+                .color(secondaryTextColor)
+                .append(side.toString(), (message) -> message.leftMargin(margin)
+                        .color(side.getColor())
+                        .boxed((box) -> box.outlineColor(side.getColor().withLuminance(darkeningFactor))
+                                .backgroundColor(side.getColor().withAlpha(alphaAttenuation))
+                                .padding(horizontalPadding, verticalPadding)
+                                .render())
+                        .render())
                 .render();
     }
 

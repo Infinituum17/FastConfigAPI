@@ -1,11 +1,12 @@
 package infinituum.fastconfigapi.screens.widgets;
 
 import infinituum.fastconfigapi.screens.models.ConfigSelectionModel;
+import infinituum.fastconfigapi.screens.utils.ExpansionListManager;
 import infinituum.fastconfigapi.screens.utils.Refreshable;
 import infinituum.fastconfigapi.screens.utils.Repositionable;
+import infinituum.fastconfigapi.screens.widgets.custom.DynamicHeightObjectSelectionList;
 import infinituum.fastconfigapi.utils.ConfigOption;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public final class ConfigOptionsList extends ObjectSelectionList<ConfigOptionsEntry> implements Refreshable, Repositionable {
+public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList<ConfigOptionsEntry<T>> implements Refreshable, Repositionable {
     private final ExpansionListManager manager;
     private final ConfigSelectionModel model;
 
@@ -26,56 +27,29 @@ public final class ConfigOptionsList extends ObjectSelectionList<ConfigOptionsEn
         super(manager.getMinecraft(),
                 manager.getOptionsWidth(),
                 manager.getOptionsHeight(),
-                manager.getTopPadding(),
-                manager.getItemHeight());
+                manager.getTopPadding());
 
         this.manager = manager;
         this.model = manager.getModel();
     }
 
     @Override
-    public int getRowWidth() {
-        return this.width;
-    }
-
-    @Override
-    public void setSelected(@Nullable ConfigOptionsEntry entry) {
-        super.setSelected(entry);
-    }
-
-    @Override
-    protected int getScrollbarPosition() {
-        return this.getRight() - 6;
-    }
-
-    @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        boolean isProcessedClick = super.mouseClicked(d, e, i);
-
-        if (isProcessedClick) {
-            this.manager.getList().setFocused(null);
-        }
-
-        return isProcessedClick;
-    }
-
-    @Override
     public void refresh() {
         this.children().clear();
 
-        List<ConfigOptionsEntry> entries = translateSelected();
+        List<ConfigOptionsEntry<T>> entries = translateSelected();
 
         if (!entries.isEmpty()) {
             this.children().addAll(entries);
         }
     }
 
-    private <T> List<ConfigOptionsEntry> translateSelected() {
-        List<ConfigOptionsEntry> configOptionEntries = new ArrayList<>();
-        T instance = (T) this.model.getSelected().getInstance();
+    private <U> List<ConfigOptionsEntry<T>> translateSelected() {
+        List<ConfigOptionsEntry<T>> configOptionEntries = new ArrayList<>();
+        U instance = (U) this.model.getSelected().getInstance();
 
         for (Field field : instance.getClass().getDeclaredFields()) {
-            ConfigOptionsEntry entry = translateSelected(field, instance);
+            ConfigOptionsEntry<T> entry = translateSelected(field, instance);
 
             if (entry != null) {
                 configOptionEntries.add(entry);
@@ -85,22 +59,22 @@ public final class ConfigOptionsList extends ObjectSelectionList<ConfigOptionsEn
         return Collections.unmodifiableList(configOptionEntries);
     }
 
-    private <T, U> ConfigOptionsEntry translateSelected(Field field, T instance) {
+    private <U> ConfigOptionsEntry<T> translateSelected(Field field, U instance) {
         field.setAccessible(true);
 
         if (Modifier.isTransient(field.getModifiers())) {
             return null;
         }
 
-        Supplier<U> getter = () -> {
+        Supplier<T> getter = () -> {
             try {
-                return (U) field.get(instance);
+                return (T) field.get(instance);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         };
 
-        Consumer<U> setter = (v) -> {
+        Consumer<T> setter = (v) -> {
             try {
                 field.set(instance, v);
             } catch (IllegalAccessException e) {
@@ -108,7 +82,7 @@ public final class ConfigOptionsList extends ObjectSelectionList<ConfigOptionsEn
             }
         };
 
-        return new ConfigOptionsEntry(this.manager, new ConfigOption<>(field.getName(), getter, setter));
+        return new ConfigOptionsEntry<>(this.manager, new ConfigOption<>(field.getName(), getter, setter, this.manager.getFont()));
     }
 
     @Nullable
@@ -128,7 +102,7 @@ public final class ConfigOptionsList extends ObjectSelectionList<ConfigOptionsEn
     }
 
     private ComponentPath tabForward(FocusNavigationEvent.TabNavigation navigation) {
-        ConfigOptionsEntry nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
+        ConfigOptionsEntry<T> nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
 
         if (nextEntry != null) {
             return ComponentPath.path(this, ComponentPath.leaf(nextEntry));
@@ -147,12 +121,12 @@ public final class ConfigOptionsList extends ObjectSelectionList<ConfigOptionsEn
 
     private ComponentPath tabBackwards(FocusNavigationEvent.TabNavigation navigation) {
         ConfigSelectionList list = this.manager.getList();
-        
+
         if (!this.isFocused() && !list.isFocused()) {
             return ComponentPath.path(list, ComponentPath.leaf(list.children().getLast()));
         }
 
-        ConfigOptionsEntry nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
+        ConfigOptionsEntry<T> nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
 
         if (nextEntry != null) {
             return ComponentPath.path(this, ComponentPath.leaf(nextEntry));
@@ -166,6 +140,32 @@ public final class ConfigOptionsList extends ObjectSelectionList<ConfigOptionsEn
 
     private ComponentPath arrowNavigate(FocusNavigationEvent.ArrowNavigation arrowNavigation) {
         return super.nextFocusPath(arrowNavigation);
+    }
+
+    @Override
+    public void setSelected(@Nullable ConfigOptionsEntry<T> entry) {
+        super.setSelected(entry);
+    }
+
+    @Override
+    public int getRowWidth() {
+        return this.width;
+    }
+
+    @Override
+    protected int getScrollbarPosition() {
+        return this.getRight() - 6;
+    }
+
+    @Override
+    public boolean mouseClicked(double d, double e, int i) {
+        boolean isProcessedClick = super.mouseClicked(d, e, i);
+
+        if (isProcessedClick && this.manager.getList().getFocused() != null) {
+            this.manager.getList().setFocused(null);
+        }
+
+        return isProcessedClick;
     }
 
     @Override

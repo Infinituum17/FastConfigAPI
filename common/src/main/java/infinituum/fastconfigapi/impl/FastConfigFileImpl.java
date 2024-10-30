@@ -63,45 +63,8 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
         }
     }
 
-    @Override
-    public void loadDefault() throws RuntimeException {
-        this.loaderType.load(this);
-
-        if (!this.deserializer.getClass().equals(this.serializer.getClass())) {
-            this.deserializer = this.serializer;
-        }
-
-        this.save();
-    }
-
-    @Override
-    public void load() throws RuntimeException {
-        try {
-            deserializer.deserialize(this);
-        } catch (Exception e) {
-            try {
-                this.loadDefault();
-            } catch (Exception e2) {
-                throw new RuntimeException("Config '" + getFileNameWithExtension() + "' could not be loaded");
-            }
-        }
-
-        FastConfigAPI.LOGGER.info("Config '{}' was successfully loaded", this.getFileNameWithExtension());
-    }
-
     public void loadStateUnsafely(String content) throws IOException {
         originalDeserializer.deserialize(this, new StringReader(content));
-    }
-
-    @Override
-    public void save() throws RuntimeException {
-        try {
-            Files.createDirectories(this.getConfigSubdirectoryPath());
-
-            serializer.serialize(this);
-        } catch (Exception e) {
-            throw new RuntimeException("Contents of Config '" + getFileNameWithExtension() + "' could not be saved: " + e);
-        }
     }
 
     public void setDefaultClassInstance() {
@@ -112,6 +75,21 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
         }
 
         this.setInstance(instance);
+    }
+
+    @Override
+    public @NotNull Class<T> getConfigClass() {
+        return clazz;
+    }
+
+    @Override
+    public FastConfig.@NotNull Side getSide() {
+        return side;
+    }
+
+    @Override
+    public @NotNull String getFileName() {
+        return fileName;
     }
 
     @Override
@@ -130,16 +108,6 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     }
 
     @Override
-    public @NotNull String getFileName() {
-        return fileName;
-    }
-
-    @Override
-    public FastConfig.@NotNull Side getSide() {
-        return side;
-    }
-
-    @Override
     public @NotNull Path getFullFilePath() {
         return fullFilePath;
     }
@@ -152,20 +120,20 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     @Override
     public @NotNull ConfigSerializer<T> getDeserializer() {
         return deserializer;
+    }    @Override
+    public void loadDefault() throws RuntimeException {
+        this.loaderType.load(this);
+
+        if (!this.deserializer.getClass().equals(this.serializer.getClass())) {
+            this.deserializer = this.serializer;
+        }
+
+        this.save();
     }
 
     @Override
-    public @NotNull Class<T> getConfigClass() {
-        return clazz;
-    }
-
-    @Override
-    public @NotNull T getInstance() throws RuntimeException {
-        return instance;
-    }
-
-    public void setInstance(@NotNull T instance) {
-        this.instance = instance;
+    public boolean isSilentlyFailing() {
+        return silentlyFail;
     }
 
     @Override
@@ -179,14 +147,12 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     }
 
     @Override
-    public boolean isSilentlyFailing() {
-        return silentlyFail;
+    public @NotNull T getInstance() throws RuntimeException {
+        return instance;
     }
 
-    public void setDefaultLoader() {
-        this.loaderType = Loader.Type.DEFAULT;
-        this.loaderTarget = "";
-        this.deserializer = this.serializer;
+    public void setInstance(@NotNull T instance) {
+        this.instance = instance;
     }
 
     @Override
@@ -198,4 +164,41 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     public String getModId() {
         return modId;
     }
+
+    public void setDefaultLoader() {
+        this.loaderType = Loader.Type.DEFAULT;
+        this.loaderTarget = "";
+        this.deserializer = this.serializer;
+    }
+
+
+
+    @Override
+    public void load() throws RuntimeException {
+        try {
+            deserializer.deserialize(this);
+        } catch (Exception e) {
+            try {
+                this.loadDefault();
+            } catch (Exception e2) {
+                throw new RuntimeException("Config '" + getFileNameWithExtension() + "' could not be loaded: " + e2);
+            }
+        }
+
+        FastConfigAPI.LOGGER.info("Config '{}' was successfully loaded", this.getFileNameWithExtension());
+    }
+
+
+    @Override
+    public void save() throws RuntimeException {
+        try {
+            Files.createDirectories(this.getConfigSubdirectoryPath());
+
+            serializer.serialize(this);
+        } catch (Exception e) {
+            throw new RuntimeException("Contents of Config '" + getFileNameWithExtension() + "' could not be saved: " + e);
+        }
+    }
+
+
 }
