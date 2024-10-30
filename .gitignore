@@ -8,6 +8,9 @@ out/
 output/
 bin/
 libs/
+fabric/tests/
+neoforge/tests/
+forge/tests/
 
 .classpath
 .project
