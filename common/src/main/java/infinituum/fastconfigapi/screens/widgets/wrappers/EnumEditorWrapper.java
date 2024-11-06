@@ -70,10 +70,22 @@ public final class EnumEditorWrapper extends InputWidgetWrapper<Enum<?>> {
     }
 
     @Override
-    public int requiredHeight() {
-        int buttonHeight = this.button.getHeight();
-        int borderSize = 2;
+    public int getHeight() {
+        return this.button.getHeight();
+    }
 
-        return borderSize + buttonHeight;
+    @Override
+    public int getWidth() {
+        return this.button.getWidth();
+    }
+
+    @Override
+    public int getX() {
+        return this.button.getX();
+    }
+
+    @Override
+    public int getY() {
+        return this.button.getY();
     }
 }

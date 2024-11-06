@@ -96,12 +96,24 @@ public final class LongEditorWrapper extends InputWidgetWrapper<Long> {
     public void onClick(double d, double e) {
         this.editBox.onClick(d, e);
     }
+    
+    @Override
+    public int getHeight() {
+        return this.editBox.getHeight();
+    }
 
     @Override
-    public int requiredHeight() {
-        int buttonHeight = this.editBox.getHeight();
-        int borderSize = 2;
+    public int getWidth() {
+        return this.editBox.getWidth();
+    }
 
-        return borderSize + buttonHeight;
+    @Override
+    public int getX() {
+        return this.editBox.getX();
+    }
+
+    @Override
+    public int getY() {
+        return this.editBox.getY();
     }
 }

@@ -16,6 +16,8 @@ public class MessageComponent extends DrawableComponent implements BoxComponent.
     private Color messageColor;
     private boolean isScrolling;
     private int scrollingMaxWidth;
+    private boolean isMultiline;
+    private int multilineMaxWidth;
 
     public MessageComponent(FastRenderer renderer, MessageComponent parent, String message, int x, int y) {
         this.renderer = renderer;
@@ -43,21 +45,35 @@ public class MessageComponent extends DrawableComponent implements BoxComponent.
     protected int getWidth() {
         int textWidth = this.renderer.font().width(message);
 
-        if (!isScrolling) {
-            return textWidth;
+        if (isScrolling) {
+            int maxWidth = scrollingMaxWidth;
+
+            if (textWidth < maxWidth) {
+                maxWidth = textWidth;
+            }
+
+            return maxWidth;
         }
 
-        int maxWidth = scrollingMaxWidth;
+        if (isMultiline) {
+            int maxWidth = multilineMaxWidth;
 
-        if (textWidth + x + leftMargin < maxWidth) {
-            maxWidth = textWidth;
+            if (textWidth < maxWidth) {
+                maxWidth = textWidth;
+            }
+
+            return maxWidth;
         }
 
-        return maxWidth;
+        return textWidth;
     }
 
     @Override
     protected int getHeight() {
+        if (isMultiline) {
+            return FastRenderer.multilineStringHeight(this.renderer.font(), message, multilineMaxWidth);
+        }
+
         return this.renderer.font().lineHeight;
     }
 
@@ -68,17 +84,15 @@ public class MessageComponent extends DrawableComponent implements BoxComponent.
 
     @Override
     public DrawableComponent render() {
-        if (!isScrolling) {
-            drawString(message, messageColor);
-        } else {
+        if (isScrolling) {
             drawScrollingString(message, messageColor);
+        } else if (isMultiline) {
+            drawMultilineString(message, messageColor);
+        } else {
+            drawString(message, messageColor);
         }
 
         return this.parent;
-    }
-
-    private void drawString(String message, Color color) {
-        this.renderer.get().drawString(this.renderer.font(), message, x + leftMargin, y, color.toDecimal());
     }
 
     private void drawScrollingString(String message, Color color) {
@@ -94,15 +108,45 @@ public class MessageComponent extends DrawableComponent implements BoxComponent.
         );
     }
 
+    private void drawMultilineString(String message, Color color) {
+        this.renderer.get().drawWordWrap(
+                this.renderer.font(),
+                Component.nullToEmpty(message),
+                x + leftMargin,
+                y,
+                getWidth() + x + leftMargin,
+                color.toDecimal()
+        );
+    }
+
+    private void drawString(String message, Color color) {
+        this.renderer.get().drawString(this.renderer.font(), message, x + leftMargin, y, color.toDecimal());
+    }
+
     public MessageComponent scrolling(int maxWidth) {
         this.isScrolling = true;
         this.scrollingMaxWidth = maxWidth;
+
+        if (isMultiline) {
+            throw new RuntimeException("Unable to create a multiline scrolling string (choose one of the two)");
+        }
 
         return this;
     }
 
     public MessageComponent color(Color color) {
         this.messageColor = color;
+
+        return this;
+    }
+
+    public MessageComponent multiline(int maxWidth) {
+        this.isMultiline = true;
+        this.multilineMaxWidth = maxWidth;
+
+        if (isScrolling) {
+            throw new RuntimeException("Unable to create a multiline scrolling string (choose one of the two)");
+        }
 
         return this;
     }

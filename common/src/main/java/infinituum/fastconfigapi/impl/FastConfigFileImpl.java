@@ -32,20 +32,20 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     private final ConfigSerializer<T> serializer;
     private final boolean silentlyFail;
     private final ConfigSerializer<T> originalDeserializer;
-    private final String humanReadableName;
     private final String modId;
+    private final ConfigMetadata<T> metadata;
     private ConfigSerializer<T> deserializer;
     private Loader.Type loaderType;
     private String loaderTarget;
     private T instance;
 
-    public FastConfigFileImpl(@NotNull Class<T> clazz, @NotNull FastConfig.Side side, @NotNull Map<String, Object> data) {
+    public FastConfigFileImpl(@NotNull Class<T> clazz, @NotNull FastConfig.Side side, @NotNull Map<String, Object> data, ConfigMetadata<T> metadata) {
         String subdirectoryStringPath = FastConfigHelper.getSubdirectoryOrDefault(data);
 
         this.clazz = clazz;
         this.side = side;
+        this.metadata = metadata;
         this.modId = FastConfigHelper.getModId(clazz, data);
-        this.humanReadableName = FastConfigHelper.getHumanReadableNameOrDefault(data, clazz.getSimpleName());
         this.fileName = FastConfigHelper.getFileNameOrDefault(data, clazz.getSimpleName(), side);
         this.serializer = FastConfigHelper.getSerializerOrDefault(data);
         this.configDirectoryPath = PlatformHelper.getDefaultConfigDirPath();
@@ -75,6 +75,11 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
         }
 
         this.setInstance(instance);
+    }
+
+    @Override
+    public ConfigMetadata<T> getMetadata() {
+        return this.metadata;
     }
 
     @Override
@@ -120,15 +125,6 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     @Override
     public @NotNull ConfigSerializer<T> getDeserializer() {
         return deserializer;
-    }    @Override
-    public void loadDefault() throws RuntimeException {
-        this.loaderType.load(this);
-
-        if (!this.deserializer.getClass().equals(this.serializer.getClass())) {
-            this.deserializer = this.serializer;
-        }
-
-        this.save();
     }
 
     @Override
@@ -156,11 +152,6 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     }
 
     @Override
-    public String getHumanReadableName() {
-        return humanReadableName;
-    }
-
-    @Override
     public String getModId() {
         return modId;
     }
@@ -171,6 +162,16 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
         this.deserializer = this.serializer;
     }
 
+    @Override
+    public void loadDefault() throws RuntimeException {
+        this.loaderType.load(this);
+
+        if (!this.deserializer.getClass().equals(this.serializer.getClass())) {
+            this.deserializer = this.serializer;
+        }
+
+        this.save();
+    }
 
 
     @Override

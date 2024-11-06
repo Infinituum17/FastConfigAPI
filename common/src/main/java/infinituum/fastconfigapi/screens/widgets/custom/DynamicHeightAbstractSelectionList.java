@@ -133,14 +133,17 @@ public abstract class DynamicHeightAbstractSelectionList<E extends DynamicHeight
     }
 
     protected int getMaxPosition() {
-        return getItemsHeightUntil(getItemCount()) + this.headerHeight;
+        return getItemsHeightDefaultUntil(getItemCount()) + this.headerHeight;
     }
 
-    protected int getItemsHeightUntil(int index) {
+    private int getItemsHeightDefaultUntil(int index) {
         int heights = 0;
 
         for (int j = 0; j < index; j++) {
-            heights += this.children.get(j).getItemHeight();
+            E entry = this.children.get(j);
+            int height = entry.getItemHeight();
+
+            heights += height != 0 ? height : entry.approximateHeight();
         }
 
         return heights;
@@ -148,36 +151,6 @@ public abstract class DynamicHeightAbstractSelectionList<E extends DynamicHeight
 
     protected int getItemCount() {
         return this.children().size();
-    }
-
-    @Nullable
-    protected final E getEntryAtPosition(double d, double e) {
-        int i = this.getRowWidth() / 2;
-        int j = this.getX() + this.width / 2;
-        int k = j - i;
-        int l = j + i;
-
-        if (d < k || d > l) {
-            return null;
-        }
-
-        int m = Mth.floor(e - (double) this.getY()) - this.headerHeight + (int) this.getScrollAmount() - 4;
-
-        if (m < 0) {
-            return null;
-        }
-
-        int baseY = 0;
-
-        for (E current : this.children) {
-            if (m >= baseY && m <= baseY + current.getItemHeight()) {
-                return current;
-            }
-
-            baseY += current.getItemHeight();
-        }
-
-        return null;
     }
 
     public final @NotNull List<E> children() {
@@ -220,8 +193,8 @@ public abstract class DynamicHeightAbstractSelectionList<E extends DynamicHeight
             }
 
             RenderSystem.enableBlend();
-            arg.blitSprite(SCROLLER_BACKGROUND_SPRITE, k, this.getY(), 6, this.getHeight());
-            arg.blitSprite(SCROLLER_SPRITE, k, m, 6, l);
+            arg.blitSprite(SCROLLER_BACKGROUND_SPRITE, k, this.getY(), SCROLLBAR_WIDTH, this.getHeight());
+            arg.blitSprite(SCROLLER_SPRITE, k, m, SCROLLBAR_WIDTH, l);
             RenderSystem.disableBlend();
         }
 
@@ -263,6 +236,34 @@ public abstract class DynamicHeightAbstractSelectionList<E extends DynamicHeight
 
     protected void enableScissor(GuiGraphics arg) {
         arg.enableScissor(this.getX(), this.getY(), this.getRight(), this.getBottom());
+    }    @Nullable
+    protected final E getEntryAtPosition(double d, double e) {
+        int i = this.getRowWidth() / 2;
+        int j = this.getX() + this.width / 2;
+        int k = j - i;
+        int l = j + i;
+
+        if (d < k || d > l) {
+            return null;
+        }
+
+        int m = Mth.floor(e - (double) this.getY()) - this.headerHeight + (int) this.getScrollAmount() - 4;
+
+        if (m < 0) {
+            return null;
+        }
+
+        int baseY = 0;
+
+        for (E current : this.children) {
+            if (m >= baseY && m <= baseY + current.getItemHeight()) {
+                return current;
+            }
+
+            baseY += current.getItemHeight();
+        }
+
+        return null;
     }
 
     protected void centerScrollOn(E arg) {
@@ -271,6 +272,16 @@ public abstract class DynamicHeightAbstractSelectionList<E extends DynamicHeight
                         + (double) arg.getItemHeight() / 2
                         - (double) this.height / 2
         );
+    }
+
+    protected int getItemsHeightUntil(int index) {
+        int heights = 0;
+
+        for (int j = 0; j < index; j++) {
+            heights += this.children.get(j).getItemHeight();
+        }
+
+        return heights;
     }
 
     @Nullable
@@ -363,10 +374,6 @@ public abstract class DynamicHeightAbstractSelectionList<E extends DynamicHeight
         return this.getX() + this.width / 2 - this.getRowWidth() / 2 + 2;
     }
 
-    protected boolean clickedHeader(int i, int j) {
-        return false;
-    }
-
     public int getRowWidth() {
         return 220;
     }
@@ -413,6 +420,77 @@ public abstract class DynamicHeightAbstractSelectionList<E extends DynamicHeight
         }
 
     }
+
+    @Environment(EnvType.CLIENT)
+    protected abstract static class Entry<E extends DynamicHeightAbstractSelectionList.Entry<E>> implements GuiEventListener {
+        /**
+         * @deprecated
+         */
+        @Deprecated
+        protected DynamicHeightAbstractSelectionList<E> list;
+
+        protected Entry() {
+        }
+
+        public abstract void render(GuiGraphics arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f);
+
+        public void renderBack(GuiGraphics arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
+        }
+
+        public boolean isMouseOver(double d, double e) {
+            return Objects.equals(this.list.getEntryAtPosition(d, e), this);
+        }
+
+        public abstract int getItemHeight();
+
+        public abstract int approximateHeight();
+
+        public boolean isFocused() {
+            return this.list.getFocused() == this;
+        }
+
+        public void setFocused(boolean bl) {
+        }
+    }
+
+    @Environment(EnvType.CLIENT)
+    private class TrackedList extends AbstractList<E> {
+        private final List<E> delegate = Lists.newArrayList();
+
+        TrackedList() {
+        }
+
+        public E get(int i) {
+            return this.delegate.get(i);
+        }
+
+        public E set(int i, E arg) {
+            E entry = this.delegate.set(i, arg);
+            DynamicHeightAbstractSelectionList.this.bindEntryToSelf(arg);
+            return entry;
+        }
+
+        public void add(int i, E arg) {
+            this.delegate.add(i, arg);
+            DynamicHeightAbstractSelectionList.this.bindEntryToSelf(arg);
+        }
+
+        public E remove(int i) {
+            return this.delegate.remove(i);
+        }
+
+        public int size() {
+            return this.delegate.size();
+        }
+    }
+
+
+
+
+    protected boolean clickedHeader(int i, int j) {
+        return false;
+    }
+
 
     protected void ensureVisible(E arg) {
         int i = this.getRowTop(this.children().indexOf(arg));
@@ -537,64 +615,5 @@ public abstract class DynamicHeightAbstractSelectionList<E extends DynamicHeight
         }
     }
 
-    @Environment(EnvType.CLIENT)
-    protected abstract static class Entry<E extends DynamicHeightAbstractSelectionList.Entry<E>> implements GuiEventListener {
-        /**
-         * @deprecated
-         */
-        @Deprecated
-        protected DynamicHeightAbstractSelectionList<E> list;
 
-        protected Entry() {
-        }
-
-        public abstract void render(GuiGraphics arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f);
-
-        public void renderBack(GuiGraphics arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-        }
-
-        public boolean isMouseOver(double d, double e) {
-            return Objects.equals(this.list.getEntryAtPosition(d, e), this);
-        }
-
-        public abstract int getItemHeight();
-
-        public boolean isFocused() {
-            return this.list.getFocused() == this;
-        }
-
-        public void setFocused(boolean bl) {
-        }
-    }
-
-    @Environment(EnvType.CLIENT)
-    private class TrackedList extends AbstractList<E> {
-        private final List<E> delegate = Lists.newArrayList();
-
-        TrackedList() {
-        }
-
-        public E get(int i) {
-            return this.delegate.get(i);
-        }
-
-        public E set(int i, E arg) {
-            E entry = this.delegate.set(i, arg);
-            DynamicHeightAbstractSelectionList.this.bindEntryToSelf(arg);
-            return entry;
-        }
-
-        public void add(int i, E arg) {
-            this.delegate.add(i, arg);
-            DynamicHeightAbstractSelectionList.this.bindEntryToSelf(arg);
-        }
-
-        public E remove(int i) {
-            return this.delegate.remove(i);
-        }
-
-        public int size() {
-            return this.delegate.size();
-        }
-    }
 }

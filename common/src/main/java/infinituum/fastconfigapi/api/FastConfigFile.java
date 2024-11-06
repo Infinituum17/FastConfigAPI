@@ -3,6 +3,7 @@ package infinituum.fastconfigapi.api;
 import infinituum.fastconfigapi.api.annotations.FastConfig.Side;
 import infinituum.fastconfigapi.api.annotations.Loader.Type;
 import infinituum.fastconfigapi.api.serializers.ConfigSerializer;
+import infinituum.fastconfigapi.impl.ConfigMetadata;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,6 +17,13 @@ import java.nio.file.Path;
  * @param <T> The type of the class instance contained in the current config file.
  */
 public interface FastConfigFile<T> extends GenericConfigFile {
+    /**
+     * Gets the config metadata.
+     *
+     * @return {@link ConfigMetadata}
+     */
+    ConfigMetadata<T> getMetadata();
+
     /**
      * Gets the class contained in the current config file.
      *
@@ -118,13 +126,6 @@ public interface FastConfigFile<T> extends GenericConfigFile {
      */
     @NotNull
     T getInstance();
-
-    /**
-     * Gets a human-readable representation of the class name / file name used.
-     *
-     * @return The human-readable {@link String}.
-     */
-    String getHumanReadableName();
 
     /**
      * Gets the mod-id of the mod which manages this config.

@@ -5,6 +5,7 @@ import infinituum.fastconfigapi.PlatformHelper;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
 import infinituum.fastconfigapi.api.serializers.ConfigSerializer;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
+import infinituum.fastconfigapi.impl.ConfigMetadata;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 import infinituum.void_lib.api.utils.UnsafeLoader;
 import org.jetbrains.annotations.NotNull;
@@ -26,17 +27,7 @@ public final class FastConfigHelper {
 
         return side.appendTo(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, fileName));
     }
-
-    public static @NotNull String getHumanReadableNameOrDefault(Map<String, Object> data, String className) {
-        String name = className;
-
-        if (data.containsKey("fileName") && data.get("fileName") instanceof String fileName) {
-            name = fileName;
-        }
-
-        return name;
-    }
-
+    
     public static <T> @NotNull ConfigSerializer<T> getSerializerOrDefault(Map<String, Object> data) {
         Class<? extends SerializerWrapper<T>> clazz = null;
 
@@ -60,14 +51,6 @@ public final class FastConfigHelper {
         return UnsafeLoader.loadInstance(clazz).get();
     }
 
-    public static @NotNull FastConfig.Side getSideOrDefault(Map<String, Object> data) {
-        if (data.containsKey("side")) {
-            return PlatformHelper.getPlatformSide(data.get("side"));
-        }
-
-        return FastConfig.Side.COMMON;
-    }
-
     public static @NotNull String getSubdirectoryOrDefault(Map<String, Object> data) {
         if (data.containsKey("subdirectory") && data.get("subdirectory") instanceof String subdirectory) {
             return subdirectory;
@@ -79,12 +62,13 @@ public final class FastConfigHelper {
     public static <T> FastConfigFileImpl<T> toFile(Class<T> clazz, Map<String, Object> data, FastConfig.Side expectedSide) throws RuntimeException {
         Class<T> validClass = validateClass(clazz);
         FastConfig.Side currentSide = getSideOrDefault(data);
+        ConfigMetadata<T> metadata = new ConfigMetadata<>(clazz);
 
         if (currentSide.ordinal() != expectedSide.ordinal()) {
             return null;
         }
 
-        FastConfigFileImpl<T> configFile = new FastConfigFileImpl<>(validClass, expectedSide, data);
+        FastConfigFileImpl<T> configFile = new FastConfigFileImpl<>(validClass, expectedSide, data, metadata);
         Constructor<?>[] constructors = clazz.getConstructors();
 
         if (constructors.length > 1 || (constructors.length == 1 && constructors[0].getParameterCount() > 0)) {
@@ -100,6 +84,14 @@ public final class FastConfigHelper {
         }
 
         return clazz;
+    }
+
+    public static @NotNull FastConfig.Side getSideOrDefault(Map<String, Object> data) {
+        if (data.containsKey("side")) {
+            return PlatformHelper.getPlatformSide(data.get("side"));
+        }
+
+        return FastConfig.Side.COMMON;
     }
 
     public static <T> @NotNull String getModId(Class<T> clazz, @NotNull Map<String, Object> data) {

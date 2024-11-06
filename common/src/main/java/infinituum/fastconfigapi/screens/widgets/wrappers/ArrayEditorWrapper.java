@@ -3,6 +3,7 @@ package infinituum.fastconfigapi.screens.widgets.wrappers;
 import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
@@ -83,11 +84,7 @@ public final class ArrayEditorWrapper<T> extends InputWidgetWrapper<T[]> {
 
     @Override
     public void setPosition(int i, int j) {
-        InputWidgetWrapper<T> selected = this.wrapperList.getSelected();
-
-        if (selected != null) {
-            selected.setPosition(i, j);
-        }
+        this.wrapperList.setPosition(i, j);
     }
 
     @Override
@@ -102,19 +99,35 @@ public final class ArrayEditorWrapper<T> extends InputWidgetWrapper<T[]> {
 
     @Override
     public void onClick(double d, double e) {
-        InputWidgetWrapper<T> selected = this.wrapperList.getSelected();
-
-        if (selected != null) {
-            selected.onClick(d, e);
-        }
+        this.wrapperList.onClick(d, e);
     }
 
     @Override
-    public int requiredHeight() {
-        int boxesHeight = this.wrapperList.size() * this.singleBoxHeight;
+    public int getTotalHeight() {
+        int boxesHeight = this.wrapperList.size() * this.singleBoxHeight + (this.wrapperList.size() - 1) * this.lineSpacing;
         int borderSize = 2;
 
         return borderSize + boxesHeight;
+    }
+
+    @Override
+    public int getHeight() {
+        return this.wrapperList.getHeight();
+    }
+
+    @Override
+    public int getWidth() {
+        return this.wrapperList.getWidth();
+    }
+
+    @Override
+    public int getX() {
+        return this.wrapperList.getX();
+    }
+
+    @Override
+    public int getY() {
+        return this.wrapperList.getY();
     }
 
     private int getLineSpacing() {
@@ -123,6 +136,10 @@ public final class ArrayEditorWrapper<T> extends InputWidgetWrapper<T[]> {
 
     public void setLineSpacing(int lineSpacing) {
         this.lineSpacing = lineSpacing;
+    }
+
+    public boolean hasNextElement(FocusNavigationEvent.TabNavigation tabNavigation) {
+        return this.wrapperList.setNextElement(tabNavigation);
     }
 
     public class WrappersList<S> {
@@ -159,18 +176,6 @@ public final class ArrayEditorWrapper<T> extends InputWidgetWrapper<T[]> {
             }
         }
 
-        private InputWidgetWrapper<S> getSelected() {
-            try {
-                return this.list.get(this.selected);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-
-        public void setSelected(int selected) {
-            this.selected = selected;
-        }
-
         public S[] get() {
             List<S> values = new ArrayList<>();
 
@@ -181,8 +186,107 @@ public final class ArrayEditorWrapper<T> extends InputWidgetWrapper<T[]> {
             return (S[]) values.toArray();
         }
 
+        public void setPosition(int i, int j) {
+            int padding = 0;
+
+            for (var element : this.list) {
+                element.setPosition(i, j + padding);
+
+                padding += ArrayEditorWrapper.this.getLineSpacing() + 16;
+            }
+        }
+
+        public boolean setNextElement(FocusNavigationEvent.TabNavigation tabNavigation) {
+            int i = tabNavigation.forward() ? this.selected + 1 : this.selected - 1;
+
+            if (i >= 0 && i < this.size()) {
+                this.setSelected(i);
+
+                return true;
+            }
+
+            return false;
+        }
+
         public int size() {
             return this.list.size();
+        }
+
+        public void onClick(double d, double e) {
+            if (!this.list.isEmpty()) {
+                int height = getTotalHeight() - 2;
+                int y = (int) (e - this.getY());
+
+                if (y >= 0 && y <= height) {
+                    for (int i = 0; i < this.list.size(); i++) {
+                        InputWidgetWrapper<S> wrapper = this.list.get(i);
+                        int wy = wrapper.getY();
+                        int wHeight = wrapper.getHeight();
+
+                        if (e >= wy && e <= wy + wHeight) {
+                            this.setSelected(i);
+
+                            InputWidgetWrapper<S> selectedElement = this.getSelected();
+
+                            if (selectedElement != null) {
+                                selectedElement.onClick(d, e);
+                            }
+
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        public int getY() {
+            if (this.list.isEmpty()) {
+                return 0;
+            }
+
+            return this.list.getFirst().getY();
+        }
+
+        private InputWidgetWrapper<S> getSelected() {
+            try {
+                return this.list.get(this.selected);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        public void setSelected(int selected) {
+            ArrayEditorWrapper.this.setFocused(false);
+
+            if (selected >= 0 && selected < this.size()) {
+                this.selected = selected;
+            } else {
+                throw new IndexOutOfBoundsException("WrappersList widget index is out of bounds");
+            }
+        }
+
+        public int getWidth() {
+            if (this.list.isEmpty()) {
+                return 0;
+            }
+
+            return this.list.getFirst().getWidth();
+        }
+
+        public int getX() {
+            if (this.list.isEmpty()) {
+                return 0;
+            }
+
+            return this.list.getFirst().getX();
+        }
+
+        public int getHeight() {
+            if (this.list.isEmpty()) {
+                return 0;
+            }
+
+            return this.list.getFirst().getHeight();
         }
     }
 }

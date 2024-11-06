@@ -61,7 +61,22 @@ public final class ObjectEditorWrapper extends InputWidgetWrapper<Object> {
     }
 
     @Override
-    public int requiredHeight() {
+    public int getHeight() {
+        return 0;
+    }
+
+    @Override
+    public int getWidth() {
+        return 0;
+    }
+
+    @Override
+    public int getX() {
+        return 0;
+    }
+
+    @Override
+    public int getY() {
         return 0;
     }
 }

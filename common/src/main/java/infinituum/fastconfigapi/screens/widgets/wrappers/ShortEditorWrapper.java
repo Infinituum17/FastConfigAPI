@@ -98,10 +98,22 @@ public final class ShortEditorWrapper extends InputWidgetWrapper<Short> {
     }
 
     @Override
-    public int requiredHeight() {
-        int buttonHeight = this.editBox.getHeight();
-        int borderSize = 2;
+    public int getHeight() {
+        return this.editBox.getHeight();
+    }
 
-        return borderSize + buttonHeight;
+    @Override
+    public int getWidth() {
+        return this.editBox.getWidth();
+    }
+
+    @Override
+    public int getX() {
+        return this.editBox.getX();
+    }
+
+    @Override
+    public int getY() {
+        return this.editBox.getY();
     }
 }

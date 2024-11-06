@@ -3,6 +3,7 @@ package infinituum.fastconfigapi.screens.utils.renderer;
 import infinituum.fastconfigapi.screens.utils.Color;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public class FastRenderer {
@@ -16,6 +17,10 @@ public class FastRenderer {
 
     public static FastRenderer startRender(GuiGraphics guiGraphics, Font font) {
         return new FastRenderer(guiGraphics, font);
+    }
+
+    public static int multilineStringHeight(Font font, String string, int maxWidth) {
+        return font.split(Component.nullToEmpty(string), maxWidth).size() * font.lineHeight;
     }
 
     protected Font font() {

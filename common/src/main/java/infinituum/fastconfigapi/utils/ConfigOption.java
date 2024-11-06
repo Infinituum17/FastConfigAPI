@@ -8,15 +8,22 @@ import java.util.function.Supplier;
 
 public class ConfigOption<T> {
     private final Consumer<T> setter;
-    private final String fieldName;
     private final Supplier<T> getter;
-    private final InputWidgetWrapper<T> widgetWrapper;
+    private final Font font;
+    private InputWidgetWrapper<T> widgetWrapper;
 
-    public ConfigOption(String fieldName, Supplier<T> getter, Consumer<T> setter, Font font) {
-        this.fieldName = fieldName;
+    public ConfigOption(Supplier<T> getter, Consumer<T> setter, Font font) {
         this.getter = getter;
         this.setter = setter;
-        this.widgetWrapper = InputWidgetWrapper.createWidgetWrapper(getter.get(), font, fieldName);
+        this.font = font;
+    }
+
+    public InputWidgetWrapper<T> createWidgetWrapper(String fieldName) {
+        if (widgetWrapper == null) {
+            this.widgetWrapper = InputWidgetWrapper.createWidgetWrapper(getter.get(), font, fieldName);
+        }
+
+        return widgetWrapper;
     }
 
     public T getValue() {
@@ -25,13 +32,5 @@ public class ConfigOption<T> {
 
     public void setValue(T value) {
         this.setter.accept(value);
-    }
-
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public InputWidgetWrapper<?> getWidgetWrapper() {
-        return this.widgetWrapper;
     }
 }

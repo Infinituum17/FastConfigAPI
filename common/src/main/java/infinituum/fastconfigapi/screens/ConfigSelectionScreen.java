@@ -33,6 +33,14 @@ public final class ConfigSelectionScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
+
+        if (this.manager.getList().isHovered()) {
+            this.manager.getList().renderTooltip(guiGraphics, i, j, f);
+        }
+
+        if (this.manager.getOptions().isHovered()) {
+            this.manager.getOptions().renderTooltip(guiGraphics, i, j, f);
+        }
     }
 
     @Override

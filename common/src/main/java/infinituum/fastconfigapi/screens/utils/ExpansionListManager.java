@@ -27,7 +27,7 @@ public final class ExpansionListManager implements Refreshable, Repositionable {
 
         this.model = new ConfigSelectionModel();
         this.list = new ConfigSelectionList(this);
-        this.options = new ConfigOptionsList(this);
+        this.options = new ConfigOptionsList<>(this);
     }
 
     public Minecraft getMinecraft() {
@@ -47,31 +47,27 @@ public final class ExpansionListManager implements Refreshable, Repositionable {
     }
 
     public int getListWidth() {
-        return 175;
+        return 225;
     }
 
     public int getListHeight() {
         return parent.height - 70;
     }
 
-    public int getListItemHeight() {
+    public int getImageSize() {
         return 50;
     }
 
-    public int getOptionsX() {
-        return 180;
+    public int getOptionsWidth() {
+        return parent.width - getOptionsX() - 10;
     }
 
-    public int getOptionsWidth() {
-        return parent.width - 180;
+    public int getOptionsX() {
+        return 225 + 10;
     }
 
     public int getOptionsHeight() {
         return parent.height - 70;
-    }
-
-    public int getOptionsItemHeight() {
-        return 30;
     }
 
     public int getTopPadding() {

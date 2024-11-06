@@ -4,17 +4,21 @@ import infinituum.fastconfigapi.screens.models.ConfigSelectionModel;
 import infinituum.fastconfigapi.screens.utils.ExpansionListManager;
 import infinituum.fastconfigapi.screens.utils.Refreshable;
 import infinituum.fastconfigapi.screens.utils.Repositionable;
+import infinituum.fastconfigapi.screens.widgets.custom.DynamicHeightObjectSelectionList;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent.ArrowNavigation;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent.TabNavigation;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
-public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelectionEntry> implements Refreshable, Repositionable {
+public final class ConfigSelectionList extends DynamicHeightObjectSelectionList<ConfigSelectionEntry> implements Refreshable, Repositionable {
     private final ExpansionListManager manager;
     private final ConfigSelectionModel model;
 
@@ -22,16 +26,25 @@ public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelecti
         super(manager.getMinecraft(),
                 manager.getListWidth(),
                 manager.getListHeight(),
-                manager.getTopPadding(),
-                manager.getListItemHeight());
+                manager.getTopPadding());
 
         this.manager = manager;
         this.model = manager.getModel();
     }
 
     @Override
-    public int getRowWidth() {
-        return this.width;
+    public void refresh() {
+        this.children().clear();
+        this.setSelected(null);
+
+        this.model.getConfigs().forEach(config -> {
+            var entry = new ConfigSelectionEntry(this.manager, config, this);
+            this.children().add(entry);
+
+            if (config.equals(this.model.getSelected())) {
+                this.setFocused(entry);
+            }
+        });
     }
 
     @Override
@@ -44,11 +57,17 @@ public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelecti
                 this.manager.saveCurrent();
             }
             this.model.setSelected(entry.getConfig());
+            this.manager.getOptions().setScrollAmount(0);
         }
 
         this.manager.getOptions().setSelected(null);
         this.manager.getOptions().setFocused(null);
         this.manager.refreshOptions();
+    }
+
+    @Override
+    public int getRowWidth() {
+        return this.width;
     }
 
     @Override
@@ -68,21 +87,6 @@ public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelecti
         }
 
         return isProcessedClick;
-    }
-
-    @Override
-    public void refresh() {
-        this.children().clear();
-        this.setSelected(null);
-
-        this.model.getConfigs().forEach(config -> {
-            var entry = new ConfigSelectionEntry(this.manager, config, this);
-            this.children().add(entry);
-
-            if (config.equals(this.model.getSelected())) {
-                this.setFocused(entry);
-            }
-        });
     }
 
     @Nullable
@@ -109,7 +113,7 @@ public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelecti
         }
 
         if (this.isFocused()) {
-            ConfigOptionsList options = this.manager.getOptions();
+            ConfigOptionsList<?> options = this.manager.getOptions();
             ComponentPath nextOptionsEntry = options.nextFocusPath(navigation);
 
             if (nextOptionsEntry != null) {
@@ -121,7 +125,7 @@ public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelecti
         ConfigSelectionEntry nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
 
         if (nextEntry != null) {
-            ConfigOptionsList options = this.manager.getOptions();
+            ConfigOptionsList<?> options = this.manager.getOptions();
 
             if (options.isFocused()) {
                 options.setFocused(null);
@@ -140,7 +144,7 @@ public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelecti
 
     private ComponentPath tabBackwards(TabNavigation navigation) {
         if (this.isFocused()) {
-            ConfigOptionsList options = this.manager.getOptions();
+            ConfigOptionsList<?> options = this.manager.getOptions();
             ComponentPath nextOptionsEntry = options.nextFocusPath(navigation);
 
             if (nextOptionsEntry != null) {
@@ -152,7 +156,7 @@ public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelecti
         ConfigSelectionEntry nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
 
         if (nextEntry != null) {
-            ConfigOptionsList options = this.manager.getOptions();
+            ConfigOptionsList<?> options = this.manager.getOptions();
 
             if (!options.isFocused()) {
                 options.setFocused(true);
@@ -178,5 +182,17 @@ public final class ConfigSelectionList extends ObjectSelectionList<ConfigSelecti
     public void reposition(HeaderAndFooterLayout layout) {
         this.updateSize(this.manager.getListWidth(), layout);
         this.setX(this.manager.getListX());
+    }
+
+    public void renderTooltip(GuiGraphics guiGraphics, int i, int j, float f) {
+        ConfigSelectionEntry entry = this.getHovered();
+
+        if (entry != null) {
+            List<Component> tooltip = entry.getTooltip();
+
+            if (!tooltip.isEmpty()) {
+                guiGraphics.renderTooltip(this.minecraft.font, tooltip, Optional.empty(), i, j);
+            }
+        }
     }
 }

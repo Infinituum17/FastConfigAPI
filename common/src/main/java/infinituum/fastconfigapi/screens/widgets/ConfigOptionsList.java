@@ -7,8 +7,10 @@ import infinituum.fastconfigapi.screens.utils.Repositionable;
 import infinituum.fastconfigapi.screens.widgets.custom.DynamicHeightObjectSelectionList;
 import infinituum.fastconfigapi.utils.ConfigOption;
 import net.minecraft.client.gui.ComponentPath;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
@@ -16,6 +18,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -82,7 +85,12 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
             }
         };
 
-        return new ConfigOptionsEntry<>(this.manager, new ConfigOption<>(field.getName(), getter, setter, this.manager.getFont()));
+        return new ConfigOptionsEntry<>(
+                this.manager,
+                new ConfigOption<>(getter, setter, this.manager.getFont()),
+                this.model.getSelected().getMetadata().getField(field),
+                this
+        );
     }
 
     @Nullable
@@ -102,6 +110,16 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
     }
 
     private ComponentPath tabForward(FocusNavigationEvent.TabNavigation navigation) {
+        ConfigOptionsEntry<T> selected = this.getSelected();
+
+        if (selected != null) {
+            ComponentPath componentPath = selected.nextFocusPath(navigation);
+
+            if (componentPath != null) {
+                return componentPath;
+            }
+        }
+
         ConfigOptionsEntry<T> nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
 
         if (nextEntry != null) {
@@ -123,12 +141,24 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
         ConfigSelectionList list = this.manager.getList();
 
         if (!this.isFocused() && !list.isFocused()) {
+            this.setScrollAmount(this.getMaxScroll());
             return ComponentPath.path(list, ComponentPath.leaf(list.children().getLast()));
+        }
+
+        ConfigOptionsEntry<T> selected = this.getSelected();
+
+        if (selected != null) {
+            ComponentPath componentPath = selected.nextFocusPath(navigation);
+
+            if (componentPath != null) {
+                return componentPath;
+            }
         }
 
         ConfigOptionsEntry<T> nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
 
         if (nextEntry != null) {
+            this.setScrollAmount(this.getMaxScroll());
             return ComponentPath.path(this, ComponentPath.leaf(nextEntry));
         }
 
@@ -140,11 +170,6 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
 
     private ComponentPath arrowNavigate(FocusNavigationEvent.ArrowNavigation arrowNavigation) {
         return super.nextFocusPath(arrowNavigation);
-    }
-
-    @Override
-    public void setSelected(@Nullable ConfigOptionsEntry<T> entry) {
-        super.setSelected(entry);
     }
 
     @Override
@@ -172,5 +197,17 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
     public void reposition(HeaderAndFooterLayout layout) {
         this.updateSize(this.manager.getOptionsWidth(), layout);
         this.setX(this.manager.getOptionsX());
+    }
+
+    public void renderTooltip(GuiGraphics guiGraphics, int i, int j, float f) {
+        ConfigOptionsEntry<?> entry = this.getHovered();
+
+        if (entry != null) {
+            List<Component> tooltip = entry.getTooltip();
+
+            if (!tooltip.isEmpty()) {
+                guiGraphics.renderTooltip(this.minecraft.font, tooltip, Optional.empty(), i, j);
+            }
+        }
     }
 }
