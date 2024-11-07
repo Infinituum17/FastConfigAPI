@@ -7,6 +7,7 @@ import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
 import infinituum.fastconfigapi.screens.utils.renderer.FastRenderer;
 import infinituum.fastconfigapi.screens.widgets.custom.DynamicHeightObjectSelectionList;
 import infinituum.fastconfigapi.screens.widgets.wrappers.ArrayEditorWrapper;
+import infinituum.fastconfigapi.screens.widgets.wrappers.ObjectEditorWrapper;
 import infinituum.fastconfigapi.utils.ConfigOption;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
@@ -109,6 +110,12 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
             int maxMultilineX = rowWidth - (horizontalPadding * 2) - 6;
 
             if (inputWrapper instanceof ArrayEditorWrapper<?>) {
+                y -= this.inputWrapper.getTotalHeight();
+                y += this.inputWrapper.getHeight();
+                maxMultilineX = maxMultilineX - horizontalPadding - this.inputWrapper.getWidth();
+            }
+
+            if (inputWrapper instanceof ObjectEditorWrapper) {
                 y -= this.inputWrapper.getTotalHeight();
                 y += this.inputWrapper.getHeight();
                 maxMultilineX = maxMultilineX - horizontalPadding - this.inputWrapper.getWidth();
