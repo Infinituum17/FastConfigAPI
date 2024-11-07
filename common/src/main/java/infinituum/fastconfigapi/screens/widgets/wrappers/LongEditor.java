@@ -1,15 +1,15 @@
 package infinituum.fastconfigapi.screens.widgets.wrappers;
 
-import infinituum.fastconfigapi.screens.utils.GuardedEditBox;
-import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
+import infinituum.fastconfigapi.screens.utils.renderer.widget.GuardedEditBox;
+import infinituum.fastconfigapi.screens.widgets.InputWidgetWrapper;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
-public final class DoubleEditorWrapper extends InputWidgetWrapper<Double> {
+public final class LongEditor extends InputWidgetWrapper<Long> {
     private final GuardedEditBox editBox;
 
-    public DoubleEditorWrapper(Font font, int i, int j, int k, int l, Component component, Double initValue) {
+    public LongEditor(Font font, int i, int j, int k, int l, Component component, Long initValue) {
         this.editBox = new GuardedEditBox(font, i, j, k, l, component, this::isValid);
 
         this.editBox.setValue(String.valueOf(initValue));
@@ -17,18 +17,12 @@ public final class DoubleEditorWrapper extends InputWidgetWrapper<Double> {
     }
 
     private boolean isValid(String string) {
-        String value = this.editBox.getValue();
-
-        if (value.isEmpty() && string.equals("-")) {
-            return true;
-        }
-
-        if (!value.contains(".") && string.equals(".")) {
+        if (this.editBox.getValue().isEmpty() && string.equals("-")) {
             return true;
         }
 
         try {
-            Double.parseDouble(string);
+            Long.parseLong(string);
             return true;
         } catch (Exception e) {
             return false;
@@ -42,14 +36,10 @@ public final class DoubleEditorWrapper extends InputWidgetWrapper<Double> {
             return;
         }
 
-        if (str.equals(".")) {
-            return;
-        }
-
         try {
-            Double.parseDouble(str);
+            Long.parseLong(str);
         } catch (Exception e) {
-            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Double.MIN_VALUE : Double.MAX_VALUE));
+            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Long.MIN_VALUE : Long.MAX_VALUE));
         }
     }
 
@@ -94,9 +84,9 @@ public final class DoubleEditorWrapper extends InputWidgetWrapper<Double> {
     }
 
     @Override
-    public Double get() {
+    public Long get() {
         try {
-            return Double.parseDouble(this.editBox.getValue());
+            return Long.parseLong(this.editBox.getValue());
         } catch (Exception e) {
             return null;
         }
@@ -106,7 +96,7 @@ public final class DoubleEditorWrapper extends InputWidgetWrapper<Double> {
     public void onClick(double d, double e) {
         this.editBox.onClick(d, e);
     }
-    
+
     @Override
     public int getHeight() {
         return this.editBox.getHeight();

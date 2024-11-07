@@ -1,7 +1,6 @@
 package infinituum.fastconfigapi.screens.utils.renderer;
 
 import infinituum.fastconfigapi.mixin.AbstractWidgetInvoker;
-import infinituum.fastconfigapi.screens.utils.Color;
 import net.minecraft.network.chat.Component;
 
 import java.util.function.Consumer;

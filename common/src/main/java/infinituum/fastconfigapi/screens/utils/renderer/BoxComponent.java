@@ -1,7 +1,5 @@
 package infinituum.fastconfigapi.screens.utils.renderer;
 
-import infinituum.fastconfigapi.screens.utils.Color;
-
 import java.util.function.Consumer;
 
 public class BoxComponent<T extends DrawableComponent> extends DrawableComponent {

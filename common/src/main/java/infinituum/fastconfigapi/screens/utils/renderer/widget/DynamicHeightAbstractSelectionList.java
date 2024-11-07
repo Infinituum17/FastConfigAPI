@@ -1,4 +1,4 @@
-package infinituum.fastconfigapi.screens.widgets.custom;
+package infinituum.fastconfigapi.screens.utils.renderer.widget;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -236,6 +236,14 @@ public abstract class DynamicHeightAbstractSelectionList<E extends DynamicHeight
 
     protected void enableScissor(GuiGraphics arg) {
         arg.enableScissor(this.getX(), this.getY(), this.getRight(), this.getBottom());
+    }
+
+    protected void centerScrollOn(E arg) {
+        this.setScrollAmount(
+                getItemsHeightUntil(this.children.indexOf(arg))
+                        + (double) arg.getItemHeight() / 2
+                        - (double) this.height / 2
+        );
     }    @Nullable
     protected final E getEntryAtPosition(double d, double e) {
         int i = this.getRowWidth() / 2;
@@ -264,14 +272,6 @@ public abstract class DynamicHeightAbstractSelectionList<E extends DynamicHeight
         }
 
         return null;
-    }
-
-    protected void centerScrollOn(E arg) {
-        this.setScrollAmount(
-                getItemsHeightUntil(this.children.indexOf(arg))
-                        + (double) arg.getItemHeight() / 2
-                        - (double) this.height / 2
-        );
     }
 
     protected int getItemsHeightUntil(int index) {

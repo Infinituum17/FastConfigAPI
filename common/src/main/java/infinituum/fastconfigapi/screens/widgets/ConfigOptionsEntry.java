@@ -1,14 +1,13 @@
 package infinituum.fastconfigapi.screens.widgets;
 
 import infinituum.fastconfigapi.impl.ConfigMetadata;
-import infinituum.fastconfigapi.screens.utils.Color;
-import infinituum.fastconfigapi.screens.utils.ExpansionListManager;
-import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
+import infinituum.fastconfigapi.screens.utils.renderer.Color;
 import infinituum.fastconfigapi.screens.utils.renderer.FastRenderer;
-import infinituum.fastconfigapi.screens.widgets.custom.DynamicHeightObjectSelectionList;
-import infinituum.fastconfigapi.screens.widgets.wrappers.ArrayEditorWrapper;
-import infinituum.fastconfigapi.screens.widgets.wrappers.ObjectEditorWrapper;
+import infinituum.fastconfigapi.screens.utils.renderer.widget.DynamicHeightObjectSelectionList;
+import infinituum.fastconfigapi.screens.widgets.wrappers.ArrayEditor;
+import infinituum.fastconfigapi.screens.widgets.wrappers.ObjectEditor;
 import infinituum.fastconfigapi.utils.ConfigOption;
+import infinituum.fastconfigapi.utils.ListManager;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
@@ -21,7 +20,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionList.Entry<ConfigOptionsEntry<T>> {
-    private final ExpansionListManager manager;
+    private final ListManager manager;
     private final ConfigOption<T> option;
     private final InputWidgetWrapper<T> inputWrapper;
     private final String name;
@@ -31,7 +30,7 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
     private boolean isItemHeightComputed;
     private int itemHeight;
 
-    public ConfigOptionsEntry(ExpansionListManager manager, ConfigOption<T> option, ConfigMetadata.ConfigFieldMetadata metadata, ConfigOptionsList<T> parent) {
+    public ConfigOptionsEntry(ListManager manager, ConfigOption<T> option, ConfigMetadata.ConfigFieldMetadata metadata, ConfigOptionsList<T> parent) {
         this.manager = manager;
         this.option = option;
         this.parent = parent;
@@ -64,7 +63,7 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
     @Nullable
     @Override
     public ComponentPath nextFocusPath(FocusNavigationEvent event) {
-        if (inputWrapper instanceof ArrayEditorWrapper<?> arrayWrapper) {
+        if (inputWrapper instanceof ArrayEditor<?> arrayWrapper) {
             if (event instanceof FocusNavigationEvent.TabNavigation tabNavigation) {
                 if (arrayWrapper.hasNextElement(tabNavigation)) {
                     return ComponentPath.path(this.parent, ComponentPath.leaf(this));
@@ -109,13 +108,13 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
         if (hasDescription) {
             int maxMultilineX = rowWidth - (horizontalPadding * 2) - 6;
 
-            if (inputWrapper instanceof ArrayEditorWrapper<?>) {
+            if (inputWrapper instanceof ArrayEditor<?>) {
                 y -= this.inputWrapper.getTotalHeight();
                 y += this.inputWrapper.getHeight();
                 maxMultilineX = maxMultilineX - horizontalPadding - this.inputWrapper.getWidth();
             }
 
-            if (inputWrapper instanceof ObjectEditorWrapper) {
+            if (inputWrapper instanceof ObjectEditor) {
                 y -= this.inputWrapper.getTotalHeight();
                 y += this.inputWrapper.getHeight();
                 maxMultilineX = maxMultilineX - horizontalPadding - this.inputWrapper.getWidth();

@@ -1,4 +1,4 @@
-package infinituum.fastconfigapi.screens.utils;
+package infinituum.fastconfigapi.screens.utils.renderer.type;
 
 @FunctionalInterface
 public interface GuardingFunction {

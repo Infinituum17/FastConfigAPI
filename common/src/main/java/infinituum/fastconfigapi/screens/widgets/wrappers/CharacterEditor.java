@@ -1,46 +1,22 @@
 package infinituum.fastconfigapi.screens.widgets.wrappers;
 
-import infinituum.fastconfigapi.screens.utils.GuardedEditBox;
-import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
+import infinituum.fastconfigapi.screens.utils.renderer.widget.GuardedEditBox;
+import infinituum.fastconfigapi.screens.widgets.InputWidgetWrapper;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
-public final class LongEditorWrapper extends InputWidgetWrapper<Long> {
+public final class CharacterEditor extends InputWidgetWrapper<Character> {
     private final GuardedEditBox editBox;
 
-    public LongEditorWrapper(Font font, int i, int j, int k, int l, Component component, Long initValue) {
+    public CharacterEditor(Font font, int i, int j, int k, int l, Component component, Character initValue) {
         this.editBox = new GuardedEditBox(font, i, j, k, l, component, this::isValid);
 
-        this.editBox.setValue(String.valueOf(initValue));
-        this.editBox.addPostInsertionAction(this::postInsertion);
+        this.editBox.setValue(initValue.toString());
     }
 
     private boolean isValid(String string) {
-        if (this.editBox.getValue().isEmpty() && string.equals("-")) {
-            return true;
-        }
-
-        try {
-            Long.parseLong(string);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private void postInsertion() {
-        String str = this.editBox.getValue();
-
-        if (str.equals("-")) {
-            return;
-        }
-
-        try {
-            Long.parseLong(str);
-        } catch (Exception e) {
-            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Long.MIN_VALUE : Long.MAX_VALUE));
-        }
+        return this.editBox.getValue().isEmpty() && string.length() == 1;
     }
 
     @Override
@@ -84,19 +60,19 @@ public final class LongEditorWrapper extends InputWidgetWrapper<Long> {
     }
 
     @Override
-    public Long get() {
-        try {
-            return Long.parseLong(this.editBox.getValue());
-        } catch (Exception e) {
+    public Character get() {
+        if (this.editBox.getValue().isEmpty()) {
             return null;
         }
+
+        return this.editBox.getValue().charAt(0);
     }
 
     @Override
     public void onClick(double d, double e) {
         this.editBox.onClick(d, e);
     }
-    
+
     @Override
     public int getHeight() {
         return this.editBox.getHeight();

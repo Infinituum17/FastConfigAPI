@@ -1,12 +1,12 @@
 package infinituum.fastconfigapi.utils;
 
-import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
+import infinituum.fastconfigapi.screens.widgets.InputWidgetWrapper;
 import net.minecraft.client.gui.Font;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ConfigOption<T> {
+public final class ConfigOption<T> {
     private final Consumer<T> setter;
     private final Supplier<T> getter;
     private final Font font;

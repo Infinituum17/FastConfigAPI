@@ -1,7 +1,5 @@
 package infinituum.fastconfigapi.screens.utils.renderer;
 
-import infinituum.fastconfigapi.screens.utils.Color;
-
 public class RectComponent extends DrawableComponent {
     private final FastRenderer renderer;
     private final DrawableComponent parent;

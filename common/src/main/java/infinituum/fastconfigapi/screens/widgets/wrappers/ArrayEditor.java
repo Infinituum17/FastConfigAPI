@@ -1,6 +1,6 @@
 package infinituum.fastconfigapi.screens.widgets.wrappers;
 
-import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
+import infinituum.fastconfigapi.screens.widgets.InputWidgetWrapper;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
@@ -9,12 +9,12 @@ import net.minecraft.network.chat.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ArrayEditorWrapper<T> extends InputWidgetWrapper<T[]> {
+public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> {
     private final WrappersList<T> wrapperList;
     private final int singleBoxHeight;
     private int lineSpacing;
 
-    public ArrayEditorWrapper(Font font, int i, int j, int k, int l, Component component, T[] initValue) {
+    public ArrayEditor(Font font, int i, int j, int k, int l, Component component, T[] initValue) {
         this.wrapperList = new WrappersList<>(font, initValue, component);
         this.singleBoxHeight = l;
         this.lineSpacing = 4;
@@ -104,7 +104,7 @@ public final class ArrayEditorWrapper<T> extends InputWidgetWrapper<T[]> {
 
     @Override
     public int getTotalHeight() {
-        int boxesHeight = this.wrapperList.size() * this.singleBoxHeight + (this.wrapperList.size() - 1) * this.lineSpacing;
+        int boxesHeight = this.wrapperList.size() * this.singleBoxHeight + (this.wrapperList.size() - 1) * this.lineSpacing - 2;
         int borderSize = 2;
 
         return borderSize + boxesHeight;
@@ -157,7 +157,7 @@ public final class ArrayEditorWrapper<T> extends InputWidgetWrapper<T[]> {
             for (int i = 0; i < initValue.length; i++) {
                 S element = initValue[i];
                 String name = parentName.getString() + i;
-                InputWidgetWrapper<S> widget = InputWidgetWrapper.createWidgetWrapper(element, font, name);
+                InputWidgetWrapper<S> widget = createWidgetWrapper(element, font, name);
 
                 widgets.add(widget);
             }
@@ -171,7 +171,7 @@ public final class ArrayEditorWrapper<T> extends InputWidgetWrapper<T[]> {
                 el.render(guiGraphics, i, j, f);
 
                 if (k + 1 < list.size()) {
-                    j += ArrayEditorWrapper.this.getLineSpacing();
+                    j += ArrayEditor.this.getLineSpacing();
                 }
             }
         }
@@ -192,7 +192,7 @@ public final class ArrayEditorWrapper<T> extends InputWidgetWrapper<T[]> {
             for (var element : this.list) {
                 element.setPosition(i, j + padding);
 
-                padding += ArrayEditorWrapper.this.getLineSpacing() + 16;
+                padding += ArrayEditor.this.getLineSpacing() + 16;
             }
         }
 
@@ -256,7 +256,7 @@ public final class ArrayEditorWrapper<T> extends InputWidgetWrapper<T[]> {
         }
 
         public void setSelected(int selected) {
-            ArrayEditorWrapper.this.setFocused(false);
+            ArrayEditor.this.setFocused(false);
 
             if (selected >= 0 && selected < this.size()) {
                 this.selected = selected;

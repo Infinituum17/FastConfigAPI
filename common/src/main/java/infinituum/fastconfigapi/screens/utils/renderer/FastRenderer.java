@@ -1,6 +1,5 @@
 package infinituum.fastconfigapi.screens.utils.renderer;
 
-import infinituum.fastconfigapi.screens.utils.Color;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;

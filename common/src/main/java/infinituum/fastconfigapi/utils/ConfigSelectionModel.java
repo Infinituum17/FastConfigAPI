@@ -1,4 +1,4 @@
-package infinituum.fastconfigapi.screens.models;
+package infinituum.fastconfigapi.utils;
 
 import infinituum.fastconfigapi.FastConfigs;
 import infinituum.fastconfigapi.api.FastConfigFile;

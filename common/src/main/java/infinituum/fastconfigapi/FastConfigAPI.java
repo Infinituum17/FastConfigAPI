@@ -1,7 +1,7 @@
 package infinituum.fastconfigapi;
 
 import infinituum.fastconfigapi.api.annotations.FastConfig;
-import infinituum.fastconfigapi.utils.ConfigManager;
+import infinituum.fastconfigapi.utils.ConfigManagerReloadListener;
 import infinituum.void_lib.api.events.ClientReloadEvent;
 import infinituum.void_lib.api.events.ServerReloadEvent;
 import net.fabricmc.api.EnvType;
@@ -14,11 +14,11 @@ public final class FastConfigAPI {
 
     @Environment(EnvType.CLIENT)
     public static void initClient() {
-        ClientReloadEvent.EVENT.register(e -> e.registerReloadableResource(new ConfigManager(FastConfig.Side.CLIENT)));
+        ClientReloadEvent.EVENT.register(e -> e.registerReloadableResource(new ConfigManagerReloadListener(FastConfig.Side.CLIENT)));
     }
 
     public static void initServer() {
-        ServerReloadEvent.EVENT.register(e -> e.registerReloadableResource(new ConfigManager(FastConfig.Side.SERVER)));
+        ServerReloadEvent.EVENT.register(e -> e.registerReloadableResource(new ConfigManagerReloadListener(FastConfig.Side.SERVER)));
     }
 
     public static void initCommon() {

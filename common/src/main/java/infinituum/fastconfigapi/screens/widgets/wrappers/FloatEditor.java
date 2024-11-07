@@ -1,28 +1,34 @@
 package infinituum.fastconfigapi.screens.widgets.wrappers;
 
-import infinituum.fastconfigapi.screens.utils.GuardedEditBox;
-import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
+import infinituum.fastconfigapi.screens.utils.renderer.widget.GuardedEditBox;
+import infinituum.fastconfigapi.screens.widgets.InputWidgetWrapper;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
-public final class ShortEditorWrapper extends InputWidgetWrapper<Short> {
+public final class FloatEditor extends InputWidgetWrapper<Float> {
     private final GuardedEditBox editBox;
 
-    public ShortEditorWrapper(Font font, int i, int j, int k, int l, Component component, Short initValue) {
-        this.editBox = new GuardedEditBox(font, i, j, k, l, component, this::isValid);
+    public FloatEditor(Font font, int i, int j, int k, int l, Component name, Float initValue) {
+        this.editBox = new GuardedEditBox(font, i, j, k, l, name, this::isValid);
 
         this.editBox.setValue(String.valueOf(initValue));
         this.editBox.addPostInsertionAction(this::postInsertion);
     }
 
     private boolean isValid(String string) {
-        if (this.editBox.getValue().isEmpty() && string.equals("-")) {
+        String value = this.editBox.getValue();
+
+        if (value.isEmpty() && string.equals("-")) {
+            return true;
+        }
+
+        if (!value.contains(".") && string.equals(".")) {
             return true;
         }
 
         try {
-            Short.parseShort(string);
+            Float.parseFloat(string);
             return true;
         } catch (Exception e) {
             return false;
@@ -36,10 +42,14 @@ public final class ShortEditorWrapper extends InputWidgetWrapper<Short> {
             return;
         }
 
+        if (str.equals(".")) {
+            return;
+        }
+
         try {
-            Short.parseShort(str);
+            Float.parseFloat(str);
         } catch (Exception e) {
-            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Short.MIN_VALUE : Short.MAX_VALUE));
+            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Float.MIN_VALUE : Float.MAX_VALUE));
         }
     }
 
@@ -84,9 +94,9 @@ public final class ShortEditorWrapper extends InputWidgetWrapper<Short> {
     }
 
     @Override
-    public Short get() {
+    public Float get() {
         try {
-            return Short.parseShort(this.editBox.getValue());
+            return Float.parseFloat(this.editBox.getValue());
         } catch (Exception e) {
             return null;
         }

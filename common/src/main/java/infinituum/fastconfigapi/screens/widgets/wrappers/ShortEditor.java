@@ -1,22 +1,46 @@
 package infinituum.fastconfigapi.screens.widgets.wrappers;
 
-import infinituum.fastconfigapi.screens.utils.GuardedEditBox;
-import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
+import infinituum.fastconfigapi.screens.utils.renderer.widget.GuardedEditBox;
+import infinituum.fastconfigapi.screens.widgets.InputWidgetWrapper;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
-public final class CharacterEditorWrapper extends InputWidgetWrapper<Character> {
+public final class ShortEditor extends InputWidgetWrapper<Short> {
     private final GuardedEditBox editBox;
 
-    public CharacterEditorWrapper(Font font, int i, int j, int k, int l, Component component, Character initValue) {
+    public ShortEditor(Font font, int i, int j, int k, int l, Component component, Short initValue) {
         this.editBox = new GuardedEditBox(font, i, j, k, l, component, this::isValid);
 
-        this.editBox.setValue(initValue.toString());
+        this.editBox.setValue(String.valueOf(initValue));
+        this.editBox.addPostInsertionAction(this::postInsertion);
     }
 
     private boolean isValid(String string) {
-        return this.editBox.getValue().isEmpty() && string.length() == 1;
+        if (this.editBox.getValue().isEmpty() && string.equals("-")) {
+            return true;
+        }
+
+        try {
+            Short.parseShort(string);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void postInsertion() {
+        String str = this.editBox.getValue();
+
+        if (str.equals("-")) {
+            return;
+        }
+
+        try {
+            Short.parseShort(str);
+        } catch (Exception e) {
+            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Short.MIN_VALUE : Short.MAX_VALUE));
+        }
     }
 
     @Override
@@ -60,12 +84,12 @@ public final class CharacterEditorWrapper extends InputWidgetWrapper<Character> 
     }
 
     @Override
-    public Character get() {
-        if (this.editBox.getValue().isEmpty()) {
+    public Short get() {
+        try {
+            return Short.parseShort(this.editBox.getValue());
+        } catch (Exception e) {
             return null;
         }
-
-        return this.editBox.getValue().charAt(0);
     }
 
     @Override

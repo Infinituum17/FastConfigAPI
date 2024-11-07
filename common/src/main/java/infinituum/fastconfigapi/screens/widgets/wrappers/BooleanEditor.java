@@ -1,20 +1,20 @@
 package infinituum.fastconfigapi.screens.widgets.wrappers;
 
-import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
+import infinituum.fastconfigapi.screens.widgets.InputWidgetWrapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.network.chat.Component;
 
-public final class EnumEditorWrapper extends InputWidgetWrapper<Enum<?>> {
-    private final CycleButton<Enum<?>> button;
+public final class BooleanEditor extends InputWidgetWrapper<Boolean> {
+    private final CycleButton<Boolean> button;
 
-    public EnumEditorWrapper(Font font, int i, int j, int k, int l, Component component, Enum<?> initValue) {
-        this.button = CycleButton.<Enum<?>>builder(e -> Component.literal(e.name()))
-                .displayOnlyValue()
-                .withValues(initValue.getClass().getEnumConstants())
+    public BooleanEditor(Font font, int i, int j, int k, int l, Component component, Boolean initValue) {
+        this.button = CycleButton.<Boolean>builder(value -> Component.literal(value ? "True" : "False"))
                 .withInitialValue(initValue)
+                .displayOnlyValue()
+                .withValues(true, false)
                 .create(i, j, k, l, component);
     }
 
@@ -59,7 +59,7 @@ public final class EnumEditorWrapper extends InputWidgetWrapper<Enum<?>> {
     }
 
     @Override
-    public Enum<?> get() {
+    public Boolean get() {
         return this.button.getValue();
     }
 

@@ -1,7 +1,8 @@
-package infinituum.fastconfigapi.screens.utils;
+package infinituum.fastconfigapi.utils;
 
 import infinituum.fastconfigapi.screens.ConfigSelectionScreen;
-import infinituum.fastconfigapi.screens.models.ConfigSelectionModel;
+import infinituum.fastconfigapi.screens.utils.renderer.type.Refreshable;
+import infinituum.fastconfigapi.screens.utils.renderer.type.Repositionable;
 import infinituum.fastconfigapi.screens.widgets.ConfigOptionsEntry;
 import infinituum.fastconfigapi.screens.widgets.ConfigOptionsList;
 import infinituum.fastconfigapi.screens.widgets.ConfigSelectionEntry;
@@ -14,14 +15,14 @@ import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 
 import java.util.List;
 
-public final class ExpansionListManager implements Refreshable, Repositionable {
+public final class ListManager implements Refreshable, Repositionable {
     private final Minecraft minecraft;
     private final ConfigSelectionScreen parent;
     private final ConfigSelectionList list;
     private final ConfigOptionsList<?> options;
     private final ConfigSelectionModel model;
 
-    public ExpansionListManager(Minecraft minecraft, ConfigSelectionScreen parent) {
+    public ListManager(Minecraft minecraft, ConfigSelectionScreen parent) {
         this.minecraft = minecraft;
         this.parent = parent;
 

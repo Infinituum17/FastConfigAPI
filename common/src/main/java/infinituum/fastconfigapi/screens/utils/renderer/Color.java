@@ -1,4 +1,4 @@
-package infinituum.fastconfigapi.screens.utils;
+package infinituum.fastconfigapi.screens.utils.renderer;
 
 // TODO: Move Color and Components to Void Lib
 public final class Color {

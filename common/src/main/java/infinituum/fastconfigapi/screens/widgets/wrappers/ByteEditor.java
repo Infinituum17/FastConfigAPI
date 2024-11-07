@@ -1,18 +1,46 @@
 package infinituum.fastconfigapi.screens.widgets.wrappers;
 
-import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
+import infinituum.fastconfigapi.screens.utils.renderer.widget.GuardedEditBox;
+import infinituum.fastconfigapi.screens.widgets.InputWidgetWrapper;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 
-public final class StringEditorWrapper extends InputWidgetWrapper<String> {
-    private final EditBox editBox;
+public final class ByteEditor extends InputWidgetWrapper<Byte> {
+    private final GuardedEditBox editBox;
 
-    public StringEditorWrapper(Font font, int i, int j, int k, int l, Component component, String initValue) {
-        this.editBox = new EditBox(font, i, j, k, l, component);
+    public ByteEditor(Font font, int i, int j, int k, int l, Component component, Byte initValue) {
+        this.editBox = new GuardedEditBox(font, i, j, k, l, component, this::isValid);
 
-        this.editBox.setValue(initValue);
+        this.editBox.setValue(String.valueOf(initValue));
+        this.editBox.addPostInsertionAction(this::postInsertion);
+    }
+
+    private boolean isValid(String string) {
+        if (this.editBox.getValue().isEmpty() && string.equals("-")) {
+            return true;
+        }
+
+        try {
+            Byte.parseByte(string);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void postInsertion() {
+        String str = this.editBox.getValue();
+
+        if (str.equals("-")) {
+            return;
+        }
+
+        try {
+            Byte.parseByte(str);
+        } catch (Exception e) {
+            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Byte.MIN_VALUE : Byte.MAX_VALUE));
+        }
     }
 
     @Override
@@ -56,8 +84,12 @@ public final class StringEditorWrapper extends InputWidgetWrapper<String> {
     }
 
     @Override
-    public String get() {
-        return this.editBox.getValue();
+    public Byte get() {
+        try {
+            return Byte.parseByte(this.editBox.getValue());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override

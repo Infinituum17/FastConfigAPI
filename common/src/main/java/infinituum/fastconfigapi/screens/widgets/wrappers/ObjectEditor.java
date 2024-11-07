@@ -1,7 +1,7 @@
 package infinituum.fastconfigapi.screens.widgets.wrappers;
 
-import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
 import infinituum.fastconfigapi.screens.utils.renderer.FastRenderer;
+import infinituum.fastconfigapi.screens.widgets.InputWidgetWrapper;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
@@ -12,13 +12,12 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO: Implement
-public final class ObjectEditorWrapper extends InputWidgetWrapper<Object> {
+public final class ObjectEditor extends InputWidgetWrapper<Object> {
     private final ObjectManager manager;
     private int lineSpacing;
     private int horizontalSpacing;
 
-    public ObjectEditorWrapper(Font font, int i, int j, int k, int l, Component name, Object initValue) {
+    public ObjectEditor(Font font, int i, int j, int k, int l, Component name, Object initValue) {
         this.manager = new ObjectManager(initValue, font);
         this.lineSpacing = 4;
         this.horizontalSpacing = 4;
@@ -155,18 +154,20 @@ public final class ObjectEditorWrapper extends InputWidgetWrapper<Object> {
         private final Font font;
         private final Object object;
         private final List<ObjectField> fields;
-        private final int width;
+        private final int textMaxWidth;
+        private int height;
         private int selected;
 
         public ObjectManager(Object obj, Font font) {
             this.font = font;
             this.object = obj;
+            this.height = 0;
             Field[] fields = obj.getClass().getDeclaredFields();
 
             if (fields.length == 0) {
                 this.fields = List.of();
                 this.selected = -1;
-                this.width = 0;
+                this.textMaxWidth = 0;
 
                 return;
             }
@@ -185,9 +186,9 @@ public final class ObjectEditorWrapper extends InputWidgetWrapper<Object> {
                     throw new RuntimeException("Could not retrieve wrapper of field '" + name + "' from object '" + obj.getClass().getName() + "'");
                 }
 
-                InputWidgetWrapper<?> wrapper = InputWidgetWrapper.createWidgetWrapper(value, font, name);
+                InputWidgetWrapper<?> wrapper = createWidgetWrapper(value, font, name);
 
-                if (!(wrapper instanceof ObjectEditorWrapper)) {
+                if (!(wrapper instanceof ObjectEditor)) {
                     if (font.width(name + ":") > width) {
                         width = font.width(name + ":") + 2;
                     }
@@ -196,7 +197,7 @@ public final class ObjectEditorWrapper extends InputWidgetWrapper<Object> {
                 }
             }
 
-            this.width = width;
+            this.textMaxWidth = width;
             this.fields = objectFields;
             this.selected = 0;
         }
@@ -206,9 +207,7 @@ public final class ObjectEditorWrapper extends InputWidgetWrapper<Object> {
                 return 0;
             }
 
-            ObjectField first = this.fields.getFirst();
-
-            return first.wrapper().getWidth() + (horizontalSpacing * 2) + font.width(first.name());
+            return textMaxWidth + horizontalSpacing + this.fields.getFirst().wrapper().getWidth();
         }
 
         public int getX() {
@@ -268,23 +267,24 @@ public final class ObjectEditorWrapper extends InputWidgetWrapper<Object> {
 
         public void render(GuiGraphics guiGraphics, int i, int j, float f) {
             if (!fields.isEmpty()) {
+                j -= 2;
                 for (int k = 0; k < fields.size(); k++) {
                     String name = StringUtils.capitalize(fields.get(k).name() + ":");
                     InputWidgetWrapper<?> wrapper = fields.get(k).wrapper();
-                    int wx2 = wrapper.getX() + width + horizontalSpacing;
-                    int wy = wrapper.getY();
+                    int wx2 = wrapper.getX() + textMaxWidth + horizontalSpacing;
 
                     FastRenderer renderer = FastRenderer.startRender(guiGraphics, font);
 
-                    renderer.message(name, wx2 - horizontalSpacing - font.width(name), wy + 4)
+                    int x = wx2 - horizontalSpacing - font.width(name);
+
+                    renderer.message(name, x, j + (lineSpacing * 2))
                             .render();
 
-                    wrapper.setPosition(wx2, wy);
-
+                    wrapper.setPosition(wrapper.getX() + textMaxWidth + horizontalSpacing, j + lineSpacing);
                     wrapper.render(guiGraphics, i, j, f);
 
                     if (k + 1 < fields.size()) {
-                        j += ObjectEditorWrapper.this.getLineSpacing();
+                        j += ObjectEditor.this.getLineSpacing() + wrapper.getTotalHeight();
                     }
                 }
             }
@@ -296,7 +296,7 @@ public final class ObjectEditorWrapper extends InputWidgetWrapper<Object> {
             for (var field : this.fields) {
                 field.wrapper().setPosition(i, j + padding);
 
-                padding += ObjectEditorWrapper.this.getLineSpacing() + 16;
+                padding += ObjectEditor.this.getLineSpacing() + 16;
             }
         }
 
@@ -331,7 +331,18 @@ public final class ObjectEditorWrapper extends InputWidgetWrapper<Object> {
         }
 
         public int getTotalHeight() {
-            return this.size() * this.getHeight() + (this.size() - 1) * lineSpacing;
+            if (!this.fields.isEmpty() && height == 0) {
+                for (int i = 0; i < this.fields.size(); i++) {
+                    ObjectField field = this.fields.get(i);
+                    height += field.wrapper().getTotalHeight();
+
+                    if (i + 1 < this.fields.size()) {
+                        height += lineSpacing;
+                    }
+                }
+            }
+
+            return height;
         }
 
         public int getHeight() {

@@ -1,46 +1,18 @@
 package infinituum.fastconfigapi.screens.widgets.wrappers;
 
-import infinituum.fastconfigapi.screens.utils.GuardedEditBox;
-import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
+import infinituum.fastconfigapi.screens.widgets.InputWidgetWrapper;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 
-public final class IntegerEditorWrapper extends InputWidgetWrapper<Integer> {
-    private final GuardedEditBox editBox;
+public final class StringEditor extends InputWidgetWrapper<String> {
+    private final EditBox editBox;
 
-    public IntegerEditorWrapper(Font font, int i, int j, int k, int l, Component component, Integer initValue) {
-        this.editBox = new GuardedEditBox(font, i, j, k, l, component, this::isValid);
+    public StringEditor(Font font, int i, int j, int k, int l, Component component, String initValue) {
+        this.editBox = new EditBox(font, i, j, k, l, component);
 
-        this.editBox.setValue(String.valueOf(initValue));
-        this.editBox.addPostInsertionAction(this::postInsertion);
-    }
-
-    private boolean isValid(String string) {
-        if (this.editBox.getValue().isEmpty() && string.equals("-")) {
-            return true;
-        }
-
-        try {
-            Integer.parseInt(string);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private void postInsertion() {
-        String str = this.editBox.getValue();
-
-        if (str.equals("-")) {
-            return;
-        }
-
-        try {
-            Integer.parseInt(str);
-        } catch (Exception e) {
-            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Integer.MIN_VALUE : Integer.MAX_VALUE));
-        }
+        this.editBox.setValue(initValue);
     }
 
     @Override
@@ -84,12 +56,8 @@ public final class IntegerEditorWrapper extends InputWidgetWrapper<Integer> {
     }
 
     @Override
-    public Integer get() {
-        try {
-            return Integer.parseInt(this.editBox.getValue());
-        } catch (Exception e) {
-            return null;
-        }
+    public String get() {
+        return this.editBox.getValue();
     }
 
     @Override

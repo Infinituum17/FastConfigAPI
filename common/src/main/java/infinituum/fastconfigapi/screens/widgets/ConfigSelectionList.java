@@ -1,10 +1,10 @@
 package infinituum.fastconfigapi.screens.widgets;
 
-import infinituum.fastconfigapi.screens.models.ConfigSelectionModel;
-import infinituum.fastconfigapi.screens.utils.ExpansionListManager;
-import infinituum.fastconfigapi.screens.utils.Refreshable;
-import infinituum.fastconfigapi.screens.utils.Repositionable;
-import infinituum.fastconfigapi.screens.widgets.custom.DynamicHeightObjectSelectionList;
+import infinituum.fastconfigapi.screens.utils.renderer.type.Refreshable;
+import infinituum.fastconfigapi.screens.utils.renderer.type.Repositionable;
+import infinituum.fastconfigapi.screens.utils.renderer.widget.DynamicHeightObjectSelectionList;
+import infinituum.fastconfigapi.utils.ConfigSelectionModel;
+import infinituum.fastconfigapi.utils.ListManager;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
@@ -19,10 +19,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class ConfigSelectionList extends DynamicHeightObjectSelectionList<ConfigSelectionEntry> implements Refreshable, Repositionable {
-    private final ExpansionListManager manager;
+    private final ListManager manager;
     private final ConfigSelectionModel model;
 
-    public ConfigSelectionList(ExpansionListManager manager) {
+    public ConfigSelectionList(ListManager manager) {
         super(manager.getMinecraft(),
                 manager.getListWidth(),
                 manager.getListHeight(),

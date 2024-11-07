@@ -1,4 +1,4 @@
-package infinituum.fastconfigapi.screens.widgets.custom;
+package infinituum.fastconfigapi.screens.utils.renderer.widget;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

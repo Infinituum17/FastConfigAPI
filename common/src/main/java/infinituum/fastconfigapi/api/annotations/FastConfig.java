@@ -6,7 +6,7 @@ import infinituum.fastconfigapi.PlatformHelper;
 import infinituum.fastconfigapi.api.annotations.Loader.Type;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
-import infinituum.fastconfigapi.screens.utils.Color;
+import infinituum.fastconfigapi.screens.utils.renderer.Color;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,5 +1,6 @@
-package infinituum.fastconfigapi.screens.utils;
+package infinituum.fastconfigapi.screens.utils.renderer.widget;
 
+import infinituum.fastconfigapi.screens.utils.renderer.type.GuardingFunction;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;

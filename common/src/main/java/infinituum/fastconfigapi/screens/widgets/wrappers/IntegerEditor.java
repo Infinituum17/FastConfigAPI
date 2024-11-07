@@ -1,15 +1,15 @@
 package infinituum.fastconfigapi.screens.widgets.wrappers;
 
-import infinituum.fastconfigapi.screens.utils.GuardedEditBox;
-import infinituum.fastconfigapi.screens.utils.InputWidgetWrapper;
+import infinituum.fastconfigapi.screens.utils.renderer.widget.GuardedEditBox;
+import infinituum.fastconfigapi.screens.widgets.InputWidgetWrapper;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
-public final class ByteEditorWrapper extends InputWidgetWrapper<Byte> {
+public final class IntegerEditor extends InputWidgetWrapper<Integer> {
     private final GuardedEditBox editBox;
 
-    public ByteEditorWrapper(Font font, int i, int j, int k, int l, Component component, Byte initValue) {
+    public IntegerEditor(Font font, int i, int j, int k, int l, Component component, Integer initValue) {
         this.editBox = new GuardedEditBox(font, i, j, k, l, component, this::isValid);
 
         this.editBox.setValue(String.valueOf(initValue));
@@ -22,7 +22,7 @@ public final class ByteEditorWrapper extends InputWidgetWrapper<Byte> {
         }
 
         try {
-            Byte.parseByte(string);
+            Integer.parseInt(string);
             return true;
         } catch (Exception e) {
             return false;
@@ -37,9 +37,9 @@ public final class ByteEditorWrapper extends InputWidgetWrapper<Byte> {
         }
 
         try {
-            Byte.parseByte(str);
+            Integer.parseInt(str);
         } catch (Exception e) {
-            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Byte.MIN_VALUE : Byte.MAX_VALUE));
+            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Integer.MIN_VALUE : Integer.MAX_VALUE));
         }
     }
 
@@ -84,9 +84,9 @@ public final class ByteEditorWrapper extends InputWidgetWrapper<Byte> {
     }
 
     @Override
-    public Byte get() {
+    public Integer get() {
         try {
-            return Byte.parseByte(this.editBox.getValue());
+            return Integer.parseInt(this.editBox.getValue());
         } catch (Exception e) {
             return null;
         }

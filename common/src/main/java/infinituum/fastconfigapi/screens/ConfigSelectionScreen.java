@@ -1,6 +1,6 @@
 package infinituum.fastconfigapi.screens;
 
-import infinituum.fastconfigapi.screens.utils.ExpansionListManager;
+import infinituum.fastconfigapi.utils.ListManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,7 +16,7 @@ import net.minecraft.network.chat.Component;
 public final class ConfigSelectionScreen extends Screen {
     private final HeaderAndFooterLayout layout;
     private final Screen parent;
-    private ExpansionListManager manager;
+    private ListManager manager;
     private Button doneButton;
 
     public ConfigSelectionScreen(Screen parent) {
@@ -55,7 +55,7 @@ public final class ConfigSelectionScreen extends Screen {
 
     @Override
     protected void init() {
-        this.manager = new ExpansionListManager(this.minecraft, this);
+        this.manager = new ListManager(this.minecraft, this);
 
         LinearLayout linearLayout = this.layout.addToHeader(LinearLayout.vertical().spacing(5));
         linearLayout.defaultCellSetting().alignHorizontallyCenter();
