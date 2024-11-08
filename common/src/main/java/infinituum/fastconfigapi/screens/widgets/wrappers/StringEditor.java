@@ -1,6 +1,7 @@
 package infinituum.fastconfigapi.screens.widgets.wrappers;
 
 import infinituum.fastconfigapi.screens.widgets.InputWidgetWrapper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -83,5 +84,10 @@ public final class StringEditor extends InputWidgetWrapper<String> {
     @Override
     public int getY() {
         return this.editBox.getY();
+    }
+
+    @Override
+    public void resize(Minecraft minecraft, int width, int height, int listWidth, int listHeight, int elementHeight) {
+        this.editBox.setWidth(computeWidth(listWidth));
     }
 }

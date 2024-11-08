@@ -2,6 +2,8 @@ package infinituum.fastconfigapi.screens.widgets.wrappers;
 
 import infinituum.fastconfigapi.screens.utils.renderer.FastRenderer;
 import infinituum.fastconfigapi.screens.widgets.InputWidgetWrapper;
+import infinituum.fastconfigapi.screens.widgets.type.CompoundEditor;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
@@ -12,15 +14,17 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ObjectEditor extends InputWidgetWrapper<Object> {
+public final class ObjectEditor extends InputWidgetWrapper<Object> implements CompoundEditor {
     private final ObjectManager manager;
+    private final int listWidth;
     private int lineSpacing;
     private int horizontalSpacing;
 
-    public ObjectEditor(Font font, int i, int j, int k, int l, Component name, Object initValue) {
+    public ObjectEditor(Font font, int i, int j, int k, int l, Component name, Object initValue, int width) {
         this.manager = new ObjectManager(initValue, font);
         this.lineSpacing = 4;
         this.horizontalSpacing = 4;
+        this.listWidth = width;
     }
 
     @Override
@@ -130,24 +134,25 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> {
         return this.manager.getY();
     }
 
-    private int getLineSpacing() {
-        return this.lineSpacing;
+    @Override
+    public void resize(Minecraft minecraft, int width, int height, int listWidth, int listHeight, int elementHeight) {
+        this.manager.resize(minecraft, width, height, listWidth, listHeight, elementHeight);
     }
 
-    public void setLineSpacing(int lineSpacing) {
-        this.lineSpacing = lineSpacing;
+    private int getLineSpacing() {
+        return this.lineSpacing;
     }
 
     private int getHorizontalSpacing() {
         return this.horizontalSpacing;
     }
 
-    public void setHorizontalSpacing(int horizontalSpacing) {
-        this.horizontalSpacing = horizontalSpacing;
-    }
-
+    @Override
     public boolean hasNextElement(FocusNavigationEvent.TabNavigation tabNavigation) {
         return this.manager.setNextElement(tabNavigation);
+    }
+
+    private record ObjectField(Field field, String name, InputWidgetWrapper<?> wrapper) {
     }
 
     public class ObjectManager {
@@ -186,7 +191,7 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> {
                     throw new RuntimeException("Could not retrieve wrapper of field '" + name + "' from object '" + obj.getClass().getName() + "'");
                 }
 
-                InputWidgetWrapper<?> wrapper = createWidgetWrapper(value, font, name);
+                InputWidgetWrapper<?> wrapper = createWidgetWrapper(value, font, name, listWidth);
 
                 if (!(wrapper instanceof ObjectEditor)) {
                     if (font.width(name + ":") > width) {
@@ -227,7 +232,7 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> {
                     for (int i = 0; i < this.fields.size(); i++) {
                         InputWidgetWrapper<?> wrapper = this.fields.get(i).wrapper();
                         int wy = wrapper.getY();
-                        int wHeight = wrapper.getHeight();
+                        int wHeight = wrapper.getTotalHeight();
 
                         if (e >= wy && e <= wy + wHeight) {
                             this.setSelected(i);
@@ -262,7 +267,17 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> {
         }
 
         public void setSelected(int selected) {
-            this.selected = selected;
+            ObjectEditor.this.setFocused(false);
+
+            if (selected >= 0 && selected < this.size()) {
+                this.selected = selected;
+            } else {
+                throw new IndexOutOfBoundsException("ObjectManager widget index is out of bounds");
+            }
+        }
+
+        public int size() {
+            return this.fields.size();
         }
 
         public void render(GuiGraphics guiGraphics, int i, int j, float f) {
@@ -271,16 +286,16 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> {
                 for (int k = 0; k < fields.size(); k++) {
                     String name = StringUtils.capitalize(fields.get(k).name() + ":");
                     InputWidgetWrapper<?> wrapper = fields.get(k).wrapper();
-                    int wx2 = wrapper.getX() + textMaxWidth + horizontalSpacing;
+                    int wx2 = wrapper.getX() + textMaxWidth + getHorizontalSpacing();
 
                     FastRenderer renderer = FastRenderer.startRender(guiGraphics, font);
 
-                    int x = wx2 - horizontalSpacing - font.width(name);
+                    int x = wx2 - getHorizontalSpacing() - font.width(name);
 
-                    renderer.message(name, x, j + (lineSpacing * 2))
+                    renderer.message(name, x, j + (getLineSpacing() * 2))
                             .render();
 
-                    wrapper.setPosition(wrapper.getX() + textMaxWidth + horizontalSpacing, j + lineSpacing);
+                    wrapper.setPosition(wrapper.getX() + textMaxWidth + getHorizontalSpacing(), j + getLineSpacing());
                     wrapper.render(guiGraphics, i, j, f);
 
                     if (k + 1 < fields.size()) {
@@ -301,6 +316,12 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> {
         }
 
         public boolean setNextElement(FocusNavigationEvent.TabNavigation tabNavigation) {
+            if (this.getSelected() instanceof CompoundEditor editor) {
+                if (editor.hasNextElement(tabNavigation)) {
+                    return true;
+                }
+            }
+
             int i = tabNavigation.forward() ? this.selected + 1 : this.selected - 1;
 
             if (i >= 0 && i < this.size()) {
@@ -310,10 +331,6 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> {
             }
 
             return false;
-        }
-
-        public int size() {
-            return this.fields.size();
         }
 
         public Object get() {
@@ -337,7 +354,7 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> {
                     height += field.wrapper().getTotalHeight();
 
                     if (i + 1 < this.fields.size()) {
-                        height += lineSpacing;
+                        height += getLineSpacing();
                     }
                 }
             }
@@ -353,7 +370,10 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> {
             return this.fields.getFirst().wrapper().getHeight();
         }
 
-        private record ObjectField(Field field, String name, InputWidgetWrapper<?> wrapper) {
+        public void resize(Minecraft minecraft, int width, int height, int listWidth, int listHeight, int elementHeight) {
+            for (ObjectField field : this.fields) {
+                field.wrapper().resize(minecraft, width, height, listWidth, listHeight, elementHeight);
+            }
         }
     }
 }

@@ -88,4 +88,9 @@ public final class BooleanEditor extends InputWidgetWrapper<Boolean> {
     public int getY() {
         return this.button.getY();
     }
+
+    @Override
+    public void resize(Minecraft minecraft, int width, int height, int listWidth, int listHeight, int elementHeight) {
+        this.button.setWidth(computeWidth(listWidth));
+    }
 }

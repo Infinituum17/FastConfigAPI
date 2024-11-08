@@ -1,8 +1,8 @@
 package infinituum.fastconfigapi.screens.widgets;
 
-import infinituum.fastconfigapi.screens.utils.renderer.type.Refreshable;
-import infinituum.fastconfigapi.screens.utils.renderer.type.Repositionable;
 import infinituum.fastconfigapi.screens.utils.renderer.widget.DynamicHeightObjectSelectionList;
+import infinituum.fastconfigapi.screens.widgets.type.Refreshable;
+import infinituum.fastconfigapi.screens.widgets.type.Repositionable;
 import infinituum.fastconfigapi.utils.ConfigSelectionModel;
 import infinituum.fastconfigapi.utils.ListManager;
 import net.minecraft.client.gui.ComponentPath;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+// TODO: Fix weird problem when tabbing not fullscreen
 public final class ConfigSelectionList extends DynamicHeightObjectSelectionList<ConfigSelectionEntry> implements Refreshable, Repositionable {
     private final ListManager manager;
     private final ConfigSelectionModel model;

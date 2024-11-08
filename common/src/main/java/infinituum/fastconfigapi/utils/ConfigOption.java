@@ -18,9 +18,9 @@ public final class ConfigOption<T> {
         this.font = font;
     }
 
-    public InputWidgetWrapper<T> createWidgetWrapper(String fieldName) {
+    public InputWidgetWrapper<T> createWidgetWrapper(String fieldName, int width) {
         if (widgetWrapper == null) {
-            this.widgetWrapper = InputWidgetWrapper.createWidgetWrapper(getter.get(), font, fieldName);
+            this.widgetWrapper = InputWidgetWrapper.createWidgetWrapper(getter.get(), font, fieldName, width);
         }
 
         return widgetWrapper;

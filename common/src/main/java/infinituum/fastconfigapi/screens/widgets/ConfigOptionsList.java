@@ -1,11 +1,13 @@
 package infinituum.fastconfigapi.screens.widgets;
 
-import infinituum.fastconfigapi.screens.utils.renderer.type.Refreshable;
-import infinituum.fastconfigapi.screens.utils.renderer.type.Repositionable;
 import infinituum.fastconfigapi.screens.utils.renderer.widget.DynamicHeightObjectSelectionList;
+import infinituum.fastconfigapi.screens.widgets.type.Refreshable;
+import infinituum.fastconfigapi.screens.widgets.type.Repositionable;
+import infinituum.fastconfigapi.screens.widgets.type.Resizable;
 import infinituum.fastconfigapi.utils.ConfigOption;
 import infinituum.fastconfigapi.utils.ConfigSelectionModel;
 import infinituum.fastconfigapi.utils.ListManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
@@ -22,7 +24,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList<ConfigOptionsEntry<T>> implements Refreshable, Repositionable {
+public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList<ConfigOptionsEntry<T>> implements Resizable, Refreshable, Repositionable {
     private final ListManager manager;
     private final ConfigSelectionModel model;
 
@@ -208,6 +210,13 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
             if (!tooltip.isEmpty()) {
                 guiGraphics.renderTooltip(this.minecraft.font, tooltip, Optional.empty(), i, j);
             }
+        }
+    }
+
+    @Override
+    public void resize(Minecraft minecraft, int width, int height, int listWidth, int listHeight, int elementHeight) {
+        for (ConfigOptionsEntry<T> child : this.children()) {
+            child.resize(minecraft, width, height, this.getWidth(), this.getHeight(), elementHeight);
         }
     }
 }

@@ -1,12 +1,12 @@
 package infinituum.fastconfigapi.utils;
 
 import infinituum.fastconfigapi.screens.ConfigSelectionScreen;
-import infinituum.fastconfigapi.screens.utils.renderer.type.Refreshable;
-import infinituum.fastconfigapi.screens.utils.renderer.type.Repositionable;
 import infinituum.fastconfigapi.screens.widgets.ConfigOptionsEntry;
 import infinituum.fastconfigapi.screens.widgets.ConfigOptionsList;
 import infinituum.fastconfigapi.screens.widgets.ConfigSelectionEntry;
 import infinituum.fastconfigapi.screens.widgets.ConfigSelectionList;
+import infinituum.fastconfigapi.screens.widgets.type.Refreshable;
+import infinituum.fastconfigapi.screens.widgets.type.Repositionable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;

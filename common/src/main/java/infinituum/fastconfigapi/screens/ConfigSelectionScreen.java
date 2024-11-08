@@ -3,6 +3,7 @@ package infinituum.fastconfigapi.screens;
 import infinituum.fastconfigapi.utils.ListManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
@@ -78,5 +79,12 @@ public final class ConfigSelectionScreen extends Screen {
         this.manager.refresh();
         this.layout.arrangeElements();
         this.manager.reposition(this.layout);
+    }
+
+    @Override
+    public void resize(Minecraft minecraft, int i, int j) {
+        super.resize(minecraft, i, j);
+
+        this.manager.getOptions().resize(minecraft, i, j, 0, 0, 0);
     }
 }

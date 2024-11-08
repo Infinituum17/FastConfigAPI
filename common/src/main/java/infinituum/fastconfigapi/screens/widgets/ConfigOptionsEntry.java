@@ -4,10 +4,12 @@ import infinituum.fastconfigapi.impl.ConfigMetadata;
 import infinituum.fastconfigapi.screens.utils.renderer.Color;
 import infinituum.fastconfigapi.screens.utils.renderer.FastRenderer;
 import infinituum.fastconfigapi.screens.utils.renderer.widget.DynamicHeightObjectSelectionList;
+import infinituum.fastconfigapi.screens.widgets.type.Resizable;
 import infinituum.fastconfigapi.screens.widgets.wrappers.ArrayEditor;
 import infinituum.fastconfigapi.screens.widgets.wrappers.ObjectEditor;
 import infinituum.fastconfigapi.utils.ConfigOption;
 import infinituum.fastconfigapi.utils.ListManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
@@ -19,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionList.Entry<ConfigOptionsEntry<T>> {
+public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionList.Entry<ConfigOptionsEntry<T>> implements Resizable {
     private final ListManager manager;
     private final ConfigOption<T> option;
     private final InputWidgetWrapper<T> inputWrapper;
@@ -42,7 +44,7 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
         this.description = metadata.description();
         this.tooltip = metadata.tooltip();
 
-        this.inputWrapper = option.createWidgetWrapper(name);
+        this.inputWrapper = option.createWidgetWrapper(name, this.parent.getRowWidth());
     }
 
     @Override
@@ -66,6 +68,14 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
         if (inputWrapper instanceof ArrayEditor<?> arrayWrapper) {
             if (event instanceof FocusNavigationEvent.TabNavigation tabNavigation) {
                 if (arrayWrapper.hasNextElement(tabNavigation)) {
+                    return ComponentPath.path(this.parent, ComponentPath.leaf(this));
+                }
+            }
+        }
+
+        if (inputWrapper instanceof ObjectEditor objectEditor) {
+            if (event instanceof FocusNavigationEvent.TabNavigation tabNavigation) {
+                if (objectEditor.hasNextElement(tabNavigation)) {
                     return ComponentPath.path(this.parent, ComponentPath.leaf(this));
                 }
             }
@@ -201,5 +211,10 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
 
     private List<Component> stringsToComponents(String[] tooltip) {
         return Stream.of(tooltip).<Component>map(Component::literal).toList();
+    }
+
+    @Override
+    public void resize(Minecraft minecraft, int width, int height, int listWidth, int listHeight, int elementHeight) {
+        this.inputWrapper.resize(minecraft, width, height, listWidth, listHeight, this.getItemHeight());
     }
 }

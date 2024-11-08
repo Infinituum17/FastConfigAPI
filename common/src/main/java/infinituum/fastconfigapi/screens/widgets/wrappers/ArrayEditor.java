@@ -1,6 +1,8 @@
 package infinituum.fastconfigapi.screens.widgets.wrappers;
 
 import infinituum.fastconfigapi.screens.widgets.InputWidgetWrapper;
+import infinituum.fastconfigapi.screens.widgets.type.CompoundEditor;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
@@ -9,15 +11,17 @@ import net.minecraft.network.chat.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> {
+public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> implements CompoundEditor {
     private final WrappersList<T> wrapperList;
     private final int singleBoxHeight;
+    private final int listWidth;
     private int lineSpacing;
 
-    public ArrayEditor(Font font, int i, int j, int k, int l, Component component, T[] initValue) {
+    public ArrayEditor(Font font, int i, int j, int k, int l, Component component, T[] initValue, int width) {
         this.wrapperList = new WrappersList<>(font, initValue, component);
         this.singleBoxHeight = l;
         this.lineSpacing = 4;
+        this.listWidth = width;
     }
 
     @Override
@@ -130,14 +134,16 @@ public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> {
         return this.wrapperList.getY();
     }
 
+    @Override
+    public void resize(Minecraft minecraft, int width, int height, int listWidth, int listHeight, int elementHeight) {
+        this.wrapperList.resize(minecraft, width, height, listWidth, listHeight, elementHeight);
+    }
+
     private int getLineSpacing() {
         return this.lineSpacing;
     }
 
-    public void setLineSpacing(int lineSpacing) {
-        this.lineSpacing = lineSpacing;
-    }
-
+    @Override
     public boolean hasNextElement(FocusNavigationEvent.TabNavigation tabNavigation) {
         return this.wrapperList.setNextElement(tabNavigation);
     }
@@ -157,7 +163,7 @@ public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> {
             for (int i = 0; i < initValue.length; i++) {
                 S element = initValue[i];
                 String name = parentName.getString() + i;
-                InputWidgetWrapper<S> widget = createWidgetWrapper(element, font, name);
+                InputWidgetWrapper<S> widget = createWidgetWrapper(element, font, name, listWidth);
 
                 widgets.add(widget);
             }
@@ -197,6 +203,12 @@ public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> {
         }
 
         public boolean setNextElement(FocusNavigationEvent.TabNavigation tabNavigation) {
+            if (this.getSelected() instanceof CompoundEditor editor) {
+                if (editor.hasNextElement(tabNavigation)) {
+                    return true;
+                }
+            }
+
             int i = tabNavigation.forward() ? this.selected + 1 : this.selected - 1;
 
             if (i >= 0 && i < this.size()) {
@@ -208,8 +220,26 @@ public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> {
             return false;
         }
 
+        private InputWidgetWrapper<S> getSelected() {
+            try {
+                return this.list.get(this.selected);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
         public int size() {
             return this.list.size();
+        }
+
+        public void setSelected(int selected) {
+            ArrayEditor.this.setFocused(false);
+
+            if (selected >= 0 && selected < this.size()) {
+                this.selected = selected;
+            } else {
+                throw new IndexOutOfBoundsException("WrappersList widget index is out of bounds");
+            }
         }
 
         public void onClick(double d, double e) {
@@ -247,24 +277,6 @@ public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> {
             return this.list.getFirst().getY();
         }
 
-        private InputWidgetWrapper<S> getSelected() {
-            try {
-                return this.list.get(this.selected);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-
-        public void setSelected(int selected) {
-            ArrayEditor.this.setFocused(false);
-
-            if (selected >= 0 && selected < this.size()) {
-                this.selected = selected;
-            } else {
-                throw new IndexOutOfBoundsException("WrappersList widget index is out of bounds");
-            }
-        }
-
         public int getWidth() {
             if (this.list.isEmpty()) {
                 return 0;
@@ -287,6 +299,12 @@ public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> {
             }
 
             return this.list.getFirst().getHeight();
+        }
+
+        public void resize(Minecraft minecraft, int width, int height, int listWidth, int listHeight, int elementHeight) {
+            for (InputWidgetWrapper<S> wrapper : this.list) {
+                wrapper.resize(minecraft, width, height, listWidth, listHeight, elementHeight);
+            }
         }
     }
 }

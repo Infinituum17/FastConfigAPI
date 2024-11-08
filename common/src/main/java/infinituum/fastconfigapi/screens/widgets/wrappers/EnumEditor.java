@@ -88,4 +88,9 @@ public final class EnumEditor extends InputWidgetWrapper<Enum<?>> {
     public int getY() {
         return this.button.getY();
     }
+
+    @Override
+    public void resize(Minecraft minecraft, int width, int height, int listWidth, int listHeight, int elementHeight) {
+        this.button.setWidth(computeWidth(listWidth));
+    }
 }
