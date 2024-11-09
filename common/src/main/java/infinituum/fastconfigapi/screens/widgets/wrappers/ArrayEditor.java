@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> implements CompoundEditor {
-    private final WrappersList<T> wrapperList;
+    private final ElementsList<T> wrapperList;
     private final int singleBoxHeight;
     private final int lineSpacing;
 
     public ArrayEditor(Font font, int i, int j, int k, int l, Component component, T[] initValue) {
-        this.wrapperList = new WrappersList<>(font, initValue, component, k);
+        this.wrapperList = new ElementsList<>(font, initValue, component, k);
         this.singleBoxHeight = l;
         this.lineSpacing = 4;
     }
@@ -146,11 +146,11 @@ public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> implements Com
         return this.wrapperList.setNextElement(tabNavigation);
     }
 
-    public class WrappersList<S> {
+    public class ElementsList<S> {
         private final List<InputWidgetWrapper<S>> list;
         private int selected;
 
-        public WrappersList(Font font, S[] initValue, Component parentName, int listWidth) {
+        public ElementsList(Font font, S[] initValue, Component parentName, int listWidth) {
             this.selected = (initValue.length > 0) ? 0 : -1;
             this.list = this.composeList(font, initValue, parentName, listWidth);
         }
@@ -236,7 +236,7 @@ public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> implements Com
             if (selected >= 0 && selected < this.size()) {
                 this.selected = selected;
             } else {
-                throw new IndexOutOfBoundsException("WrappersList widget index is out of bounds");
+                throw new IndexOutOfBoundsException("ElementsList widget index is out of bounds");
             }
         }
 
