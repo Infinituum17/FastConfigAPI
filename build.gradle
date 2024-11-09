@@ -81,6 +81,13 @@ subprojects {
     }
 
     tasks.register("checkIntegrity") {
+        if (gradle.startParameter.taskNames.any { it == "test" }) {
+            logger.lifecycle("Skipping 'checkIntegrity' in test task")
+            return
+        }
+
+        logger.lifecycle("Checking integrity of '" + project.name + "' project...")
+
         if (project.name == "common") {
             if (!rootProject.hasProperty("has_generation") || rootProject.has_generation.toBoolean()) {
                 URI uri = Paths.get(projectDir.toString(), "src", "main", "generated").toUri()
