@@ -152,7 +152,7 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
 
     @Override
     public int getItemHeight() {
-        return this.itemHeight;
+        return this.itemHeight == 0 ? this.inputWrapper.getTotalHeight() : this.itemHeight;
     }
 
     @Override

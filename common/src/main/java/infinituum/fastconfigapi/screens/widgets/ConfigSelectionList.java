@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-// TODO: Fix weird problem when tabbing not fullscreen
 public final class ConfigSelectionList extends DynamicHeightObjectSelectionList<ConfigSelectionEntry> implements Refreshable, Repositionable {
     private final ListManager manager;
     private final ConfigSelectionModel model;
@@ -82,9 +81,13 @@ public final class ConfigSelectionList extends DynamicHeightObjectSelectionList<
         ConfigSelectionEntry clickedEntry = getEntryAtPosition(d, e);
         boolean isProcessedClick = super.mouseClicked(d, e, i);
 
-        if (isProcessedClick && selectedEntry != null && clickedEntry != null && !Objects.equals(selectedEntry, clickedEntry)) {
-            this.manager.getOptions().setFocused(null);
-            this.manager.getOptions().setSelected(null);
+        if (isProcessedClick && selectedEntry != null && clickedEntry != null) {
+            if (!Objects.equals(selectedEntry, clickedEntry)) {
+                this.manager.getOptions().setFocused(null);
+                this.manager.getOptions().setSelected(null);
+            }
+
+            this.manager.getOptions().setScrollAmount(0);
         }
 
         return isProcessedClick;

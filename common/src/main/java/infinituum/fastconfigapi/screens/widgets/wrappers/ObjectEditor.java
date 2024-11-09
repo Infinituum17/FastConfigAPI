@@ -16,15 +16,13 @@ import java.util.List;
 
 public final class ObjectEditor extends InputWidgetWrapper<Object> implements CompoundEditor {
     private final ObjectManager manager;
-    private final int listWidth;
     private int lineSpacing;
     private int horizontalSpacing;
 
-    public ObjectEditor(Font font, int i, int j, int k, int l, Component name, Object initValue, int width) {
-        this.manager = new ObjectManager(initValue, font);
+    public ObjectEditor(Font font, int i, int j, int k, int l, Component name, Object initValue) {
+        this.manager = new ObjectManager(initValue, font, k);
         this.lineSpacing = 4;
         this.horizontalSpacing = 4;
-        this.listWidth = width;
     }
 
     @Override
@@ -163,7 +161,7 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> implements Co
         private int height;
         private int selected;
 
-        public ObjectManager(Object obj, Font font) {
+        public ObjectManager(Object obj, Font font, int listWidth) {
             this.font = font;
             this.object = obj;
             this.height = 0;
@@ -191,7 +189,7 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> implements Co
                     throw new RuntimeException("Could not retrieve wrapper of field '" + name + "' from object '" + obj.getClass().getName() + "'");
                 }
 
-                InputWidgetWrapper<?> wrapper = createWidgetWrapper(value, font, name, listWidth);
+                InputWidgetWrapper<?> wrapper = createWidgetWrapper(value, font, name, listWidth, false);
 
                 if (!(wrapper instanceof ObjectEditor)) {
                     if (font.width(name + ":") > width) {

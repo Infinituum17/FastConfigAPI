@@ -125,6 +125,7 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
         ConfigOptionsEntry<T> nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
 
         if (nextEntry != null) {
+            this.manager.getList().setFocused(null);
             return ComponentPath.path(this, ComponentPath.leaf(nextEntry));
         }
 

@@ -244,41 +244,16 @@ public abstract class DynamicHeightAbstractSelectionList<E extends DynamicHeight
                         + (double) arg.getItemHeight() / 2
                         - (double) this.height / 2
         );
-    }    @Nullable
-    protected final E getEntryAtPosition(double d, double e) {
-        int i = this.getRowWidth() / 2;
-        int j = this.getX() + this.width / 2;
-        int k = j - i;
-        int l = j + i;
-
-        if (d < k || d > l) {
-            return null;
-        }
-
-        int m = Mth.floor(e - (double) this.getY()) - this.headerHeight + (int) this.getScrollAmount() - 4;
-
-        if (m < 0) {
-            return null;
-        }
-
-        int baseY = 0;
-
-        for (E current : this.children) {
-            if (m >= baseY && m <= baseY + current.getItemHeight()) {
-                return current;
-            }
-
-            baseY += current.getItemHeight();
-        }
-
-        return null;
     }
 
     protected int getItemsHeightUntil(int index) {
         int heights = 0;
+        int j = 0;
 
-        for (int j = 0; j < index; j++) {
+        while (j < index) {
             heights += this.children.get(j).getItemHeight();
+
+            j++;
         }
 
         return heights;
@@ -484,26 +459,59 @@ public abstract class DynamicHeightAbstractSelectionList<E extends DynamicHeight
         }
     }
 
+    @Nullable
+    protected final E getEntryAtPosition(double d, double e) {
+        int i = this.getRowWidth() / 2;
+        int j = this.getX() + this.width / 2;
+        int k = j - i;
+        int l = j + i;
 
+        if (d < k || d > l) {
+            return null;
+        }
+
+        int m = Mth.floor(e - (double) this.getY()) - this.headerHeight + (int) this.getScrollAmount() - 4;
+
+        if (m < 0) {
+            return null;
+        }
+
+        int baseY = 0;
+
+        for (E current : this.children) {
+            if (m >= baseY && m <= baseY + current.getItemHeight()) {
+                return current;
+            }
+
+            baseY += current.getItemHeight();
+        }
+
+        return null;
+    }
 
 
     protected boolean clickedHeader(int i, int j) {
         return false;
     }
 
-
     protected void ensureVisible(E arg) {
-        int i = this.getRowTop(this.children().indexOf(arg));
+        int idx = this.children().indexOf(arg);
+        int i = this.getRowTop(idx);
         int j = i - this.getY() - 4 - arg.getItemHeight();
+
         if (j < 0) {
             this.scroll(j);
         }
 
-        int k = this.getBottom() - i - arg.getItemHeight() - arg.getItemHeight();
+        int k = this.getBottom() - i;
+
+        if (idx != 0) {
+            k -= arg.getItemHeight();
+        }
+
         if (k < 0) {
             this.scroll(-k);
         }
-
     }
 
     private void scroll(int i) {
@@ -557,7 +565,6 @@ public abstract class DynamicHeightAbstractSelectionList<E extends DynamicHeight
                 this.ensureVisible(entry);
             }
         }
-
     }
 
     public boolean mouseClicked(double d, double e, int i) {

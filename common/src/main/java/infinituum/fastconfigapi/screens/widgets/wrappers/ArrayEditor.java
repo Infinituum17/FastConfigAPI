@@ -14,14 +14,12 @@ import java.util.List;
 public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> implements CompoundEditor {
     private final WrappersList<T> wrapperList;
     private final int singleBoxHeight;
-    private final int listWidth;
-    private int lineSpacing;
+    private final int lineSpacing;
 
-    public ArrayEditor(Font font, int i, int j, int k, int l, Component component, T[] initValue, int width) {
-        this.wrapperList = new WrappersList<>(font, initValue, component);
+    public ArrayEditor(Font font, int i, int j, int k, int l, Component component, T[] initValue) {
+        this.wrapperList = new WrappersList<>(font, initValue, component, k);
         this.singleBoxHeight = l;
         this.lineSpacing = 4;
-        this.listWidth = width;
     }
 
     @Override
@@ -152,18 +150,18 @@ public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> implements Com
         private final List<InputWidgetWrapper<S>> list;
         private int selected;
 
-        public WrappersList(Font font, S[] initValue, Component parentName) {
+        public WrappersList(Font font, S[] initValue, Component parentName, int listWidth) {
             this.selected = (initValue.length > 0) ? 0 : -1;
-            this.list = this.composeList(font, initValue, parentName);
+            this.list = this.composeList(font, initValue, parentName, listWidth);
         }
 
-        private List<InputWidgetWrapper<S>> composeList(Font font, S[] initValue, Component parentName) {
+        private List<InputWidgetWrapper<S>> composeList(Font font, S[] initValue, Component parentName, int listWidth) {
             List<InputWidgetWrapper<S>> widgets = new ArrayList<>();
 
             for (int i = 0; i < initValue.length; i++) {
                 S element = initValue[i];
                 String name = parentName.getString() + i;
-                InputWidgetWrapper<S> widget = createWidgetWrapper(element, font, name, listWidth);
+                InputWidgetWrapper<S> widget = createWidgetWrapper(element, font, name, listWidth, false);
 
                 widgets.add(widget);
             }

@@ -20,7 +20,7 @@ public final class ConfigOption<T> {
 
     public InputWidgetWrapper<T> createWidgetWrapper(String fieldName, int width) {
         if (widgetWrapper == null) {
-            this.widgetWrapper = InputWidgetWrapper.createWidgetWrapper(getter.get(), font, fieldName, width);
+            this.widgetWrapper = InputWidgetWrapper.createWidgetWrapper(getter.get(), font, fieldName, width, true);
         }
 
         return widgetWrapper;
