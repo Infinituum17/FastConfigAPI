@@ -8,6 +8,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.List;
+
 public abstract class InputWidgetWrapper<T> implements Resizable {
     private static final int HEIGHT = 16;
 
@@ -43,6 +45,10 @@ public abstract class InputWidgetWrapper<T> implements Resizable {
     }
 
     private static <X> InputWidgetWrapper<?> getExactType(Font font, int i, int j, int k, int l, Component name, X value) {
+        if (value instanceof List<?> list) {
+            return new ListEditor<>(font, i, j, k, l, name, list);
+        }
+
         if (value instanceof int[] array) {
             return new ArrayEditor<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
         }

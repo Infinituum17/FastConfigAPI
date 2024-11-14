@@ -29,7 +29,6 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
     private final String description;
     private final String[] tooltip;
     private final ConfigOptionsList<T> parent;
-    private boolean isItemHeightComputed;
     private int itemHeight;
 
     public ConfigOptionsEntry(ListManager manager, ConfigOption<T> option, ConfigMetadata.ConfigFieldMetadata metadata, ConfigOptionsList<T> parent) {
@@ -38,50 +37,12 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
         this.parent = parent;
 
         this.itemHeight = 0;
-        this.isItemHeightComputed = false;
 
         this.name = metadata.name();
         this.description = metadata.description();
         this.tooltip = metadata.tooltip();
 
         this.inputWrapper = option.createWidgetWrapper(name, this.parent.getRowWidth());
-    }
-
-    @Override
-    public boolean keyPressed(int i, int j, int k) {
-        return this.inputWrapper.keyPressed(i, j, k);
-    }
-
-    @Override
-    public boolean keyReleased(int i, int j, int k) {
-        return this.inputWrapper.keyReleased(i, j, k);
-    }
-
-    @Override
-    public boolean charTyped(char c, int i) {
-        return this.inputWrapper.charTyped(c, i);
-    }
-
-    @Nullable
-    @Override
-    public ComponentPath nextFocusPath(FocusNavigationEvent event) {
-        if (inputWrapper instanceof ArrayEditor<?> arrayWrapper) {
-            if (event instanceof FocusNavigationEvent.TabNavigation tabNavigation) {
-                if (arrayWrapper.hasNextElement(tabNavigation)) {
-                    return ComponentPath.path(this.parent, ComponentPath.leaf(this));
-                }
-            }
-        }
-
-        if (inputWrapper instanceof ObjectEditor objectEditor) {
-            if (event instanceof FocusNavigationEvent.TabNavigation tabNavigation) {
-                if (objectEditor.hasNextElement(tabNavigation)) {
-                    return ComponentPath.path(this.parent, ComponentPath.leaf(this));
-                }
-            }
-        }
-
-        return super.nextFocusPath(event);
     }
 
     @Override
@@ -142,17 +103,16 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
 
         y += verticalPadding - 5;
 
-        addHeight(y);
-        addHeight(-j);
-
-        computeItemHeight();
+        if (itemHeight == 0 || itemHeight != y - j) {
+            this.itemHeight = y - j;
+        }
 
         guiGraphics.hLine(k - 2, k + rowWidth, y - 2, 0x40FFFFFF);
     }
 
     @Override
     public int getItemHeight() {
-        return this.itemHeight == 0 ? this.inputWrapper.getTotalHeight() : this.itemHeight;
+        return this.itemHeight;
     }
 
     @Override
@@ -167,18 +127,6 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
     @Override
     public void setFocused(boolean bl) {
         this.inputWrapper.setFocused(bl);
-    }
-
-    private void addHeight(int height) {
-        if (!isItemHeightComputed) {
-            itemHeight += height;
-        }
-    }
-
-    private void computeItemHeight() {
-        if (!isItemHeightComputed) {
-            isItemHeightComputed = true;
-        }
     }
 
     @Override
@@ -216,5 +164,42 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
     @Override
     public void resize(Minecraft minecraft, int width, int height, int listWidth, int listHeight, int elementHeight) {
         this.inputWrapper.resize(minecraft, width, height, listWidth, listHeight, this.getItemHeight());
+    }
+
+    @Override
+    public boolean keyPressed(int i, int j, int k) {
+        return this.inputWrapper.keyPressed(i, j, k);
+    }
+
+    @Override
+    public boolean keyReleased(int i, int j, int k) {
+        return this.inputWrapper.keyReleased(i, j, k);
+    }
+
+    @Override
+    public boolean charTyped(char c, int i) {
+        return this.inputWrapper.charTyped(c, i);
+    }
+
+    @Nullable
+    @Override
+    public ComponentPath nextFocusPath(FocusNavigationEvent event) {
+        if (inputWrapper instanceof ArrayEditor<?> arrayWrapper) {
+            if (event instanceof FocusNavigationEvent.TabNavigation tabNavigation) {
+                if (arrayWrapper.hasNextElement(tabNavigation)) {
+                    return ComponentPath.path(this.parent, ComponentPath.leaf(this));
+                }
+            }
+        }
+
+        if (inputWrapper instanceof ObjectEditor objectEditor) {
+            if (event instanceof FocusNavigationEvent.TabNavigation tabNavigation) {
+                if (objectEditor.hasNextElement(tabNavigation)) {
+                    return ComponentPath.path(this.parent, ComponentPath.leaf(this));
+                }
+            }
+        }
+
+        return super.nextFocusPath(event);
     }
 }
