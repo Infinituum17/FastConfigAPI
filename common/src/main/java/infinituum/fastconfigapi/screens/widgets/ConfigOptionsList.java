@@ -87,6 +87,10 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
             }
         };
 
+        if (getter.get() instanceof List<?> list && list.isEmpty()) {
+            return null;
+        }
+
         return new ConfigOptionsEntry<>(
                 this.manager,
                 new ConfigOption<>(getter, setter, this.manager.getFont()),

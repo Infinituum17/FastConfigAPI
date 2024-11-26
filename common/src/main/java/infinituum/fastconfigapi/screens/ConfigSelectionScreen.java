@@ -15,6 +15,8 @@ import net.minecraft.network.chat.Component;
 
 @Environment(EnvType.CLIENT)
 public final class ConfigSelectionScreen extends Screen {
+    //    private static int mouseX;
+    //    private static int mouseY;
     private final HeaderAndFooterLayout layout;
     private final Screen parent;
     private ListManager manager;
@@ -42,6 +44,8 @@ public final class ConfigSelectionScreen extends Screen {
         if (this.manager.getOptions().isHovered()) {
             this.manager.getOptions().renderTooltip(guiGraphics, i, j, f);
         }
+
+//        guiGraphics.drawString(font, mouseX + ", " + mouseY, 8, 8, 0xFFFFFFFF);
     }
 
     @Override
@@ -87,4 +91,12 @@ public final class ConfigSelectionScreen extends Screen {
 
         this.manager.getOptions().resize(minecraft, i, j, 0, 0, 0);
     }
+
+//    @Override
+//    public void mouseMoved(double d, double e) {
+//        super.mouseMoved(d, e);
+//
+//        ConfigSelectionScreen.mouseX = (int) d;
+//        ConfigSelectionScreen.mouseY = (int) e;
+//    }
 }

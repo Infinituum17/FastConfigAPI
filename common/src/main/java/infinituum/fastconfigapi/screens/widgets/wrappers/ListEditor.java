@@ -10,8 +10,7 @@ import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static infinituum.fastconfigapi.FastConfigAPI.MOD_ID;
 
@@ -110,10 +109,11 @@ public final class ListEditor<T> extends InputWidgetWrapper<List<T>> implements 
 
     @Override
     public int getTotalHeight() {
-        int boxesHeight = this.wrapperList.size() * this.singleBoxHeight + (this.wrapperList.size() - 1) * this.lineSpacing - 2;
+        int newBoxHeight = this.singleBoxHeight + this.lineSpacing;
+        int boxesHeight = (this.wrapperList.size() - 1) * this.singleBoxHeight + (this.wrapperList.size() - 2) * this.lineSpacing - 2;
         int borderSize = 2;
 
-        return borderSize + boxesHeight + 1;
+        return newBoxHeight + borderSize + boxesHeight + 1;
     }
 
     @Override
@@ -151,62 +151,83 @@ public final class ListEditor<T> extends InputWidgetWrapper<List<T>> implements 
     }
 
     public class ElementsList<S> {
-        private final List<InputWidgetWrapper<S>> list;
-        private List<SpriteIconButton> buttons;
+        private final SortedMap<Integer, WidgetPair<S>> map;
+        private int listWidth;
         private int selected;
+        private int index;
 
         public ElementsList(Font font, List<S> initValue, Component parentName, int listWidth) {
-            this.selected = (!initValue.isEmpty()) ? 0 : -1;
-            this.list = this.composeList(font, initValue, parentName, listWidth);
+            this.listWidth = listWidth;
+            this.selected = 0;
+            this.map = new TreeMap<>();
+            this.index = this.composeList(font, initValue, parentName);
         }
 
-        private List<InputWidgetWrapper<S>> composeList(Font font, List<S> initValue, Component parentName, int listWidth) {
-            List<InputWidgetWrapper<S>> widgets = new ArrayList<>();
-            List<SpriteIconButton> buttons = new ArrayList<>();
-
-            for (int i = 0; i < initValue.size(); i++) {
-                S element = initValue.get(i);
-                String name = parentName.getString();
-                InputWidgetWrapper<S> widget = createWidgetWrapper(element, font, name, listWidth, false);
-
-                widgets.add(widget);
-                int i2 = i;
-                buttons.add(
-                        SpriteIconButton.builder(Component.literal("button_" + name), button -> this.remove(i2), true)
-                                .size(18, 18)
-                                .sprite(ResourceLocation.fromNamespaceAndPath(MOD_ID, "icon/cross"), 15, 15)
-                                .build()
-                );
+        private int composeList(Font font, List<S> initValue, Component parentName) {
+            for (S element : initValue) {
+                this.createNewElement(element, font, parentName.getString());
             }
 
-            this.buttons = buttons;
-            return widgets;
+            int currentIndex = this.map.size();
+
+            InputWidgetWrapper<S> wrapper = InputWidgetWrapper.createWidgetWrapper(this.map.get(0).widget().get(), font, "new_element", listWidth, false);
+            SpriteIconButton newElementButton = SpriteIconButton.builder(Component.literal("add_element"),
+                            b -> this.createNewElement(wrapper.get(), font, parentName.getString()), true)
+                    .size(18, 18)
+                    .sprite(ResourceLocation.fromNamespaceAndPath(MOD_ID, "icon/add"), 15, 15)
+                    .build();
+
+            wrapper.setValue(null);
+
+            this.map.put(Integer.MAX_VALUE, new WidgetPair<>(wrapper, newElementButton));
+
+            return currentIndex;
         }
 
-        public void remove(int i) {
-            this.list.remove(i);
-            this.buttons.remove(i);
+        private void createNewElement(S value, Font font, String name) {
+            InputWidgetWrapper<S> widget = createWidgetWrapper(value, font, name, listWidth, false);
+
+            int i = newIndex();
+
+            SpriteIconButton button = SpriteIconButton.builder(Component.literal("button_" + name), b -> this.map.remove(i), true)
+                    .size(18, 18)
+                    .sprite(ResourceLocation.fromNamespaceAndPath(MOD_ID, "icon/cross"), 15, 15)
+                    .build();
+
+            this.map.put(i, new WidgetPair<>(widget, button));
+        }
+
+        private int newIndex() {
+            if (index == Integer.MAX_VALUE) {
+                throw new RuntimeException("Reached max number of elements in List Editor");
+            }
+
+            return index++;
         }
 
         public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-            for (int k = 0; k < list.size(); k++) {
-                InputWidgetWrapper<S> el = list.get(k);
-                SpriteIconButton button = buttons.get(k);
-                el.render(guiGraphics, i, j, f);
-                button.setPosition(el.getX() - button.getWidth() - 2 - 1, el.getY() - 1);
-                button.render(guiGraphics, i, j, f);
+            for (int k : map.keySet()) {
+                map.get(k).widget().render(guiGraphics, i, j, f);
+                map.get(k).button().render(guiGraphics, i, j, f);
             }
         }
 
         public List<S> get() {
-            return this.list.stream().map(InputWidgetWrapper::get).toList();
+            return this.map.entrySet()
+                    .stream()
+                    .sorted(Comparator.comparingInt(Map.Entry::getKey))
+                    .map(e -> e.getValue().widget().get())
+                    .toList();
         }
 
         public void setPosition(int i, int j) {
             int padding = 0;
 
-            for (var element : this.list) {
-                element.setPosition(i, j + padding);
+            for (var element : this.map.values()) {
+                InputWidgetWrapper<S> widget = element.widget();
+                SpriteIconButton button = element.button();
+                widget.setPosition(i + button.getWidth() + 2, j + padding);
+                button.setPosition(widget.getX() - button.getWidth() - 2 - 1, widget.getY() - 1);
 
                 padding += ListEditor.this.getLineSpacing() + 16;
             }
@@ -232,20 +253,24 @@ public final class ListEditor<T> extends InputWidgetWrapper<List<T>> implements 
 
         private InputWidgetWrapper<S> getSelected() {
             try {
-                return this.list.get(this.selected);
+                return this.map.get(this.selected).widget();
             } catch (Exception e) {
                 return null;
             }
         }
 
         public int size() {
-            return this.list.size();
+            return this.map.size();
         }
 
         public void setSelected(int selected) {
             ListEditor.this.setFocused(false);
 
-            if (selected >= 0 && selected < this.size()) {
+            if (selected == -1) {
+                return;
+            }
+
+            if (this.map.get(selected) != null) {
                 this.selected = selected;
             } else {
                 throw new IndexOutOfBoundsException("ElementsList widget index is out of bounds");
@@ -253,7 +278,7 @@ public final class ListEditor<T> extends InputWidgetWrapper<List<T>> implements 
         }
 
         public void onClick(double d, double e) {
-            if (!this.list.isEmpty()) {
+            if (!this.map.isEmpty()) {
                 int height = getTotalHeight() - 2;
                 int y = (int) (e - this.getY());
 
@@ -261,9 +286,9 @@ public final class ListEditor<T> extends InputWidgetWrapper<List<T>> implements 
                     return;
                 }
 
-                for (int i = 0; i < this.list.size(); i++) {
-                    InputWidgetWrapper<S> wrapper = this.list.get(i);
-                    SpriteIconButton button = this.buttons.get(i);
+                for (int i : map.keySet()) {
+                    InputWidgetWrapper<S> wrapper = this.map.get(i).widget();
+                    SpriteIconButton button = this.map.get(i).button();
                     int wy = wrapper.getY();
 
                     if (e >= wy && e <= wy + wrapper.getHeight()) {
@@ -290,41 +315,34 @@ public final class ListEditor<T> extends InputWidgetWrapper<List<T>> implements 
         }
 
         public int getY() {
-            if (this.list.isEmpty()) {
-                return 0;
-            }
+            return this.map.get(firstElementKey()).widget().getY();
+        }
 
-            return this.list.getFirst().getY();
+        private int firstElementKey() {
+            return this.map.entrySet().stream().min(Comparator.comparingInt(Map.Entry::getKey)).orElseThrow().getKey();
         }
 
         public int getWidth() {
-            if (this.list.isEmpty()) {
-                return 0;
-            }
-
-            return this.list.getFirst().getWidth() + 2 + this.buttons.getFirst().getWidth();
+            return this.map.get(Integer.MAX_VALUE).widget().getWidth() + 2 + this.map.get(Integer.MAX_VALUE).button().getWidth();
         }
 
         public int getX() {
-            if (this.list.isEmpty()) {
-                return 0;
-            }
-
-            return this.list.getFirst().getX();
+            return this.map.get(firstElementKey()).button().getX();
         }
 
         public int getHeight() {
-            if (this.list.isEmpty()) {
-                return 0;
-            }
-
-            return this.list.getFirst().getHeight();
+            return this.map.get(firstElementKey()).widget().getHeight();
         }
 
         public void resize(Minecraft minecraft, int width, int height, int listWidth, int listHeight, int elementHeight) {
-            for (InputWidgetWrapper<S> wrapper : this.list) {
-                wrapper.resize(minecraft, width, height, listWidth, listHeight, elementHeight);
+            for (WidgetPair<S> widgetPair : this.map.values()) {
+                widgetPair.widget().resize(minecraft, width, height, listWidth, listHeight, elementHeight);
             }
+
+            this.listWidth = listWidth;
+        }
+
+        public record WidgetPair<T>(InputWidgetWrapper<T> widget, SpriteIconButton button) {
         }
     }
 }

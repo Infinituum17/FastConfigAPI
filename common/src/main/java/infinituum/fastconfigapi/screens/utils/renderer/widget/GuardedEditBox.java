@@ -39,7 +39,7 @@ public class GuardedEditBox extends EditBox {
 
     @Override
     public void setValue(String string) {
-        if (guardingFunction.isValid(string)) {
+        if (guardingFunction.isValid(this.getValue(), string)) {
             super.setValue(string);
 
             if (postSetAction != null) {
@@ -50,7 +50,7 @@ public class GuardedEditBox extends EditBox {
 
     @Override
     public void insertText(String string) {
-        if (guardingFunction.isValid(string)) {
+        if (guardingFunction.isValid(this.getValue(), string)) {
             super.insertText(string);
 
             if (postInsertionAction != null) {

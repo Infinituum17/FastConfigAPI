@@ -123,4 +123,7 @@ public abstract class InputWidgetWrapper<T> implements Resizable {
     @Override
     public void resize(Minecraft minecraft, int width, int height, int listWidth, int listHeight, int elementHeight) {
     }
+
+    public void setValue(T value) {
+    }
 }
