@@ -5,10 +5,10 @@ import infinituum.fastconfigapi.screens.utils.renderer.Color;
 import infinituum.fastconfigapi.screens.utils.renderer.FastRenderer;
 import infinituum.fastconfigapi.screens.utils.renderer.widget.DynamicHeightObjectSelectionList;
 import infinituum.fastconfigapi.screens.widgets.type.Resizable;
-import infinituum.fastconfigapi.screens.widgets.wrappers.ArrayEditor;
-import infinituum.fastconfigapi.screens.widgets.wrappers.ObjectEditor;
+import infinituum.fastconfigapi.screens.widgets.wrappers.ArrayEditBoxCompound;
+import infinituum.fastconfigapi.screens.widgets.wrappers.ObjectEditBoxCompound;
 import infinituum.fastconfigapi.utils.ConfigOption;
-import infinituum.fastconfigapi.utils.ListManager;
+import infinituum.fastconfigapi.utils.ConfigScreenManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionList.Entry<ConfigOptionsEntry<T>> implements Resizable {
-    private final ListManager manager;
+public final class ConfigOptionsListEntry<T> extends DynamicHeightObjectSelectionList.Entry<ConfigOptionsListEntry<T>> implements Resizable {
+    private final ConfigScreenManager manager;
     private final ConfigOption<T> option;
     private final InputWidgetWrapper<T> inputWrapper;
     private final String name;
@@ -31,7 +31,7 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
     private final ConfigOptionsList<T> parent;
     private int itemHeight;
 
-    public ConfigOptionsEntry(ListManager manager, ConfigOption<T> option, ConfigMetadata.ConfigFieldMetadata metadata, ConfigOptionsList<T> parent) {
+    public ConfigOptionsListEntry(ConfigScreenManager manager, ConfigOption<T> option, ConfigMetadata.ConfigFieldMetadata metadata, ConfigOptionsList<T> parent) {
         this.manager = manager;
         this.option = option;
         this.parent = parent;
@@ -79,13 +79,13 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
         if (hasDescription) {
             int maxMultilineX = rowWidth - (horizontalPadding * 2) - 6;
 
-            if (inputWrapper instanceof ArrayEditor<?>) {
+            if (inputWrapper instanceof ArrayEditBoxCompound<?>) {
                 y -= this.inputWrapper.getTotalHeight();
                 y += this.inputWrapper.getHeight();
                 maxMultilineX = maxMultilineX - horizontalPadding - this.inputWrapper.getWidth();
             }
 
-            if (inputWrapper instanceof ObjectEditor) {
+            if (inputWrapper instanceof ObjectEditBoxCompound) {
                 y -= this.inputWrapper.getTotalHeight();
                 y += this.inputWrapper.getHeight();
                 maxMultilineX = maxMultilineX - horizontalPadding - this.inputWrapper.getWidth();
@@ -184,17 +184,17 @@ public final class ConfigOptionsEntry<T> extends DynamicHeightObjectSelectionLis
     @Nullable
     @Override
     public ComponentPath nextFocusPath(FocusNavigationEvent event) {
-        if (inputWrapper instanceof ArrayEditor<?> arrayWrapper) {
+        if (inputWrapper instanceof ArrayEditBoxCompound<?> arrayEditBoxCompound) {
             if (event instanceof FocusNavigationEvent.TabNavigation tabNavigation) {
-                if (arrayWrapper.hasNextElement(tabNavigation)) {
+                if (arrayEditBoxCompound.hasNextElement(tabNavigation)) {
                     return ComponentPath.path(this.parent, ComponentPath.leaf(this));
                 }
             }
         }
 
-        if (inputWrapper instanceof ObjectEditor objectEditor) {
+        if (inputWrapper instanceof ObjectEditBoxCompound objectEditBoxCompound) {
             if (event instanceof FocusNavigationEvent.TabNavigation tabNavigation) {
-                if (objectEditor.hasNextElement(tabNavigation)) {
+                if (objectEditBoxCompound.hasNextElement(tabNavigation)) {
                     return ComponentPath.path(this.parent, ComponentPath.leaf(this));
                 }
             }

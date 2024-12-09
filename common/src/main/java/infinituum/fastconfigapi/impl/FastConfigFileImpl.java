@@ -23,7 +23,7 @@ import java.util.Map;
  * @param <T> The type of the class instance contained in the current config file.
  */
 public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
-    private final Class<T> clazz;
+    private final Class<T> configClass;
     private final FastConfig.Side side;
     private final String fileName;
     private final Path configDirectoryPath;
@@ -39,14 +39,14 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     private String loaderTarget;
     private T instance;
 
-    public FastConfigFileImpl(@NotNull Class<T> clazz, @NotNull FastConfig.Side side, @NotNull Map<String, Object> data, ConfigMetadata<T> metadata) {
+    public FastConfigFileImpl(@NotNull Class<T> configClass, @NotNull FastConfig.Side side, @NotNull Map<String, Object> data, ConfigMetadata<T> metadata) {
         String subdirectoryStringPath = FastConfigHelper.getSubdirectoryOrDefault(data);
 
-        this.clazz = clazz;
+        this.configClass = configClass;
         this.side = side;
         this.metadata = metadata;
-        this.modId = FastConfigHelper.getModId(clazz, data);
-        this.fileName = FastConfigHelper.getFileNameOrDefault(data, clazz.getSimpleName(), side);
+        this.modId = FastConfigHelper.getModId(configClass, data);
+        this.fileName = FastConfigHelper.getFileNameOrDefault(data, configClass.getSimpleName(), side);
         this.serializer = FastConfigHelper.getSerializerOrDefault(data);
         this.configDirectoryPath = PlatformHelper.getDefaultConfigDirPath();
         this.configSubdirectoryPath = (!subdirectoryStringPath.isEmpty()) ? configDirectoryPath.resolve(subdirectoryStringPath) : configDirectoryPath;
@@ -68,10 +68,10 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     }
 
     public void setDefaultClassInstance() {
-        T instance = UnsafeLoader.loadInstance(clazz);
+        T instance = UnsafeLoader.loadInstance(configClass);
 
         if (instance == null) {
-            throw new RuntimeException("Could not load default instance for class '" + clazz.getSimpleName() + "'");
+            throw new RuntimeException("Could not load default instance for class '" + configClass.getSimpleName() + "'");
         }
 
         this.setInstance(instance);
@@ -84,7 +84,7 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
 
     @Override
     public @NotNull Class<T> getConfigClass() {
-        return clazz;
+        return configClass;
     }
 
     @Override

@@ -3,8 +3,8 @@ package infinituum.fastconfigapi.screens.widgets;
 import infinituum.fastconfigapi.screens.utils.renderer.widget.DynamicHeightObjectSelectionList;
 import infinituum.fastconfigapi.screens.widgets.type.Refreshable;
 import infinituum.fastconfigapi.screens.widgets.type.Repositionable;
+import infinituum.fastconfigapi.utils.ConfigScreenManager;
 import infinituum.fastconfigapi.utils.ConfigSelectionModel;
-import infinituum.fastconfigapi.utils.ListManager;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
@@ -18,18 +18,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public final class ConfigSelectionList extends DynamicHeightObjectSelectionList<ConfigSelectionEntry> implements Refreshable, Repositionable {
-    private final ListManager manager;
+public final class ConfigSelectionList extends DynamicHeightObjectSelectionList<ConfigSelectionListEntry> implements Refreshable, Repositionable {
+    private final ConfigScreenManager manager;
     private final ConfigSelectionModel model;
 
-    public ConfigSelectionList(ListManager manager) {
+    public ConfigSelectionList(ConfigScreenManager manager, ConfigSelectionModel model) {
         super(manager.getMinecraft(),
                 manager.getListWidth(),
                 manager.getListHeight(),
                 manager.getTopPadding());
 
         this.manager = manager;
-        this.model = manager.getModel();
+        this.model = model;
     }
 
     @Override
@@ -38,7 +38,7 @@ public final class ConfigSelectionList extends DynamicHeightObjectSelectionList<
         this.setSelected(null);
 
         this.model.getConfigs().forEach(config -> {
-            var entry = new ConfigSelectionEntry(this.manager, config, this);
+            var entry = new ConfigSelectionListEntry(this.manager, config, this);
             this.children().add(entry);
 
             if (config.equals(this.model.getSelected())) {
@@ -48,8 +48,8 @@ public final class ConfigSelectionList extends DynamicHeightObjectSelectionList<
     }
 
     @Override
-    public void setSelected(@Nullable ConfigSelectionEntry entry) {
-        ConfigSelectionEntry previous = super.getSelected();
+    public void setSelected(@Nullable ConfigSelectionListEntry entry) {
+        ConfigSelectionListEntry previous = super.getSelected();
         super.setSelected(entry);
 
         if (entry != null && !entry.equals(previous)) {
@@ -77,8 +77,8 @@ public final class ConfigSelectionList extends DynamicHeightObjectSelectionList<
 
     @Override
     public boolean mouseClicked(double d, double e, int i) {
-        ConfigSelectionEntry selectedEntry = this.getSelected();
-        ConfigSelectionEntry clickedEntry = getEntryAtPosition(d, e);
+        ConfigSelectionListEntry selectedEntry = this.getSelected();
+        ConfigSelectionListEntry clickedEntry = getEntryAtPosition(d, e);
         boolean isProcessedClick = super.mouseClicked(d, e, i);
 
         if (isProcessedClick && selectedEntry != null && clickedEntry != null) {
@@ -126,7 +126,7 @@ public final class ConfigSelectionList extends DynamicHeightObjectSelectionList<
             }
         }
 
-        ConfigSelectionEntry nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
+        ConfigSelectionListEntry nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
 
         if (nextEntry != null) {
             ConfigOptionsList<?> options = this.manager.getOptions();
@@ -157,7 +157,7 @@ public final class ConfigSelectionList extends DynamicHeightObjectSelectionList<
             }
         }
 
-        ConfigSelectionEntry nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
+        ConfigSelectionListEntry nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
 
         if (nextEntry != null) {
             ConfigOptionsList<?> options = this.manager.getOptions();
@@ -189,7 +189,7 @@ public final class ConfigSelectionList extends DynamicHeightObjectSelectionList<
     }
 
     public void renderTooltip(GuiGraphics guiGraphics, int i, int j, float f) {
-        ConfigSelectionEntry entry = this.getHovered();
+        ConfigSelectionListEntry entry = this.getHovered();
 
         if (entry != null) {
             List<Component> tooltip = entry.getTooltip();

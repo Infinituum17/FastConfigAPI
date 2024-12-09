@@ -11,12 +11,12 @@ import net.minecraft.network.chat.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> implements CompoundEditor {
+public final class ArrayEditBoxCompound<T> extends InputWidgetWrapper<T[]> implements CompoundEditor {
     private final ElementsList<T> wrapperList;
     private final int singleBoxHeight;
     private final int lineSpacing;
 
-    public ArrayEditor(Font font, int i, int j, int k, int l, Component component, T[] initValue) {
+    public ArrayEditBoxCompound(Font font, int i, int j, int k, int l, Component component, T[] initValue) {
         this.wrapperList = new ElementsList<>(font, initValue, component, k);
         this.singleBoxHeight = l;
         this.lineSpacing = 4;
@@ -148,9 +148,11 @@ public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> implements Com
 
     public class ElementsList<S> {
         private final List<InputWidgetWrapper<S>> list;
+        private final S[] initValue;
         private int selected;
 
         public ElementsList(Font font, S[] initValue, Component parentName, int listWidth) {
+            this.initValue = initValue;
             this.selected = (initValue.length > 0) ? 0 : -1;
             this.list = this.composeList(font, initValue, parentName, listWidth);
         }
@@ -175,7 +177,7 @@ public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> implements Com
                 el.render(guiGraphics, i, j, f);
 
                 if (k + 1 < list.size()) {
-                    j += ArrayEditor.this.getLineSpacing();
+                    j += ArrayEditBoxCompound.this.getLineSpacing();
                 }
             }
         }
@@ -187,7 +189,7 @@ public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> implements Com
                 values.add(element.get());
             }
 
-            return (S[]) values.toArray();
+            return values.toArray(initValue);
         }
 
         public void setPosition(int i, int j) {
@@ -196,7 +198,7 @@ public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> implements Com
             for (var element : this.list) {
                 element.setPosition(i, j + padding);
 
-                padding += ArrayEditor.this.getLineSpacing() + 16;
+                padding += ArrayEditBoxCompound.this.getLineSpacing() + 16;
             }
         }
 
@@ -231,7 +233,7 @@ public final class ArrayEditor<T> extends InputWidgetWrapper<T[]> implements Com
         }
 
         public void setSelected(int selected) {
-            ArrayEditor.this.setFocused(false);
+            ArrayEditBoxCompound.this.setFocused(false);
 
             if (selected >= 0 && selected < this.size()) {
                 this.selected = selected;

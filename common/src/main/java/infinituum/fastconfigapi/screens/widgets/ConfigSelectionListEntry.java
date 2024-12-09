@@ -6,7 +6,7 @@ import infinituum.fastconfigapi.impl.ConfigMetadata;
 import infinituum.fastconfigapi.screens.utils.renderer.Color;
 import infinituum.fastconfigapi.screens.utils.renderer.FastRenderer;
 import infinituum.fastconfigapi.screens.utils.renderer.widget.DynamicHeightObjectSelectionList;
-import infinituum.fastconfigapi.utils.ListManager;
+import infinituum.fastconfigapi.utils.ConfigScreenManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -17,8 +17,8 @@ import java.util.stream.Stream;
 
 import static infinituum.fastconfigapi.FastConfigAPI.MOD_ID;
 
-public final class ConfigSelectionEntry extends DynamicHeightObjectSelectionList.Entry<ConfigSelectionEntry> {
-    private final ListManager manager;
+public final class ConfigSelectionListEntry extends DynamicHeightObjectSelectionList.Entry<ConfigSelectionListEntry> {
+    private final ConfigScreenManager manager;
     private final FastConfigFile<?> config;
     private final ConfigSelectionList parent;
     private final String modId;
@@ -29,7 +29,7 @@ public final class ConfigSelectionEntry extends DynamicHeightObjectSelectionList
     private int itemHeight;
     private boolean isItemHeightComputed;
 
-    public ConfigSelectionEntry(ListManager minecraft, @NotNull FastConfigFile<?> config, ConfigSelectionList parent) {
+    public ConfigSelectionListEntry(ConfigScreenManager minecraft, @NotNull FastConfigFile<?> config, ConfigSelectionList parent) {
         this.manager = minecraft;
         this.config = config;
         this.parent = parent;

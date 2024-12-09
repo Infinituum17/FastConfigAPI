@@ -7,6 +7,7 @@ import infinituum.fastconfigapi.impl.ConfigMetadata;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.nio.file.Path;
 
 /**
@@ -16,7 +17,7 @@ import java.nio.file.Path;
  *
  * @param <T> The type of the class instance contained in the current config file.
  */
-public interface FastConfigFile<T> extends GenericConfigFile {
+public interface FastConfigFile<T> extends GenericConfigFile, Serializable {
     /**
      * Gets the config metadata.
      *

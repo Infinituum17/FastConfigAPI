@@ -14,12 +14,12 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ObjectEditor extends InputWidgetWrapper<Object> implements CompoundEditor {
+public final class ObjectEditBoxCompound extends InputWidgetWrapper<Object> implements CompoundEditor {
     private final ObjectManager manager;
     private int lineSpacing;
     private int horizontalSpacing;
 
-    public ObjectEditor(Font font, int i, int j, int k, int l, Component name, Object initValue) {
+    public ObjectEditBoxCompound(Font font, int i, int j, int k, int l, Component name, Object initValue) {
         this.manager = new ObjectManager(initValue, font, k);
         this.lineSpacing = 4;
         this.horizontalSpacing = 4;
@@ -191,7 +191,7 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> implements Co
 
                 InputWidgetWrapper<?> wrapper = createWidgetWrapper(value, font, name, listWidth, false);
 
-                if (!(wrapper instanceof ObjectEditor)) {
+                if (!(wrapper instanceof ObjectEditBoxCompound)) {
                     if (font.width(name + ":") > width) {
                         width = font.width(name + ":") + 2;
                     }
@@ -265,7 +265,7 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> implements Co
         }
 
         public void setSelected(int selected) {
-            ObjectEditor.this.setFocused(false);
+            ObjectEditBoxCompound.this.setFocused(false);
 
             if (selected >= 0 && selected < this.size()) {
                 this.selected = selected;
@@ -297,7 +297,7 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> implements Co
                     wrapper.render(guiGraphics, i, j, f);
 
                     if (k + 1 < fields.size()) {
-                        j += ObjectEditor.this.getLineSpacing() + wrapper.getTotalHeight();
+                        j += ObjectEditBoxCompound.this.getLineSpacing() + wrapper.getTotalHeight();
                     }
                 }
             }
@@ -309,7 +309,7 @@ public final class ObjectEditor extends InputWidgetWrapper<Object> implements Co
             for (var field : this.fields) {
                 field.wrapper().setPosition(i, j + padding);
 
-                padding += ObjectEditor.this.getLineSpacing() + 16;
+                padding += ObjectEditBoxCompound.this.getLineSpacing() + 16;
             }
         }
 

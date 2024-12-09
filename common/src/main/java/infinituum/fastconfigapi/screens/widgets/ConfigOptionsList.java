@@ -5,14 +5,15 @@ import infinituum.fastconfigapi.screens.widgets.type.Refreshable;
 import infinituum.fastconfigapi.screens.widgets.type.Repositionable;
 import infinituum.fastconfigapi.screens.widgets.type.Resizable;
 import infinituum.fastconfigapi.utils.ConfigOption;
+import infinituum.fastconfigapi.utils.ConfigScreenManager;
 import infinituum.fastconfigapi.utils.ConfigSelectionModel;
-import infinituum.fastconfigapi.utils.ListManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.network.chat.Component;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
@@ -24,37 +25,37 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList<ConfigOptionsEntry<T>> implements Resizable, Refreshable, Repositionable {
-    private final ListManager manager;
+public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList<ConfigOptionsListEntry<T>> implements Resizable, Refreshable, Repositionable {
+    private final ConfigScreenManager manager;
     private final ConfigSelectionModel model;
 
-    public ConfigOptionsList(ListManager manager) {
+    public ConfigOptionsList(ConfigScreenManager manager, ConfigSelectionModel model) {
         super(manager.getMinecraft(),
                 manager.getOptionsWidth(),
                 manager.getOptionsHeight(),
                 manager.getTopPadding());
 
         this.manager = manager;
-        this.model = manager.getModel();
+        this.model = model;
     }
 
     @Override
     public void refresh() {
         this.children().clear();
 
-        List<ConfigOptionsEntry<T>> entries = translateSelected();
+        List<ConfigOptionsListEntry<T>> entries = translateSelected();
 
         if (!entries.isEmpty()) {
             this.children().addAll(entries);
         }
     }
 
-    private <U> List<ConfigOptionsEntry<T>> translateSelected() {
-        List<ConfigOptionsEntry<T>> configOptionEntries = new ArrayList<>();
+    private <U> List<ConfigOptionsListEntry<T>> translateSelected() {
+        List<ConfigOptionsListEntry<T>> configOptionEntries = new ArrayList<>();
         U instance = (U) this.model.getSelected().getInstance();
 
         for (Field field : instance.getClass().getDeclaredFields()) {
-            ConfigOptionsEntry<T> entry = translateSelected(field, instance);
+            ConfigOptionsListEntry<T> entry = translateSelected(field, instance);
 
             if (entry != null) {
                 configOptionEntries.add(entry);
@@ -64,7 +65,7 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
         return Collections.unmodifiableList(configOptionEntries);
     }
 
-    private <U> ConfigOptionsEntry<T> translateSelected(Field field, U instance) {
+    private <U> ConfigOptionsListEntry<T> translateSelected(Field field, U instance) {
         field.setAccessible(true);
 
         if (Modifier.isTransient(field.getModifiers())) {
@@ -81,7 +82,11 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
 
         Consumer<T> setter = (v) -> {
             try {
-                field.set(instance, v);
+                if (isUnboxableArray(v)) {
+                    field.set(instance, ArrayUtils.toPrimitive(v));
+                } else {
+                    field.set(instance, v);
+                }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -91,12 +96,23 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
             return null;
         }
 
-        return new ConfigOptionsEntry<>(
+        return new ConfigOptionsListEntry<>(
                 this.manager,
                 new ConfigOption<>(getter, setter, this.manager.getFont()),
                 this.model.getSelected().getMetadata().getField(field),
                 this
         );
+    }
+
+    private boolean isUnboxableArray(T v) {
+        return v instanceof Byte[]
+                || v instanceof Short[]
+                || v instanceof Integer[]
+                || v instanceof Long[]
+                || v instanceof Float[]
+                || v instanceof Double[]
+                || v instanceof Character[]
+                || v instanceof Boolean[];
     }
 
     @Nullable
@@ -116,7 +132,7 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
     }
 
     private ComponentPath tabForward(FocusNavigationEvent.TabNavigation navigation) {
-        ConfigOptionsEntry<T> selected = this.getSelected();
+        ConfigOptionsListEntry<T> selected = this.getSelected();
 
         if (selected != null) {
             ComponentPath componentPath = selected.nextFocusPath(navigation);
@@ -126,7 +142,7 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
             }
         }
 
-        ConfigOptionsEntry<T> nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
+        ConfigOptionsListEntry<T> nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
 
         if (nextEntry != null) {
             this.manager.getList().setFocused(null);
@@ -152,7 +168,7 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
             return ComponentPath.path(list, ComponentPath.leaf(list.children().getLast()));
         }
 
-        ConfigOptionsEntry<T> selected = this.getSelected();
+        ConfigOptionsListEntry<T> selected = this.getSelected();
 
         if (selected != null) {
             ComponentPath componentPath = selected.nextFocusPath(navigation);
@@ -162,7 +178,7 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
             }
         }
 
-        ConfigOptionsEntry<T> nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
+        ConfigOptionsListEntry<T> nextEntry = this.nextEntry(navigation.getVerticalDirectionForInitialFocus());
 
         if (nextEntry != null) {
             this.setScrollAmount(this.getMaxScroll());
@@ -207,7 +223,7 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
     }
 
     public void renderTooltip(GuiGraphics guiGraphics, int i, int j, float f) {
-        ConfigOptionsEntry<?> entry = this.getHovered();
+        ConfigOptionsListEntry<?> entry = this.getHovered();
 
         if (entry != null) {
             List<Component> tooltip = entry.getTooltip();
@@ -220,7 +236,7 @@ public final class ConfigOptionsList<T> extends DynamicHeightObjectSelectionList
 
     @Override
     public void resize(Minecraft minecraft, int width, int height, int listWidth, int listHeight, int elementHeight) {
-        for (ConfigOptionsEntry<T> child : this.children()) {
+        for (ConfigOptionsListEntry<T> child : this.children()) {
             child.resize(minecraft, width, height, this.getWidth(), this.getHeight(), elementHeight);
         }
     }

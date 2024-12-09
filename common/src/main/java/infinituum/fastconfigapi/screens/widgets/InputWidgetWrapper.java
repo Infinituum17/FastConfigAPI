@@ -24,16 +24,16 @@ public abstract class InputWidgetWrapper<T> implements Resizable {
         }
 
         InputWidgetWrapper<?> widgetWrapper = switch (data) {
-            case Integer value -> new IntegerEditor(font, i, j, parentWidth, HEIGHT, name, value);
-            case Short value -> new ShortEditor(font, i, j, parentWidth, HEIGHT, name, value);
-            case Long value -> new LongEditor(font, i, j, parentWidth, HEIGHT, name, value);
-            case Double value -> new DoubleEditor(font, i, j, parentWidth, HEIGHT, name, value);
-            case Float value -> new FloatEditor(font, i, j, parentWidth, HEIGHT, name, value);
-            case Boolean value -> new BooleanEditor(font, i, j, parentWidth, HEIGHT, name, value);
-            case Byte value -> new ByteEditor(font, i, j, parentWidth, HEIGHT, name, value);
-            case Character value -> new CharacterEditor(font, i, j, parentWidth, HEIGHT, name, value);
-            case String value -> new StringEditor(font, i, j, parentWidth, HEIGHT, name, value);
-            case Enum<?> value -> new EnumEditor(font, i, j, parentWidth, HEIGHT, name, value);
+            case Integer value -> new IntegerEditBox(font, i, j, parentWidth, HEIGHT, name, value);
+            case Short value -> new ShortEditBox(font, i, j, parentWidth, HEIGHT, name, value);
+            case Long value -> new LongEditBox(font, i, j, parentWidth, HEIGHT, name, value);
+            case Double value -> new DoubleEditBox(font, i, j, parentWidth, HEIGHT, name, value);
+            case Float value -> new FloatEditBox(font, i, j, parentWidth, HEIGHT, name, value);
+            case Boolean value -> new BooleanButton(font, i, j, parentWidth, HEIGHT, name, value);
+            case Byte value -> new ByteEditBox(font, i, j, parentWidth, HEIGHT, name, value);
+            case Character value -> new CharacterEditBox(font, i, j, parentWidth, HEIGHT, name, value);
+            case String value -> new StringEditBox(font, i, j, parentWidth, HEIGHT, name, value);
+            case Enum<?> value -> new EnumButton(font, i, j, parentWidth, HEIGHT, name, value);
             case X value -> getExactType(font, i, j, parentWidth, HEIGHT, name, value);
         };
 
@@ -46,46 +46,46 @@ public abstract class InputWidgetWrapper<T> implements Resizable {
 
     private static <X> InputWidgetWrapper<?> getExactType(Font font, int i, int j, int k, int l, Component name, X value) {
         if (value instanceof List<?> list) {
-            return new ListEditor<>(font, i, j, k, l, name, list);
+            return new ListEditBoxCompound<>(font, i, j, k, l, name, list);
         }
 
         if (value instanceof int[] array) {
-            return new ArrayEditor<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
+            return new ArrayEditBoxCompound<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
         }
 
         if (value instanceof short[] array) {
-            return new ArrayEditor<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
+            return new ArrayEditBoxCompound<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
         }
 
         if (value instanceof long[] array) {
-            return new ArrayEditor<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
+            return new ArrayEditBoxCompound<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
         }
 
         if (value instanceof double[] array) {
-            return new ArrayEditor<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
+            return new ArrayEditBoxCompound<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
         }
 
         if (value instanceof float[] array) {
-            return new ArrayEditor<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
+            return new ArrayEditBoxCompound<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
         }
 
         if (value instanceof boolean[] array) {
-            return new ArrayEditor<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
+            return new ArrayEditBoxCompound<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
         }
 
         if (value instanceof byte[] array) {
-            return new ArrayEditor<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
+            return new ArrayEditBoxCompound<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
         }
 
         if (value instanceof char[] array) {
-            return new ArrayEditor<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
+            return new ArrayEditBoxCompound<>(font, i, j, k, l, name, ArrayUtils.toObject(array));
         }
 
         if (value instanceof Object[] array) {
-            return new ArrayEditor<>(font, i, j, k, l, name, array);
+            return new ArrayEditBoxCompound<>(font, i, j, k, l, name, array);
         }
 
-        return new ObjectEditor(font, i, j, k, l, name, value);
+        return new ObjectEditBoxCompound(font, i, j, k, l, name, value);
     }
 
     public abstract boolean keyPressed(int i, int j, int k);

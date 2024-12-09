@@ -14,12 +14,12 @@ import java.util.*;
 
 import static infinituum.fastconfigapi.FastConfigAPI.MOD_ID;
 
-public final class ListEditor<T> extends InputWidgetWrapper<List<T>> implements CompoundEditor {
+public final class ListEditBoxCompound<T> extends InputWidgetWrapper<List<T>> implements CompoundEditor {
     private final ElementsList<T> wrapperList;
     private final int singleBoxHeight;
     private final int lineSpacing;
 
-    public ListEditor(Font font, int i, int j, int k, int l, Component component, List<T> initValue) {
+    public ListEditBoxCompound(Font font, int i, int j, int k, int l, Component component, List<T> initValue) {
         this.wrapperList = new ElementsList<>(font, initValue, component, k);
         this.singleBoxHeight = l;
         this.lineSpacing = 4;
@@ -215,6 +215,7 @@ public final class ListEditor<T> extends InputWidgetWrapper<List<T>> implements 
         public List<S> get() {
             return this.map.entrySet()
                     .stream()
+                    .filter(pair -> pair.getKey() != Integer.MAX_VALUE)
                     .sorted(Comparator.comparingInt(Map.Entry::getKey))
                     .map(e -> e.getValue().widget().get())
                     .toList();
@@ -229,7 +230,7 @@ public final class ListEditor<T> extends InputWidgetWrapper<List<T>> implements 
                 widget.setPosition(i + button.getWidth() + 2, j + padding);
                 button.setPosition(widget.getX() - button.getWidth() - 2 - 1, widget.getY() - 1);
 
-                padding += ListEditor.this.getLineSpacing() + 16;
+                padding += ListEditBoxCompound.this.getLineSpacing() + 16;
             }
         }
 
@@ -264,7 +265,7 @@ public final class ListEditor<T> extends InputWidgetWrapper<List<T>> implements 
         }
 
         public void setSelected(int selected) {
-            ListEditor.this.setFocused(false);
+            ListEditBoxCompound.this.setFocused(false);
 
             if (selected == -1) {
                 return;

@@ -4,9 +4,9 @@ import infinituum.fastconfigapi.screens.widgets.type.GuardedEditBoxEditor;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 
-public final class IntegerEditor extends GuardedEditBoxEditor<Integer> {
-    public IntegerEditor(Font font, int i, int j, int k, int l, Component component, Integer initValue) {
-        super(font, i, j, k, l, component, IntegerEditor::isValid, IntegerEditor::get);
+public final class IntegerEditBox extends GuardedEditBoxEditor<Integer> {
+    public IntegerEditBox(Font font, int i, int j, int k, int l, Component component, Integer initValue) {
+        super(font, i, j, k, l, component, IntegerEditBox::isValid, IntegerEditBox::get);
 
         this.editBox.setValue(String.valueOf(initValue));
         this.editBox.addPostInsertionAction(this::postInsertion);

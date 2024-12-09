@@ -4,9 +4,9 @@ import infinituum.fastconfigapi.screens.widgets.type.GuardedEditBoxEditor;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 
-public final class LongEditor extends GuardedEditBoxEditor<Long> {
-    public LongEditor(Font font, int i, int j, int k, int l, Component component, Long initValue) {
-        super(font, i, j, k, l, component, LongEditor::isValid, LongEditor::get);
+public final class ShortEditBox extends GuardedEditBoxEditor<Short> {
+    public ShortEditBox(Font font, int i, int j, int k, int l, Component component, Short initValue) {
+        super(font, i, j, k, l, component, ShortEditBox::isValid, ShortEditBox::get);
 
         this.editBox.setValue(String.valueOf(initValue));
         this.editBox.addPostInsertionAction(this::postInsertion);
@@ -18,16 +18,16 @@ public final class LongEditor extends GuardedEditBoxEditor<Long> {
         }
 
         try {
-            Long.parseLong(newValue);
+            Short.parseShort(newValue);
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    public static Long get(String value) {
+    public static Short get(String value) {
         try {
-            return Long.parseLong(value);
+            return Short.parseShort(value);
         } catch (Exception e) {
             return null;
         }
@@ -41,9 +41,9 @@ public final class LongEditor extends GuardedEditBoxEditor<Long> {
         }
 
         try {
-            Long.parseLong(str);
+            Short.parseShort(str);
         } catch (Exception e) {
-            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Long.MIN_VALUE : Long.MAX_VALUE));
+            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Short.MIN_VALUE : Short.MAX_VALUE));
         }
     }
 }

@@ -13,6 +13,7 @@ import java.nio.file.Path;
 public final class TOMLSerializer<T> implements SerializerWrapper<T> {
     private static ConfigSerializer<?> INSTANCE;
 
+    @Override
     public ConfigSerializer<T> get() {
         if (INSTANCE == null) {
             INSTANCE = new TOML<T>();

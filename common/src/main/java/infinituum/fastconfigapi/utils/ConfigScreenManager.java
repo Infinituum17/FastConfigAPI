@@ -1,10 +1,10 @@
 package infinituum.fastconfigapi.utils;
 
 import infinituum.fastconfigapi.screens.ConfigSelectionScreen;
-import infinituum.fastconfigapi.screens.widgets.ConfigOptionsEntry;
 import infinituum.fastconfigapi.screens.widgets.ConfigOptionsList;
-import infinituum.fastconfigapi.screens.widgets.ConfigSelectionEntry;
+import infinituum.fastconfigapi.screens.widgets.ConfigOptionsListEntry;
 import infinituum.fastconfigapi.screens.widgets.ConfigSelectionList;
+import infinituum.fastconfigapi.screens.widgets.ConfigSelectionListEntry;
 import infinituum.fastconfigapi.screens.widgets.type.Refreshable;
 import infinituum.fastconfigapi.screens.widgets.type.Repositionable;
 import net.minecraft.client.Minecraft;
@@ -15,20 +15,20 @@ import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 
 import java.util.List;
 
-public final class ListManager implements Refreshable, Repositionable {
+public final class ConfigScreenManager implements Refreshable, Repositionable {
     private final Minecraft minecraft;
     private final ConfigSelectionScreen parent;
     private final ConfigSelectionList list;
     private final ConfigOptionsList<?> options;
     private final ConfigSelectionModel model;
 
-    public ListManager(Minecraft minecraft, ConfigSelectionScreen parent) {
+    public ConfigScreenManager(Minecraft minecraft, ConfigSelectionScreen parent) {
         this.minecraft = minecraft;
         this.parent = parent;
 
-        this.model = new ConfigSelectionModel();
-        this.list = new ConfigSelectionList(this);
-        this.options = new ConfigOptionsList<>(this);
+        this.model = new ConfigSelectionModel(minecraft);
+        this.list = new ConfigSelectionList(this, this.model);
+        this.options = new ConfigOptionsList<>(this, this.model);
     }
 
     public Minecraft getMinecraft() {
@@ -37,10 +37,6 @@ public final class ListManager implements Refreshable, Repositionable {
 
     public Font getFont() {
         return this.minecraft.font;
-    }
-
-    public ConfigSelectionModel getModel() {
-        return this.model;
     }
 
     public int getListX() {
@@ -104,32 +100,21 @@ public final class ListManager implements Refreshable, Repositionable {
     }
 
     public void saveCurrent() {
-        List<? extends ConfigOptionsEntry<?>> options = this.getOptions().children();
+        List<? extends ConfigOptionsListEntry<?>> options = this.getOptions().children();
 
-        for (ConfigOptionsEntry<?> option : options) {
-            // TODO: Uncomment
-            // option.save();
+        for (ConfigOptionsListEntry<?> option : options) {
+            option.save();
         }
+
+        this.model.getSelected().save();
     }
 
     public ConfigOptionsList<?> getOptions() {
         return options;
     }
 
-    public boolean isOptionsEmpty() {
-        return this.options.children().isEmpty();
-    }
-
-    public boolean isListEmpty() {
-        return this.list.children().isEmpty();
-    }
-
     public ConfigSelectionList getList() {
         return list;
-    }
-
-    public ConfigSelectionScreen getScreen() {
-        return parent;
     }
 
     public ComponentPath getEscapePath() {
@@ -141,7 +126,7 @@ public final class ListManager implements Refreshable, Repositionable {
     }
 
     public void resetLists() {
-        ConfigSelectionEntry listFirstElement = this.list.getFirstElement();
+        ConfigSelectionListEntry listFirstElement = this.list.getFirstElement();
 
         this.list.setSelected(listFirstElement);
         this.list.setFocused(listFirstElement);

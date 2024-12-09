@@ -40,6 +40,22 @@ public final class FastConfigs {
     }
 
     /**
+     * Gets a class instance contained in a {@link FastConfigFile}.
+     * <p>
+     * This method is mostly useful for "<b>read</b>" and "<b>edit</b>" (in memory) operations, since it doesn't automatically save
+     * the new values to disk. For "<b>write</b>" operations you should use {@link FastConfigs#editAndSave(Class, Consumer)} or
+     * get the {@link FastConfigFile} directly with {@link FastConfigs#getFile(Class)}.
+     *
+     * @param clazz Class type that the {@link FastConfigFile} manages.
+     * @param <T>   The type of the class' instance contained in the {@link FastConfigFile}.
+     * @return The class instance of the class type passed in.
+     * @throws RuntimeException Thrown when we're trying to access a non-existent class.
+     */
+    public static <T> T get(Class<T> clazz) throws RuntimeException {
+        return getFile(clazz).getInstance();
+    }
+
+    /**
      * Gets a specific {@link FastConfigFile}.
      *
      * @param clazz Class type that the {@link FastConfigFile} manages.
@@ -58,23 +74,7 @@ public final class FastConfigs {
     }
 
     /**
-     * Gets a class instance contained in a {@link FastConfigFile}.
-     * <p>
-     * This method is mostly useful for "<b>read</b>" and "<b>edit</b>" (in memory) operations, since it doesn't automatically save
-     * the new values to disk. For "<b>write</b>" operations you should use {@link FastConfigs#editAndSave(Class, Consumer)} or
-     * get the {@link FastConfigFile} directly with {@link FastConfigs#getFile(Class)}.
-     *
-     * @param clazz Class type that the {@link FastConfigFile} manages.
-     * @param <T>   The type of the class' instance contained in the {@link FastConfigFile}.
-     * @return The class instance of the class type passed in.
-     * @throws RuntimeException Thrown when we're trying to access a non-existent class.
-     */
-    public static <T> T get(Class<T> clazz) throws RuntimeException {
-        return getFile(clazz).getInstance();
-    }
-
-    /**
-     * Gets all available {@link FastConfigFile FastConfigFiles}.
+     * Gets all available {@link FastConfigFile FastConfigFiles} on the current side.
      *
      * @return A {@link Set} of {@link FastConfigFile FastConfigFiles}.
      */

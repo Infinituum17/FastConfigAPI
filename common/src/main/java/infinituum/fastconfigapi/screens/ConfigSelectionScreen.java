@@ -1,6 +1,6 @@
 package infinituum.fastconfigapi.screens;
 
-import infinituum.fastconfigapi.utils.ListManager;
+import infinituum.fastconfigapi.utils.ConfigScreenManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -19,7 +19,7 @@ public final class ConfigSelectionScreen extends Screen {
     //    private static int mouseY;
     private final HeaderAndFooterLayout layout;
     private final Screen parent;
-    private ListManager manager;
+    private ConfigScreenManager manager;
     private Button doneButton;
 
     public ConfigSelectionScreen(Screen parent) {
@@ -60,7 +60,7 @@ public final class ConfigSelectionScreen extends Screen {
 
     @Override
     protected void init() {
-        this.manager = new ListManager(this.minecraft, this);
+        this.manager = new ConfigScreenManager(this.minecraft, this);
 
         LinearLayout linearLayout = this.layout.addToHeader(LinearLayout.vertical().spacing(5));
         linearLayout.defaultCellSetting().alignHorizontallyCenter();
@@ -90,6 +90,10 @@ public final class ConfigSelectionScreen extends Screen {
         super.resize(minecraft, i, j);
 
         this.manager.getOptions().resize(minecraft, i, j, 0, 0, 0);
+    }
+
+    public void reload() {
+        repositionElements();
     }
 
 //    @Override

@@ -4,9 +4,9 @@ import infinituum.fastconfigapi.screens.widgets.type.GuardedEditBoxEditor;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 
-public final class ShortEditor extends GuardedEditBoxEditor<Short> {
-    public ShortEditor(Font font, int i, int j, int k, int l, Component component, Short initValue) {
-        super(font, i, j, k, l, component, ShortEditor::isValid, ShortEditor::get);
+public final class ByteEditBox extends GuardedEditBoxEditor<Byte> {
+    public ByteEditBox(Font font, int i, int j, int k, int l, Component component, Byte initValue) {
+        super(font, i, j, k, l, component, ByteEditBox::isValid, ByteEditBox::get);
 
         this.editBox.setValue(String.valueOf(initValue));
         this.editBox.addPostInsertionAction(this::postInsertion);
@@ -18,16 +18,16 @@ public final class ShortEditor extends GuardedEditBoxEditor<Short> {
         }
 
         try {
-            Short.parseShort(newValue);
+            Byte.parseByte(newValue);
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    public static Short get(String value) {
+    public static Byte get(String value) {
         try {
-            return Short.parseShort(value);
+            return Byte.parseByte(value);
         } catch (Exception e) {
             return null;
         }
@@ -41,9 +41,9 @@ public final class ShortEditor extends GuardedEditBoxEditor<Short> {
         }
 
         try {
-            Short.parseShort(str);
+            Byte.parseByte(str);
         } catch (Exception e) {
-            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Short.MIN_VALUE : Short.MAX_VALUE));
+            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Byte.MIN_VALUE : Byte.MAX_VALUE));
         }
     }
 }

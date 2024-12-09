@@ -4,9 +4,9 @@ import infinituum.fastconfigapi.screens.widgets.type.GuardedEditBoxEditor;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 
-public final class FloatEditor extends GuardedEditBoxEditor<Float> {
-    public FloatEditor(Font font, int i, int j, int k, int l, Component component, Float initValue) {
-        super(font, i, j, k, l, component, FloatEditor::isValid, FloatEditor::get);
+public final class DoubleEditBox extends GuardedEditBoxEditor<Double> {
+    public DoubleEditBox(Font font, int i, int j, int k, int l, Component component, Double initValue) {
+        super(font, i, j, k, l, component, DoubleEditBox::isValid, DoubleEditBox::get);
 
         this.editBox.setValue(String.valueOf(initValue));
         this.editBox.addPostInsertionAction(this::postInsertion);
@@ -22,16 +22,16 @@ public final class FloatEditor extends GuardedEditBoxEditor<Float> {
         }
 
         try {
-            Float.parseFloat(newValue);
+            Double.parseDouble(newValue);
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    public static Float get(String value) {
+    public static Double get(String value) {
         try {
-            return Float.parseFloat(value);
+            return Double.parseDouble(value);
         } catch (Exception e) {
             return null;
         }
@@ -49,9 +49,9 @@ public final class FloatEditor extends GuardedEditBoxEditor<Float> {
         }
 
         try {
-            Float.parseFloat(str);
+            Double.parseDouble(str);
         } catch (Exception e) {
-            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Float.MIN_VALUE : Float.MAX_VALUE));
+            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Double.MIN_VALUE : Double.MAX_VALUE));
         }
     }
 }

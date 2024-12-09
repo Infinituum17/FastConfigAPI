@@ -14,6 +14,7 @@ import java.nio.file.Path;
 public final class JSONSerializer<T> implements SerializerWrapper<T> {
     private static ConfigSerializer<?> INSTANCE;
 
+    @Override
     public ConfigSerializer<T> get() {
         if (INSTANCE == null) {
             INSTANCE = new JSON<T>();

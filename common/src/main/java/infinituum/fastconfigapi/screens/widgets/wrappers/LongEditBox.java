@@ -4,9 +4,9 @@ import infinituum.fastconfigapi.screens.widgets.type.GuardedEditBoxEditor;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 
-public final class DoubleEditor extends GuardedEditBoxEditor<Double> {
-    public DoubleEditor(Font font, int i, int j, int k, int l, Component component, Double initValue) {
-        super(font, i, j, k, l, component, DoubleEditor::isValid, DoubleEditor::get);
+public final class LongEditBox extends GuardedEditBoxEditor<Long> {
+    public LongEditBox(Font font, int i, int j, int k, int l, Component component, Long initValue) {
+        super(font, i, j, k, l, component, LongEditBox::isValid, LongEditBox::get);
 
         this.editBox.setValue(String.valueOf(initValue));
         this.editBox.addPostInsertionAction(this::postInsertion);
@@ -17,21 +17,17 @@ public final class DoubleEditor extends GuardedEditBoxEditor<Double> {
             return true;
         }
 
-        if (!oldValue.contains(".") && newValue.equals(".")) {
-            return true;
-        }
-
         try {
-            Double.parseDouble(newValue);
+            Long.parseLong(newValue);
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    public static Double get(String value) {
+    public static Long get(String value) {
         try {
-            return Double.parseDouble(value);
+            return Long.parseLong(value);
         } catch (Exception e) {
             return null;
         }
@@ -44,14 +40,10 @@ public final class DoubleEditor extends GuardedEditBoxEditor<Double> {
             return;
         }
 
-        if (str.equals(".")) {
-            return;
-        }
-
         try {
-            Double.parseDouble(str);
+            Long.parseLong(str);
         } catch (Exception e) {
-            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Double.MIN_VALUE : Double.MAX_VALUE));
+            this.editBox.setValue(String.valueOf((str.charAt(0) == '-') ? Long.MIN_VALUE : Long.MAX_VALUE));
         }
     }
 }
