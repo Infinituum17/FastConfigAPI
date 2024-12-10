@@ -1,5 +1,6 @@
 package infinituum.fastconfigapi.impl;
 
+import infinituum.fastconfigapi.FastConfigAPI;
 import infinituum.fastconfigapi.PlatformHelper;
 import infinituum.fastconfigapi.api.FastConfigFile;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
@@ -7,7 +8,6 @@ import infinituum.fastconfigapi.api.annotations.Loader;
 import infinituum.fastconfigapi.api.helpers.FastConfigHelper;
 import infinituum.fastconfigapi.api.helpers.LoaderHelper;
 import infinituum.fastconfigapi.api.serializers.ConfigSerializer;
-import infinituum.fastconfigapi.utils.Global;
 import infinituum.void_lib.api.utils.UnsafeLoader;
 import org.jetbrains.annotations.NotNull;
 
@@ -59,7 +59,9 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
         }
     }
 
-    @Override
+    public void loadStateUnsafely(String content) throws IOException {
+        originalDeserializer.deserialize(this, new StringReader(content));
+    }    @Override
     public void loadDefault() throws RuntimeException {
         this.loaderType.load(this);
 
@@ -70,7 +72,15 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
         this.save();
     }
 
-    @Override
+    public void setDefaultClassInstance() {
+        T instance = UnsafeLoader.loadInstance(clazz);
+
+        if (instance == null) {
+            throw new RuntimeException("Could not load default instance for class '" + clazz.getSimpleName() + "'");
+        }
+
+        this.setInstance(instance);
+    }    @Override
     public void load() throws RuntimeException {
         try {
             deserializer.deserialize(this);
@@ -82,14 +92,18 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
             }
         }
 
-        Global.LOGGER.info("Config '{}' was successfully loaded", this.getFileNameWithExtension());
-    }
-
-    public void loadStateUnsafely(String content) throws IOException {
-        originalDeserializer.deserialize(this, new StringReader(content));
+        FastConfigAPI.LOGGER.info("Config '{}' was successfully loaded", this.getFileNameWithExtension());
     }
 
     @Override
+    public @NotNull Class<T> getConfigClass() {
+        return clazz;
+    }
+
+    @Override
+    public FastConfig.@NotNull Side getSide() {
+        return side;
+    }    @Override
     public void save() throws RuntimeException {
         try {
             Files.createDirectories(this.getConfigSubdirectoryPath());
@@ -100,14 +114,9 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
         }
     }
 
-    public void setDefaultClassInstance() {
-        T instance = UnsafeLoader.loadInstance(clazz);
-
-        if (instance == null) {
-            throw new RuntimeException("Could not load default instance for class '" + clazz.getSimpleName() + "'");
-        }
-
-        this.setInstance(instance);
+    @Override
+    public @NotNull String getFileName() {
+        return fileName;
     }
 
     @Override
@@ -126,16 +135,6 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     }
 
     @Override
-    public @NotNull String getFileName() {
-        return fileName;
-    }
-
-    @Override
-    public FastConfig.@NotNull Side getSide() {
-        return side;
-    }
-
-    @Override
     public @NotNull Path getFullFilePath() {
         return fullFilePath;
     }
@@ -151,17 +150,8 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     }
 
     @Override
-    public @NotNull Class<T> getConfigClass() {
-        return clazz;
-    }
-
-    @Override
-    public @NotNull T getInstance() throws RuntimeException {
-        return instance;
-    }
-
-    public void setInstance(@NotNull T instance) {
-        this.instance = instance;
+    public boolean isSilentlyFailing() {
+        return silentlyFail;
     }
 
     @Override
@@ -175,8 +165,12 @@ public final class FastConfigFileImpl<T> implements FastConfigFile<T> {
     }
 
     @Override
-    public boolean isSilentlyFailing() {
-        return silentlyFail;
+    public @NotNull T getInstance() throws RuntimeException {
+        return instance;
+    }
+
+    public void setInstance(@NotNull T instance) {
+        this.instance = instance;
     }
 
     public void setDefaultLoader() {
