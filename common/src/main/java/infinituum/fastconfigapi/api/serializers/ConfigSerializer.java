@@ -36,7 +36,6 @@ public interface ConfigSerializer<T> {
      * The class instance inside the {@link FastConfigFileImpl} is set to the result of the deserialization.
      *
      * @param config  The config to deserialize.
-     * @param content The string that will be deserialized.
      * @throws IOException Exception during deserialization.
      */
     void deserialize(FastConfigFileImpl<T> config, Reader reader) throws IOException;
