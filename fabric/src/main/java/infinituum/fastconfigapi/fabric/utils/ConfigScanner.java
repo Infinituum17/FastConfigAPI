@@ -1,10 +1,10 @@
 package infinituum.fastconfigapi.fabric.utils;
 
+import infinituum.fastconfigapi.FastConfigAPI;
 import infinituum.fastconfigapi.api.FastConfigFile;
 import infinituum.fastconfigapi.api.annotations.FastConfig;
 import infinituum.fastconfigapi.api.helpers.FastConfigHelper;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
-import infinituum.fastconfigapi.utils.Global;
 import infinituum.void_lib.api.utils.UnsafeLoader;
 import infinituum.void_lib.fabric.scanner.ModAnnotationScanner;
 import infinituum.void_lib.fabric.scanner.api.AnnotatedClass;
@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static infinituum.fastconfigapi.utils.Global.MOD_ID;
+import static infinituum.fastconfigapi.FastConfigAPI.MOD_ID;
 
 public final class ConfigScanner {
     private static volatile Set<ScannedFile> scannedFiles;
@@ -62,7 +62,7 @@ public final class ConfigScanner {
             try {
                 configFile = FastConfigHelper.toFile(clazz, annotation.getFields(), side);
             } catch (Exception e) {
-                Global.LOGGER.error("Could not load config class {}: {}", clazz.getName(), e);
+                FastConfigAPI.LOGGER.error("Could not load config class {}: {}", clazz.getName(), e);
                 continue;
             }
 

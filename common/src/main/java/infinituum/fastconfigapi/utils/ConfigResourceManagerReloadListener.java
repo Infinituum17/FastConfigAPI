@@ -6,8 +6,8 @@ import infinituum.fastconfigapi.api.annotations.FastConfig;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
-public final class ConfigManager implements ResourceManagerReloadListener {
-    public ConfigManager(FastConfig.Side side) {
+public final class ConfigResourceManagerReloadListener implements ResourceManagerReloadListener {
+    public ConfigResourceManagerReloadListener(FastConfig.Side side) {
         if (side.ordinal() != FastConfig.Side.COMMON.ordinal()) {
             FastConfigs.register(PlatformHelper.getSidedConfigs(FastConfig.Side.COMMON));
         }
@@ -21,6 +21,6 @@ public final class ConfigManager implements ResourceManagerReloadListener {
     }
 
     public interface ConfigResource {
-        ConfigManager getConfigManager();
+        ConfigResourceManagerReloadListener getConfigManager();
     }
 }

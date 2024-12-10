@@ -1,8 +1,8 @@
 package infinituum.fastconfigapi.api.annotations;
 
+import infinituum.fastconfigapi.FastConfigAPI;
 import infinituum.fastconfigapi.api.serializers.SerializerWrapper;
 import infinituum.fastconfigapi.impl.FastConfigFileImpl;
-import infinituum.fastconfigapi.utils.Global;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -106,7 +106,7 @@ public @interface Loader {
                     .GET()
                     .build();
 
-            Global.LOGGER.info("Config '{}' is requesting data from url '{}'", config.getFileNameWithExtension(), config.getLoaderTarget());
+            FastConfigAPI.LOGGER.info("Config '{}' is requesting data from url '{}'", config.getFileNameWithExtension(), config.getLoaderTarget());
 
             HttpResponse<?> response;
 
@@ -134,7 +134,7 @@ public @interface Loader {
 
         private static <T> void useDefaultLoaderAfterException(FastConfigFileImpl<T> config, Throwable e) {
             if (!config.isSilentlyFailing()) {
-                Global.LOGGER.error("Could not load config '{}' from url '{}', using default loader: {}", config.getFileNameWithExtension(), config.getLoaderTarget(), e.getMessage());
+                FastConfigAPI.LOGGER.error("Could not load config '{}' from url '{}', using default loader: {}", config.getFileNameWithExtension(), config.getLoaderTarget(), e.getMessage());
             }
 
             config.setDefaultLoader();
