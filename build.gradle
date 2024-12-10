@@ -1,3 +1,5 @@
+import java.nio.file.Paths
+
 plugins {
     id "dev.architectury.loom" version "1.6-SNAPSHOT" apply false
     id "architectury-plugin" version "3.4-SNAPSHOT"
@@ -71,6 +73,60 @@ subprojects {
 
     tasks.withType(JavaCompile).configureEach {
         it.options.release = 21
+    }
+
+    tasks.register("checkIntegrity") {
+        if (gradle.startParameter.taskNames.any { it == "test" }) {
+            logger.lifecycle("Skipping 'checkIntegrity' in test task")
+            return
+        }
+
+        logger.lifecycle("Checking integrity of '" + project.name + "' project...")
+
+        if (project.name == "common") {
+            if (!rootProject.hasProperty("has_generation") || rootProject.has_generation.toBoolean()) {
+                URI uri = Paths.get(projectDir.toString(), "src", "main", "generated").toUri()
+                File generatedDirFile = new File(uri)
+
+                if (!generatedDirFile.exists()) {
+                    throw new RuntimeException("\"generated\" directory doesn't exist. If this project doesn't support generation, set \'has_generation\' to \'false\' in your gradle.properties to avoid this error")
+                }
+            }
+
+            if (!rootProject.hasProperty("has_assets") || rootProject.has_assets.toBoolean()) {
+                URI uri = Paths.get(projectDir.toString(), "src", "main", "resources", "assets").toUri()
+                File assetsDir = new File(uri)
+
+                if (!assetsDir.exists()) {
+                    throw new RuntimeException("\"assets\" directory doesn't exist. If this project doesn't have assets, set \'has_assets\' to \'false\' in your gradle.properties to avoid this error")
+                }
+            }
+        }
+    }
+
+    // Publishing Protection
+    tasks.withType(PublishToMavenRepository).configureEach {
+        dependsOn checkIntegrity
+    }
+
+    // Publishing Protection
+    tasks.withType(PublishToIvyRepository).configureEach {
+        dependsOn checkIntegrity
+    }
+
+    // Publishing Protection
+    tasks.withType(PublishToMavenLocal).configureEach {
+        dependsOn checkIntegrity
+    }
+
+    // Publishing Protection
+    tasks.publishUnified {
+        dependsOn checkIntegrity
+    }
+
+    // Publishing Protection
+    tasks.publishUnifiedToLocal {
+        dependsOn checkIntegrity
     }
 
     if ((project.name == "fabric" || project.name == "neoforge") && project.version != "0.0.0") {
