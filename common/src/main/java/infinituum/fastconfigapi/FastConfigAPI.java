@@ -14,10 +14,8 @@ public class FastConfigAPI {
 
     @Environment(EnvType.CLIENT)
     public static void initClient() {
-        ClientReloadEvent.EVENT.register(e -> {
-            e.registerReloadableResource(new ConfigResourceManagerReloadListener(FastConfig.Side.CLIENT));
-            e.registerReloadableResource(new ConfigResourceManagerReloadListener(FastConfig.Side.COMMON));
-        });
+        ClientReloadEvent.EVENT.register(e -> e.registerReloadableResource(new ConfigResourceManagerReloadListener(FastConfig.Side.CLIENT)));
+        ServerReloadEvent.EVENT.register(e -> e.registerReloadableResource(new ConfigResourceManagerReloadListener(FastConfig.Side.COMMON)));
     }
 
     public static void initServer() {
