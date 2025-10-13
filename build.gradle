@@ -72,7 +72,7 @@ subprojects {
     }
 
     tasks.withType(JavaCompile).configureEach {
-        it.options.release = 21
+        it.options.release = 17
     }
 
     tasks.register("checkIntegrity") {
